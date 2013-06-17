@@ -28,8 +28,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.AlphaMaskFilter")
 extern class AlphaMaskFilter extends Filter
-{
-	
+{	
 	/**
 	* The image (or canvas) to use as the mask.
 	*/

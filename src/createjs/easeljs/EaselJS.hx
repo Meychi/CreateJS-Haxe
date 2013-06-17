@@ -6,8 +6,7 @@ package createjs.easeljs;
 */
 @:native("createjs.EaselJS")
 extern class EaselJS
-{
-	
+{	
 	/**
 	* The build date for this release in UTC format.
 	*/

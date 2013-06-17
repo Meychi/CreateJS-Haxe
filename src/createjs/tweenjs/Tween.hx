@@ -31,8 +31,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Tween")
 extern class Tween
-{
-	
+{	
 	/**
 	* Allows you to specify data that will be used by installed plugins. Each plugin uses this differently, but in general you specify data by setting it to a property of pluginData with the same name as the plugin class.
 	*/

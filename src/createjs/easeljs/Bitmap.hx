@@ -14,8 +14,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Bitmap")
 extern class Bitmap extends DisplayObject
-{
-	
+{	
 	/**
 	* Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
 	*/

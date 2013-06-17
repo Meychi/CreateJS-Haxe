@@ -19,8 +19,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ButtonHelper")
 extern class ButtonHelper
-{
-	
+{	
 	/**
 	* If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	*/

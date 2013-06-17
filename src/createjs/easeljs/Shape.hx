@@ -21,8 +21,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Shape")
 extern class Shape extends DisplayObject
-{
-	
+{	
 	/**
 	* The graphics instance to display.
 	*/

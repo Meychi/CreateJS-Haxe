@@ -19,8 +19,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.BitmapAnimation")
 extern class BitmapAnimation extends DisplayObject
-{
-	
+{	
 	/**
 	* Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}}, {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, etc.)
 	*/

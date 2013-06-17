@@ -22,8 +22,7 @@ import js.html.Event;
 */
 @:native("createjs.Stage")
 extern class Stage extends Container
-{
-	
+{	
 	/**
 	* Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
 	*/

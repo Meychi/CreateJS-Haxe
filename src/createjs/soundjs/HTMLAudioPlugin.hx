@@ -48,8 +48,7 @@ import js.html.Element;
 */
 @:native("createjs.HTMLAudioPlugin")
 extern class HTMLAudioPlugin
-{
-	
+{	
 	/**
 	* Event constant for the "canPlayThrough" event for cleaner code.
 	*/

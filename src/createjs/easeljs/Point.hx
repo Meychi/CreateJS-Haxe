@@ -8,8 +8,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Point")
 extern class Point
-{
-	
+{	
 	/**
 	* X position.
 	*/

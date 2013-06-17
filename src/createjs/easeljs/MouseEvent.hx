@@ -6,8 +6,7 @@ package createjs.easeljs;
 */
 @:native("createjs.MouseEvent")
 extern class MouseEvent
-{
-	
+{	
 	/**
 	* For events of type "onPress" only you can assign a handler to the onMouseMove property. This handler will be called every time the mouse is moved until the mouse is released. This is useful for operations such as drag and drop.
 	*/

@@ -24,8 +24,7 @@ package createjs.soundjs;
 */
 @:native("createjs.WebAudioPlugin")
 extern class WebAudioPlugin
-{
-	
+{	
 	/**
 	* A DynamicsCompressorNode, which is used to improve sound quality and prevent audio distortion according to http://www.w3.org/TR/webaudio/#DynamicsCompressorNode. It is connected to <code>context.destination</code>.
 	*/

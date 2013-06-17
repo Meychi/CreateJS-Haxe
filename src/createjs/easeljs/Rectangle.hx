@@ -5,8 +5,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Rectangle")
 extern class Rectangle
-{
-	
+{	
 	/**
 	* Height.
 	*/

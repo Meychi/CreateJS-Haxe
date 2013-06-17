@@ -5,8 +5,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Command")
 extern class Command
-{
-	
+{	
 	/**
 	* Inner class used by the {{#crossLink "Graphics"}}{{/crossLink}} class. Used to create the instruction lists used in Graphics:
 	*/

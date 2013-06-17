@@ -20,8 +20,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Container")
 extern class Container extends DisplayObject
-{
-	
+{	
 	/**
 	* The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is included for advanced uses.
 	*/

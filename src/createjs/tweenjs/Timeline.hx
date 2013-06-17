@@ -6,8 +6,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Timeline")
 extern class Timeline
-{
-	
+{	
 	/**
 	* Called, with a single parameter referencing this timeline instance, whenever the timeline's position changes.
 	*/

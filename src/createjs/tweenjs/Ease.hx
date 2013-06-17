@@ -19,8 +19,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Ease")
 extern class Ease
-{
-	
+{	
 	/**
 	* Configurable "back in out" ease.
 	* @param amount The strength of the ease.

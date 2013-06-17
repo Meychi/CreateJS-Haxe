@@ -9,8 +9,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.XHRLoader")
 extern class XHRLoader extends AbstractLoader
-{
-	
+{	
 	/**
 	* A manual load timeout that is used for browsers that do not support the onTimeout event on XHR (XHR level 1, typically IE9).
 	*/

@@ -6,8 +6,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.AbstractLoader")
 extern class AbstractLoader
-{
-	
+{	
 	/**
 	* A path that will be prepended on to the item's source parameter before it is loaded.
 	*/

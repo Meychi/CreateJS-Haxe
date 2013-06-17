@@ -24,8 +24,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Text")
 extern class Text extends DisplayObject
-{
-	
+{	
 	/**
 	* "ideographic", or "bottom". For detailed information view the  <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "top".
 	*/

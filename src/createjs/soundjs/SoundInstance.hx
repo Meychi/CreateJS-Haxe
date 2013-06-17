@@ -33,8 +33,7 @@ package createjs.soundjs;
 */
 @:native("createjs.SoundInstance")
 extern class SoundInstance
-{
-	
+{	
 	/**
 	* A Timout created by <code>Sound</code> when this SoundInstance is played with a delay. This allows SoundInstance to remove the delay if stop or pause or cleanup are called before playback begins.
 	*/

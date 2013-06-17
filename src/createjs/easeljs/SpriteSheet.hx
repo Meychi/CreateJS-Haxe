@@ -89,8 +89,7 @@ package createjs.easeljs;
 */
 @:native("createjs.SpriteSheet")
 extern class SpriteSheet
-{
-	
+{	
 	/**
 	* Read-only property indicating whether all images are finished loading.
 	*/

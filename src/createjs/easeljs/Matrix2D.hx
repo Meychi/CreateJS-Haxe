@@ -5,8 +5,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Matrix2D")
 extern class Matrix2D
-{
-	
+{	
 	/**
 	* An identity matrix, representing a null transformation. Read-only.
 	*/

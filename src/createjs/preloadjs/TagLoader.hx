@@ -13,8 +13,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.TagLoader")
 extern class TagLoader extends AbstractLoader
-{
-	
+{	
 	/**
 	* A reference to a bound function, which we need in order to properly remove the event handler when the load completes.
 	*/

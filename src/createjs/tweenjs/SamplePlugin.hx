@@ -9,8 +9,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.SamplePlugin")
 extern class SamplePlugin
-{
-	
+{	
 	/**
 	* Used by TweenJS to determine when to call this plugin. Plugins with higher priority have their methods called before plugins with lower priority. The priority value can be any positive or negative number.
 	*/

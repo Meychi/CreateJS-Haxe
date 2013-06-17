@@ -6,8 +6,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Log")
 extern class Log
-{
-	
+{	
 	/**
 	* Read-only. Error messages.
 	*/

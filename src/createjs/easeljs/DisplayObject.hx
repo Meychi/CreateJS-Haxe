@@ -12,7 +12,6 @@ import js.html.CanvasRenderingContext2D;
 @:native("createjs.DisplayObject")
 extern class DisplayObject extends EventDispatcher
 {
-	
 	/**
 	* A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to use this property. If null it will use the default cursor.
 	*/
@@ -257,7 +256,7 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	* Initialization method.
 	*/
-	//private function initialize():Dynamic;
+	private function initialize():Dynamic;
 	
 	/**
 	* Provides a chainable shortcut method for setting a number of properties on a DisplayObject instance.
@@ -312,7 +311,7 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	* Returns a string representation of this object.
 	*/
-	//public function toString():String;
+	public function toString():String;
 	
 	/**
 	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.

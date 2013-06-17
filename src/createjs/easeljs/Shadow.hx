@@ -9,8 +9,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Shadow")
 extern class Shadow
-{
-	
+{	
 	/**
 	* An identity shadow object (all properties are set to 0). Read-only.
 	*/

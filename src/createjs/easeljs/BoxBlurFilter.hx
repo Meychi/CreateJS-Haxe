@@ -21,8 +21,7 @@ package createjs.easeljs;
 */
 @:native("createjs.BoxBlurFilter")
 extern class BoxBlurFilter extends Filter
-{
-	
+{	
 	/**
 	* Horizontal blur radius in pixels
 	*/

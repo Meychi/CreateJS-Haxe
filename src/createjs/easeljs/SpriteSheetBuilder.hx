@@ -13,8 +13,7 @@ package createjs.easeljs;
 */
 @:native("createjs.SpriteSheetBuilder")
 extern class SpriteSheetBuilder
-{
-	
+{	
 	/**
 	* A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3, the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second). Defaults to 0.3.
 	*/

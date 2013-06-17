@@ -70,8 +70,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Graphics")
 extern class Graphics
-{
-	
+{	
 	/**
 	* Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
 	*/
@@ -157,7 +156,7 @@ extern class Graphics
 	* @param matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
 	*	will be applied relative to the parent transform.
 	*/
-	public function beginBitmapFill(image:Dynamic, ?repetition:String, ?matrix:Matrix2D):Graphics;
+	public function beginBitmapFill(image:Dynamic, repetition:String, matrix:Matrix2D):Graphics;
 	
 	/**
 	* Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills,

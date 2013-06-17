@@ -43,8 +43,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.MovieClip")
 extern class MovieClip extends Container
-{
-	
+{	
 	/**
 	* Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED). See each constant for a description of the behaviour.
 	*/

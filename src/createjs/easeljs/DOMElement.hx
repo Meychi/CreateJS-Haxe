@@ -32,8 +32,7 @@ import js.html.Element;
 */
 @:native("createjs.DOMElement")
 extern class DOMElement extends DisplayObject
-{
-	
+{	
 	/**
 	* The DOM object to manage.
 	*/

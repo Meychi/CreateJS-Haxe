@@ -93,8 +93,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.LoadQueue")
 extern class LoadQueue extends AbstractLoader
-{
-	
+{	
 	/**
 	* A list of scripts in the order they were requested. This helps ensure that scripts are "completed" in the right order.
 	*/

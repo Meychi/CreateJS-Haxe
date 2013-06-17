@@ -19,8 +19,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ColorFilter")
 extern class ColorFilter extends Filter
-{
-	
+{	
 	/**
 	* Alpha channel multiplier.
 	*/
