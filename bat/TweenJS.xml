@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<buildhx>
+	<source path="../js/tweenjs" language="javascript" parser="yuidoc" />
+	<output path="../src" namespace="createjs.tweenjs" native="createjs" />
+</buildhx>
