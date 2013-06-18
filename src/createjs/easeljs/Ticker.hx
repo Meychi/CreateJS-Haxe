@@ -74,7 +74,7 @@ extern class Ticker
 	* @param pauseable If false, the listener will continue to have tick called 
 	*	even when Ticker is paused via Ticker.pause(). Default is true.
 	*/
-	public static function addListener(o:Dynamic, pauseable:Bool):Dynamic;
+	public static function addListener(o:Dynamic, ?pauseable:Bool):Dynamic;
 	
 	/**
 	* Changes the "paused" state of the Ticker, which can be retrieved by the {{#crossLink "Ticker/getPaused"}}{{/crossLink}}

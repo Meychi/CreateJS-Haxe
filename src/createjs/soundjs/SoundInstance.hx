@@ -66,7 +66,7 @@ extern class SoundInstance
 	/**
 	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. GainNode for controlling <code>SoundInstance</code> volume. Connected to <code>panNode</code>.
 	*/
-	public var gainNode:AudioGainNode;
+	public var gainNode:GainNode;
 	
 	/**
 	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. sourceNode is the audio source. Connected to <code>gainNode</code>.

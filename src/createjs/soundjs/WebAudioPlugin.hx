@@ -37,7 +37,7 @@ extern class WebAudioPlugin
 	/**
 	* A GainNode for controlling master volume. It is connected to <code>dynamicsCompressorNode</code>.
 	*/
-	public var gainNode:AudioGainNode;
+	public var gainNode:GainNode;
 	
 	/**
 	* An object hash used internally to store ArrayBuffers, indexed by the source URI used  to load it. This prevents having to load and decode audio files more than once. If a load has been started on a file, <code>arrayBuffers[src]</code> will be set to true. Once load is complete, it is set the the loaded ArrayBuffer instance.
