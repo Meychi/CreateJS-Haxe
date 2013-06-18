@@ -26,7 +26,7 @@ package createjs.easeljs;
 */
 @:native("createjs.AlphaMapFilter")
 extern class AlphaMapFilter extends Filter
-{	
+{
 	/**
 	* The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same dimensions as the target.
 	*/
@@ -59,4 +59,5 @@ extern class AlphaMapFilter extends Filter
 	*	result. This should be exactly the same dimensions as the target.
 	*/
 	public function new(alphaMap:Dynamic):Void;
+	
 }

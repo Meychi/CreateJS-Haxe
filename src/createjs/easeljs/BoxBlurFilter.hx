@@ -21,7 +21,7 @@ package createjs.easeljs;
 */
 @:native("createjs.BoxBlurFilter")
 extern class BoxBlurFilter extends Filter
-{	
+{
 	/**
 	* Horizontal blur radius in pixels
 	*/
@@ -68,4 +68,5 @@ extern class BoxBlurFilter extends Filter
 	*	blur qualities above 1 may not be properly accounted for.
 	*/
 	//public function getBounds():Rectangle;
+	
 }

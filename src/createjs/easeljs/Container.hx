@@ -20,13 +20,16 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Container")
 extern class Container extends DisplayObject
-{	
+{
 	/**
 	* The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is included for advanced uses.
 	*/
 	public var children:Array<Dynamic>;
+	
 	private var DisplayObject__tick:Dynamic;
+	
 	private var DisplayObject_draw:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -261,6 +264,9 @@ extern class Container extends DisplayObject
 	* @param y The y position to check in the display object's local coordinates.
 	*/
 	//public function hitTest(x:Float, y:Float):Bool;
+	
 	//private function _tick():Dynamic;
+	
 	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouseEvents:Float):Array<Dynamic>;
+	
 }

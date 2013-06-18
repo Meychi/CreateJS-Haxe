@@ -31,7 +31,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Tween")
 extern class Tween
-{	
+{
 	/**
 	* Allows you to specify data that will be used by installed plugins. Each plugin uses this differently, but in general you specify data by setting it to a property of pluginData with the same name as the plugin class.
 	*/
@@ -101,14 +101,23 @@ extern class Tween
 	* The position within the current step.
 	*/
 	private var _stepPosition:Float;
+	
 	private var _actions:Array<Dynamic>;
+	
 	private var _curQueueProps:Dynamic;
+	
 	private var _initQueueProps:Dynamic;
+	
 	private var _paused:Bool;
+	
 	private var _steps:Array<Dynamic>;
+	
 	private var _target:Dynamic;
+	
 	private var _useTicks:Bool;
+	
 	public static var _listeners:Array<Tween>;
+	
 	public static var _plugins:Dynamic;
 	
 	/**
@@ -281,13 +290,23 @@ extern class Tween
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
 	private function _addAction(o:Dynamic):Dynamic;
+	
 	private function _addStep(o:Dynamic):Dynamic;
+	
 	private function _appendQueueProps(o:Dynamic):Dynamic;
+	
 	private function _cloneProps(props:Dynamic):Dynamic;
+	
 	private function _runActions(startPos:Float, endPos:Float, includeStart:Bool):Dynamic;
+	
 	private function _set(props:Dynamic, o:Dynamic):Dynamic;
+	
 	private function _updateTargetProps(step:Dynamic, ratio:Float):Dynamic;
+	
 	private function clone():Dynamic;
+	
 	private function initialize(target:Dynamic, props:Dynamic, pluginData:Dynamic):Dynamic;
+	
 }

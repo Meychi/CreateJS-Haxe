@@ -103,7 +103,7 @@ package createjs.soundjs;
 */
 @:native("createjs.Sound")
 extern class Sound
-{	
+{
 	/**
 	* A list of the default supported extensions that Sound will <i>try</i> to play. Plugins will check if the browser can play these types, so modifying this list before a plugin is initialized will allow the plugins to try to support additional media types.  NOTE this does not currently work for {{#crossLink "FlashPlugin"}}{{/crossLink}}.  More details on file formats can be found at http://en.wikipedia.org/wiki/Audio_file_format. A very detailed list of file formats can be found at http://www.fileinfo.com/filetypes/audio. A useful list of extensions for each format can be found at http://html5doctor.com/html5-audio-the-state-of-play/
 	*/
@@ -588,4 +588,5 @@ extern class Sound
 	* @param src A sound file has completed loading, and should be dispatched.
 	*/
 	private static function sendFileLoadEvent(src:String):Dynamic;
+	
 }

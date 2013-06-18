@@ -89,7 +89,7 @@ package createjs.easeljs;
 */
 @:native("createjs.SpriteSheet")
 extern class SpriteSheet
-{	
+{
 	/**
 	* Read-only property indicating whether all images are finished loading.
 	*/
@@ -99,15 +99,25 @@ extern class SpriteSheet
 	* The onComplete callback is called when all images are loaded. Note that this only fires if the images were not fully loaded when the sprite sheet was initialized. You should check the complete property  to prior to adding an onComplete handler. Ex. <pre><code>var sheet = new SpriteSheet(data); if (!sheet.complete) {  &nbsp; // not preloaded, listen for onComplete:  &nbsp; sheet.onComplete = handler; }</code></pre>
 	*/
 	public var onComplete:Dynamic;
+	
 	private var _animations:Dynamic;
+	
 	private var _data:Dynamic;
+	
 	private var _frameHeight:Dynamic;
+	
 	private var _frames:Dynamic;
+	
 	private var _frameWidth:Dynamic;
+	
 	private var _images:Dynamic;
+	
 	private var _loadCount:Dynamic;
+	
 	private var _numFrames:Dynamic;
+	
 	private var _regX:Dynamic;
+	
 	private var _regY:Dynamic;
 	
 	/**
@@ -247,7 +257,11 @@ extern class SpriteSheet
 	* @param animation The name of the animation to get a frame count for.
 	*/
 	public function getNumFrames(animation:String):Float;
+	
 	private function _calculateFrames():Dynamic;
+	
 	private function _handleImageLoad():Dynamic;
+	
 	private function initialize():Dynamic;
+	
 }

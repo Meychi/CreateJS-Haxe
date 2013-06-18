@@ -24,7 +24,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Ticker")
 extern class Ticker
-{	
+{
 	/**
 	* Indicates whether Ticker should use <code>requestAnimationFrame</code> if it is supported in the browser. If false, Ticker will use <code>setTimeout</code>. If you use RAF, it is recommended that you set the framerate to a divisor of 60 (ex. 15, 20, 30, 60).
 	*/
@@ -39,17 +39,29 @@ extern class Ticker
 	* The number of ticks that have passed while Ticker has been paused
 	*/
 	private var _pausedTicks:Float;
+	
 	private var _inited:Bool;
+	
 	private var _interval:Float;
+	
 	private var _lastTime:Float;
+	
 	private var _listeners:Array<Dynamic>;
+	
 	private var _pauseable:Array<Dynamic>;
+	
 	private var _paused:Bool;
+	
 	private var _pausedTime:Float;
+	
 	private var _rafActive:Bool;
+	
 	private var _startTime:Float;
+	
 	private var _tickTimes:Array<Dynamic>;
+	
 	private var _timeoutID:Float;
+	
 	private var _times:Array<Dynamic>;
 	
 	/**
@@ -148,9 +160,15 @@ extern class Ticker
 	* @param interval Time in milliseconds between ticks. Default value is 50.
 	*/
 	public static function setInterval(interval:Float):Dynamic;
+	
 	private function _getTime():Dynamic;
+	
 	private function _handleAF():Dynamic;
+	
 	private function _handleTimeout():Dynamic;
+	
 	private function _setupTick():Dynamic;
+	
 	private function _tick():Dynamic;
+	
 }

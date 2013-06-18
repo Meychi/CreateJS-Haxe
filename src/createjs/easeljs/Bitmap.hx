@@ -14,7 +14,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Bitmap")
 extern class Bitmap extends DisplayObject
-{	
+{
 	/**
 	* Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
 	*/
@@ -24,7 +24,9 @@ extern class Bitmap extends DisplayObject
 	* The image to render. This can be an Image, a Canvas, or a Video.
 	*/
 	public var image:Dynamic;
+	
 	private var DisplayObject_draw:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -104,4 +106,5 @@ extern class Bitmap extends DisplayObject
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	*/
 	//public function isVisible():Bool;
+	
 }

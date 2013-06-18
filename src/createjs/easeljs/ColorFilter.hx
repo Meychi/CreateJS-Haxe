@@ -19,7 +19,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ColorFilter")
 extern class ColorFilter extends Filter
-{	
+{
 	/**
 	* Alpha channel multiplier.
 	*/
@@ -95,4 +95,5 @@ extern class ColorFilter extends Filter
 	* Returns a clone of this ColorFilter instance.
 	*/
 	//public function clone():ColorFilter;
+	
 }

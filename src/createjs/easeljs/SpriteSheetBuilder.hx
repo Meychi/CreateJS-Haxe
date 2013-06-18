@@ -13,7 +13,7 @@ package createjs.easeljs;
 */
 @:native("createjs.SpriteSheetBuilder")
 extern class SpriteSheetBuilder
-{	
+{
 	/**
 	* A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3, the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second). Defaults to 0.3.
 	*/
@@ -58,12 +58,19 @@ extern class SpriteSheetBuilder
 	* The sprite sheet that was generated. This will be null before a build is completed successfully.
 	*/
 	public var spriteSheet:SpriteSheet;
+	
 	private var _animations:Array<Dynamic>;
+	
 	private var _data:Array<Dynamic>;
+	
 	private var _frames:Array<Dynamic>;
+	
 	private var _index:Float;
+	
 	private var _nextFrameIndex:Float;
+	
 	private var _scale:Float;
+	
 	private var _timerID:Float;
 	
 	/**
@@ -159,9 +166,15 @@ extern class SpriteSheetBuilder
 	* @param scale The scale to draw the movie clip at.
 	*/
 	public function addMovieClip(source:MovieClip, ?sourceRect:Rectangle, ?scale:Float):Dynamic;
+	
 	private function _drawNext():Dynamic;
+	
 	private function _endBuild():Dynamic;
+	
 	private function _fillRow():Float;
+	
 	private function _run():Dynamic;
+	
 	private function _startBuild():Dynamic;
+	
 }

@@ -2,6 +2,7 @@ package createjs.easeljs;
 
 import js.html.Element;
 import js.html.Event;
+import js.html.MouseEvent;
 
 /**
 * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
@@ -22,7 +23,7 @@ import js.html.Event;
 */
 @:native("createjs.Stage")
 extern class Stage extends Container
-{	
+{
 	/**
 	* Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
 	*/
@@ -97,7 +98,9 @@ extern class Stage extends Container
 	* The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance.
 	*/
 	public var onMouseUp:Dynamic;
+	
 	private var _mouseOverIntervalID:Float;
+	
 	public static var _snapToPixelEnabled:Bool;
 	
 	/**
@@ -182,15 +185,27 @@ extern class Stage extends Container
 	* Returns a string representation of this object.
 	*/
 	//public function toString():String;
+	
 	private function _getElementRect(e:Element):Dynamic;
+	
 	private function _getPointerData(id:Float):Dynamic;
+	
 	private function _handleDoubleClick(e:MouseEvent):Dynamic;
+	
 	private function _handleMouseDown(e:MouseEvent):Dynamic;
+	
 	private function _handleMouseMove(e:MouseEvent):Dynamic;
+	
 	private function _handleMouseUp(e:MouseEvent):Dynamic;
+	
 	private function _handlePointerDown(id:Float, e:Event, x:Float, y:Float):Dynamic;
+	
 	private function _handlePointerMove(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
+	
 	private function _handlePointerUp(id:Float, e:Event, clear:Bool):Dynamic;
+	
 	private function _testMouseOver():Dynamic;
+	
 	private function _updatePointerPosition(id:Float, pageX:Float, pageY:Float):Dynamic;
+	
 }

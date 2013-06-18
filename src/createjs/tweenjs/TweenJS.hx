@@ -6,7 +6,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.TweenJS")
 extern class TweenJS
-{	
+{
 	/**
 	* The build date for this release in UTC format.
 	*/
@@ -16,4 +16,5 @@ extern class TweenJS
 	* The version string for this release.
 	*/
 	public static var version:String;
+	
 }

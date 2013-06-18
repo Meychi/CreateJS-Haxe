@@ -6,7 +6,7 @@ package createjs.easeljs;
 */
 @:native("createjs.EaselJS")
 extern class EaselJS
-{	
+{
 	/**
 	* The build date for this release in UTC format.
 	*/
@@ -16,4 +16,5 @@ extern class EaselJS
 	* The version string for this release.
 	*/
 	public static var version:String;
+	
 }

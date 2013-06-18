@@ -21,12 +21,14 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Shape")
 extern class Shape extends DisplayObject
-{	
+{
 	/**
 	* The graphics instance to display.
 	*/
 	public var graphics:Graphics;
+	
 	private var DisplayObject_draw:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -85,4 +87,5 @@ extern class Shape extends DisplayObject
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	*/
 	//public function isVisible():Bool;
+	
 }

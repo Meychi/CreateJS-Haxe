@@ -1,12 +1,14 @@
 package createjs.easeljs;
 
+import js.html.MouseEvent;
+
 /**
 * This is passed as the parameter to mousedown, mouseup, mousemove, stagemouseup, stagemousedown, mouseover, mouseout
 *	and click events on {{#crossLink "DisplayObject"}}{{/crossLink}} instances.
 */
 @:native("createjs.MouseEvent")
 extern class MouseEvent
-{	
+{
 	/**
 	* For events of type "onPress" only you can assign a handler to the onMouseMove property. This handler will be called every time the mouse is moved until the mouse is released. This is useful for operations such as drag and drop.
 	*/
@@ -91,4 +93,5 @@ extern class MouseEvent
 	* @param rawY The raw y position relative to the stage.
 	*/
 	public function new(type:String, stageX:Float, stageY:Float, target:DisplayObject, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float):Void;
+	
 }

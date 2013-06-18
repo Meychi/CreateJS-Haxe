@@ -6,7 +6,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Timeline")
 extern class Timeline
-{	
+{
 	/**
 	* Called, with a single parameter referencing this timeline instance, whenever the timeline's position changes.
 	*/
@@ -31,11 +31,17 @@ extern class Timeline
 	* Read-only. The current normalized position of the timeline. This will always be a value between 0 and duration. Changing this property directly will have no effect.
 	*/
 	public var position:Dynamic;
+	
 	private var _labels:Array<String>;
+	
 	private var _paused:Bool;
+	
 	private var _prevPos:Float;
+	
 	private var _prevPosition:Float;
+	
 	private var _tweens:Array<Tween>;
+	
 	private var _useTicks:Bool;
 	
 	/**
@@ -130,6 +136,9 @@ extern class Timeline
 	* @param positionOrLabel The position in milliseconds (or ticks if useTicks is true) or label to jump to.
 	*/
 	public function gotoAndPlay(positionOrLabel:Dynamic):Dynamic;
+	
 	private function _goto():Dynamic;
+	
 	private function clone():Dynamic;
+	
 }

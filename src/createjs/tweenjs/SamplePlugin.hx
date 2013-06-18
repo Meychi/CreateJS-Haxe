@@ -9,7 +9,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.SamplePlugin")
 extern class SamplePlugin
-{	
+{
 	/**
 	* Used by TweenJS to determine when to call this plugin. Plugins with higher priority have their methods called before plugins with lower priority. The priority value can be any positive or negative number.
 	*/
@@ -35,7 +35,7 @@ extern class SamplePlugin
 	* @param injectProps A generic object to which the plugin can append other properties which should be updated on this step.
 	* @param endValue The value of the property at the end of the step.
 	*/
-	public static function init(tween:Tween, prop:String, startValue:Any, injectProps:Dynamic, endValue:Any):Dynamic;
+	public static function init(tween:Tween, prop:String, startValue:Dynamic, injectProps:Dynamic, endValue:Dynamic):Dynamic;
 	
 	/**
 	* Called when a tween property advances that this plugin is registered for.
@@ -53,11 +53,12 @@ extern class SamplePlugin
 	* @param wait Indicates whether the current step is a "wait" step.
 	* @param end Indicates that the tween has reached the end.
 	*/
-	public static function tween(tween:Tween, prop:String, value:Any, startValues:Dynamic, endValues:Dynamic, ratio:Float, wait:Bool, end:Bool):Any;
+	public static function tween(tween:Tween, prop:String, value:Dynamic, startValues:Dynamic, endValues:Dynamic, ratio:Float, wait:Bool, end:Bool):Dynamic;
 	
 	/**
 	* Installs this plugin for use with TweenJS, and registers for a list of properties that this plugin will operate
 	*	with. Call this once after TweenJS is loaded to enable this plugin.
 	*/
 	public static function install():Dynamic;
+	
 }

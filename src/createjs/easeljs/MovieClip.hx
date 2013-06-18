@@ -43,7 +43,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.MovieClip")
 extern class MovieClip extends Container
-{	
+{
 	/**
 	* Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED). See each constant for a description of the behaviour.
 	*/
@@ -113,10 +113,15 @@ extern class MovieClip extends Container
 	* The version string for this release.
 	*/
 	public static var version:String;
+	
 	private var _prevPos:Float;
+	
 	private var _prevPosition:Float;
+	
 	private var _synchOffset:Float;
+	
 	private var Container__tick:Dynamic;
+	
 	private var Container_draw:Dynamic;
 	
 	/**
@@ -225,9 +230,15 @@ extern class MovieClip extends Container
 	*	Labels only need to be passed if they need to be used.
 	*/
 	public function new(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic):Void;
+	
 	//private function _tick():Dynamic;
+	
 	private function _goto():Dynamic;
+	
 	private function _reset():Dynamic;
+	
 	private function _setState():Dynamic;
+	
 	private function _updateTimeline():Dynamic;
+	
 }

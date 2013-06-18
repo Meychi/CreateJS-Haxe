@@ -30,7 +30,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Filter")
 extern class Filter
-{	
+{
 	/**
 	* Applies the filter to the specified context.
 	* @param ctx The 2D context to use as the source.
@@ -93,4 +93,5 @@ extern class Filter
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
 }

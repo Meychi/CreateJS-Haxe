@@ -7,7 +7,7 @@ package createjs.soundjs;
 */
 @:native("createjs.SoundJS")
 extern class SoundJS
-{	
+{
 	/**
 	* The build date for this release in UTC format.
 	*/
@@ -17,4 +17,5 @@ extern class SoundJS
 	* The version string for this release.
 	*/
 	public static var version:String;
+	
 }

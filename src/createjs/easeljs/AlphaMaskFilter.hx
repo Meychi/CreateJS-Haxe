@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import js.html.Image;
 
 /**
 * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -28,11 +29,11 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.AlphaMaskFilter")
 extern class AlphaMaskFilter extends Filter
-{	
+{
 	/**
 	* The image (or canvas) to use as the mask.
 	*/
-	public var mask:Dynamic;
+	public var mask:Image;
 	
 	/**
 	* Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -59,7 +60,7 @@ extern class AlphaMaskFilter extends Filter
 	*	See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
 	* @param mask 
 	*/
-	public function new(mask:Dynamic):Void;
+	public function new(mask:Image):Void;
 	
 	/**
 	* Applies the filter to the specified context.
@@ -76,4 +77,5 @@ extern class AlphaMaskFilter extends Filter
 	* @param targetY The y position to draw the result to. Defaults to the value passed to y.
 	*/
 	//public function applyFilter(ctx:CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float):Bool;
+	
 }

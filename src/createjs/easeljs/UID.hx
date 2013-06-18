@@ -13,4 +13,5 @@ extern class UID
 	* Returns the next unique id.
 	*/
 	public static function get():Float;
+	
 }

@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import js.html.Text;
 
 /**
 * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
@@ -24,7 +25,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Text")
 extern class Text extends DisplayObject
-{	
+{
 	/**
 	* "ideographic", or "bottom". For detailed information view the  <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "top".
 	*/
@@ -64,10 +65,15 @@ extern class Text extends DisplayObject
 	* the value of getMeasuredLineHeight is used.
 	*/
 	public var lineHeight:Float;
+	
 	private var _workingContext:CanvasRenderingContext2D;
+	
 	private var DisplayObject_cloneProps:Dynamic;
+	
 	private var DisplayObject_draw:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
+	
 	public var outline:Bool;
 	
 	/**
@@ -152,6 +158,9 @@ extern class Text extends DisplayObject
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	*/
 	//public function isVisible():Bool;
+	
 	//private function cloneProps(o:Text):Dynamic;
+	
 	private function _drawTextLine(ctx:CanvasRenderingContext2D, text:Text, y:Float):Dynamic;
+	
 }

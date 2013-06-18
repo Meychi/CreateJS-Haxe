@@ -19,7 +19,7 @@ package createjs.tweenjs;
 */
 @:native("createjs.Ease")
 extern class Ease
-{	
+{
 	/**
 	* Configurable "back in out" ease.
 	* @param amount The strength of the ease.
@@ -87,32 +87,61 @@ extern class Ease
 	* @param amount A value from -1 (ease in) to 1 (ease out) indicating the strength and direction of the ease.
 	*/
 	public static function get(amount:Dynamic):Dynamic;
+	
 	public static function backIn():Dynamic;
+	
 	public static function backInOut():Dynamic;
+	
 	public static function backOut():Dynamic;
+	
 	public static function bounceIn():Dynamic;
+	
 	public static function bounceInOut():Dynamic;
+	
 	public static function bounceOut():Dynamic;
+	
 	public static function circIn():Dynamic;
+	
 	public static function circInOut():Dynamic;
+	
 	public static function circOut():Dynamic;
+	
 	public static function cubicIn():Dynamic;
+	
 	public static function cubicInOut():Dynamic;
+	
 	public static function cubicOut():Dynamic;
+	
 	public static function elasticIn():Dynamic;
+	
 	public static function elasticInOut():Dynamic;
+	
 	public static function elasticOut():Dynamic;
+	
 	public static function linear():Dynamic;
+	
 	public static function quadIn():Dynamic;
+	
 	public static function quadInOut():Dynamic;
+	
 	public static function quadOut():Dynamic;
+	
 	public static function quartIn():Dynamic;
+	
 	public static function quartInOut():Dynamic;
+	
 	public static function quartOut():Dynamic;
+	
 	public static function quintIn():Dynamic;
+	
 	public static function quintInOut():Dynamic;
+	
 	public static function quintOut():Dynamic;
+	
 	public static function sineIn():Dynamic;
+	
 	public static function sineInOut():Dynamic;
+	
 	public static function sineOut():Dynamic;
+	
 }

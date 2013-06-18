@@ -5,7 +5,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Rectangle")
 extern class Rectangle
-{	
+{
 	/**
 	* Height.
 	*/
@@ -49,4 +49,5 @@ extern class Rectangle
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
 }

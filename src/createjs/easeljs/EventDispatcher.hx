@@ -152,5 +152,7 @@ extern class EventDispatcher
 	*	support for one or both of these features.
 	*/
 	public function new():Void;
+	
 	public function toString():String;
+	
 }

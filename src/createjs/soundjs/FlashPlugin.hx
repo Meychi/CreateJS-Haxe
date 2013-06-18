@@ -25,7 +25,7 @@ package createjs.soundjs;
 */
 @:native("createjs.FlashPlugin")
 extern class FlashPlugin
-{	
+{
 	/**
 	* A developer flag to output all flash events to the console (if it exists).  Used for debugging.       createjs.Sound.activePlugin.showOutput = true;
 	*/
@@ -290,4 +290,5 @@ extern class FlashPlugin
 	* @param data The information to be output.
 	*/
 	public function flashLog(data:String):Dynamic;
+	
 }

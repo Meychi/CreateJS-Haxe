@@ -1,5 +1,9 @@
 package createjs.soundjs;
 
+import js.html.audio.AudioNode;
+import js.html.audio.AudioSourceNode;
+import js.html.audio.GainNode;
+
 /**
 * A SoundInstance is created when any calls to the Sound API method {{#crossLink "Sound/play"}}{{/crossLink}} or
 *	{{#crossLink "Sound/createInstance"}}{{/crossLink}} are made. The SoundInstance is returned by the active plugin
@@ -33,7 +37,7 @@ package createjs.soundjs;
 */
 @:native("createjs.SoundInstance")
 extern class SoundInstance
-{	
+{
 	/**
 	* A Timout created by <code>Sound</code> when this SoundInstance is played with a delay. This allows SoundInstance to remove the delay if stop or pause or cleanup are called before playback begins.
 	*/
@@ -62,17 +66,17 @@ extern class SoundInstance
 	/**
 	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. GainNode for controlling <code>SoundInstance</code> volume. Connected to <code>panNode</code>.
 	*/
-	public var gainNode:Dynamic;
+	public var gainNode:AudioGainNode;
 	
 	/**
 	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. sourceNode is the audio source. Connected to <code>gainNode</code>.
 	*/
-	public var sourceNode:Dynamic;
+	public var sourceNode:AudioSourceNode;
 	
 	/**
 	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. sourceNodeNext is the audio source for the next loop, inserted in a look ahead approach to allow for smooth looping. Connected to <code>gainNode</code>.
 	*/
-	private var sourceNodeNext:Dynamic;
+	private var sourceNodeNext:AudioSourceNode;
 	
 	/**
 	* The callback that is fired when a sound has been interrupted.
@@ -215,7 +219,7 @@ extern class SoundInstance
 	* @param startTime The time to add this to the web audio context, in seconds.
 	* @param offset The amount of time into the src audio to start playback, in seconds.
 	*/
-	private function createAudioNode(startTime:Float, offset:Float):Dynamic;
+	private function createAudioNode(startTime:Float, offset:Float):AudioNode;
 	
 	/**
 	* Get the duration of the instance, in milliseconds. Note in most cases, you need to play a sound using
@@ -308,8 +312,8 @@ extern class SoundInstance
 	*	
 	*	<h4>Example</h4>
 	*	
-	*	     var myInstance = createJS.Sound.createInstance(mySrc);
-	*	     myInstance.play(createJS.Sound.INTERRUPT_ANY);
+	*	     var myInstance = createjs.Sound.createInstance(mySrc);
+	*	     myInstance.play(createjs.Sound.INTERRUPT_ANY);
 	* @param interrupt How this sound interrupts other instances with the same source. Interrupt values
 	*	are defined as constants on {{#crossLink "Sound"}}{{/crossLink}}. The default value is <code>Sound.INTERRUPT_NONE</code>.
 	* @param delay The delay in milliseconds before the sound starts
@@ -383,4 +387,5 @@ extern class SoundInstance
 	* The sound has been interrupted.
 	*/
 	private function interrupt():Dynamic;
+	
 }

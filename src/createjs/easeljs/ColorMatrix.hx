@@ -13,7 +13,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ColorMatrix")
 extern class ColorMatrix extends Array
-{	
+{
 	/**
 	* Array of delta values for contrast calculations.
 	*/
@@ -125,5 +125,7 @@ extern class ColorMatrix extends Array
 	* @param hue 
 	*/
 	public function adjustColor(brightness:Float, contrast:Float, saturation:Float, hue:Float):ColorMatrix;
+	
 	private function _multiplyMatrix():Dynamic;
+	
 }

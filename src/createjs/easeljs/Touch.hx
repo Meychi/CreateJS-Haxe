@@ -19,7 +19,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Touch")
 extern class Touch
-{	
+{
 	/**
 	* Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
 	*	as modern Android browsers), and IE10. Supports both single touch and multi-touch modes. Extends the EaselJS
@@ -42,12 +42,21 @@ extern class Touch
 	* Returns true if touch is supported in the current browser.
 	*/
 	public static function isSupported():Bool;
+	
 	private function _handleEnd():Dynamic;
+	
 	private function _handleMove():Dynamic;
+	
 	private function _handleStart():Dynamic;
+	
 	private static function _IE_enable(stage:Stage):Dynamic;
+	
 	private static function _IE_handleEvent():Dynamic;
+	
 	private static function _IOS_disable(stage:Stage):Dynamic;
+	
 	private static function _IOS_enable(stage:Stage):Dynamic;
+	
 	private static function _IOS_handleEvent():Dynamic;
+	
 }

@@ -19,7 +19,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ButtonHelper")
 extern class ButtonHelper
-{	
+{
 	/**
 	* If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	*/
@@ -44,6 +44,7 @@ extern class ButtonHelper
 	* The label name or frame number to display when the user presses on the target. Defaults to "down".
 	*/
 	public var downLabel:Dynamic;
+	
 	private var _isPressed:Bool;
 	
 	/**
@@ -91,5 +92,7 @@ extern class ButtonHelper
 	*	null, then the default state of the hitArea will be used.
 	*/
 	public function new(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:DisplayObject, ?hitLabel:String):Void;
+	
 	private function handleEvent():Dynamic;
+	
 }

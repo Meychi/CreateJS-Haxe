@@ -9,7 +9,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.PreloadJS")
 extern class PreloadJS
-{	
+{
 	/**
 	* The build date for this release in UTC format.
 	*/
@@ -19,4 +19,5 @@ extern class PreloadJS
 	* The version string for this release.
 	*/
 	public static var version:String;
+	
 }

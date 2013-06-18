@@ -9,7 +9,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Shadow")
 extern class Shadow
-{	
+{
 	/**
 	* An identity shadow object (all properties are set to 0). Read-only.
 	*/
@@ -46,4 +46,5 @@ extern class Shadow
 	* @param blur The size of the blurring effect.
 	*/
 	public function new(color:String, offsetX:Float, offsetY:Float, blur:Float):Void;
+	
 }

@@ -6,7 +6,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Log")
 extern class Log
-{	
+{
 	/**
 	* Read-only. Error messages.
 	*/
@@ -36,6 +36,7 @@ extern class Log
 	* Specifies the level of messages to output. For example, if you set <code>Log.level = Log.WARNING</code>, then any  messages with a level of 2 (Log.WARNING) or less (ex. Log.ERROR) will be output. Defaults to Log.ALL.
 	*/
 	public static var out:Dynamic;
+	
 	public static var _keys:Array<Dynamic>;
 	
 	/**
@@ -62,4 +63,5 @@ extern class Log
 	* @param level A number between 1 and 254 specifying the severity of this message. See Log.level for details.
 	*/
 	public static function error(message:String, details:Dynamic, level:Float):Dynamic;
+	
 }

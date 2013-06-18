@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import js.html.Text;
 
 /**
 * Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of
@@ -19,7 +20,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.BitmapAnimation")
 extern class BitmapAnimation extends DisplayObject
-{	
+{
 	/**
 	* Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}}, {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, etc.)
 	*/
@@ -59,11 +60,17 @@ extern class BitmapAnimation extends DisplayObject
 	* When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the playhead will advance on. For example, you could create two BitmapAnimations, both playing an animation with a frequency of 2, but one having offset set to 1. Both instances would advance every second tick, but they would advance on alternating ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
 	*/
 	public var offset:Float;
+	
 	private var _advanceCount:Float;
+	
 	private var _animation:Dynamic;
+	
 	private var DisplayObject__tick:Dynamic;
+	
 	private var DisplayObject_cloneProps:Dynamic;
+	
 	private var DisplayObject_draw:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -195,5 +202,7 @@ extern class BitmapAnimation extends DisplayObject
 	*	will resume playback.
 	*/
 	public function stop():Dynamic;
+	
 	//private function cloneProps(o:Text):Dynamic;
+	
 }

@@ -48,7 +48,7 @@ import js.html.Element;
 */
 @:native("createjs.HTMLAudioPlugin")
 extern class HTMLAudioPlugin
-{	
+{
 	/**
 	* Event constant for the "canPlayThrough" event for cleaner code.
 	*/
@@ -203,4 +203,5 @@ extern class HTMLAudioPlugin
 	* @param src The sound URI to unload.
 	*/
 	public function removeAllSounds(src:String):Dynamic;
+	
 }

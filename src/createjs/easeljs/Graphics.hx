@@ -70,7 +70,7 @@ import js.html.CanvasRenderingContext2D;
 */
 @:native("createjs.Graphics")
 extern class Graphics
-{	
+{
 	/**
 	* Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
 	*/
@@ -85,18 +85,31 @@ extern class Graphics
 	* Maps numeric values for the joints parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to "miter", 1 to "round", and 2 to "bevel". For example, to set the line joints to "bevel":       myGraphics.ss(16, 0, 2);
 	*/
 	public static var STROKE_JOINTS_MAP:Array<Dynamic>;
+	
 	private var _active:Bool;
+	
 	private var _activeInstructions:Array<Dynamic>;
+	
 	private var _dirty:Bool;
+	
 	private var _fillInstructions:Array<Dynamic>;
+	
 	private var _ignoreScaleStroke:Bool;
+	
 	private var _instructions:Array<Dynamic>;
+	
 	private var _oldInstructions:Array<Dynamic>;
+	
 	private var _strokeInstructions:Array<Dynamic>;
+	
 	private var _strokeStyleInstructions:Array<Dynamic>;
+	
 	public static var _ctx:CanvasRenderingContext2D;
+	
 	public static var beginCmd:Command;
+	
 	public static var fillCmd:Command;
+	
 	public static var strokeCmd:Command;
 	
 	/**
@@ -616,33 +629,63 @@ extern class Graphics
 	* @param value 
 	*/
 	private function _setProp(name:String, value:String):Dynamic;
+	
 	private function _newPath():Dynamic;
+	
 	private function _updateInstructions():Dynamic;
+	
 	private function a():Dynamic;
+	
 	private function at():Dynamic;
+	
 	private function bf():Dynamic;
+	
 	private function bs():Dynamic;
+	
 	private function bt():Dynamic;
+	
 	private function c():Dynamic;
+	
 	private function cp():Dynamic;
+	
 	private function dc():Dynamic;
+	
 	private function de():Dynamic;
+	
 	private function dp():Dynamic;
+	
 	private function dr():Dynamic;
+	
 	private function ef():Dynamic;
+	
 	private function es():Dynamic;
+	
 	private function f():Dynamic;
+	
 	private function lf():Dynamic;
+	
 	private function ls():Dynamic;
+	
 	private function lt():Dynamic;
+	
 	private function mt():Dynamic;
+	
 	private function p():Dynamic;
+	
 	private function qt():Dynamic;
+	
 	private function r():Dynamic;
+	
 	private function rc():Dynamic;
+	
 	private function rf():Dynamic;
+	
 	private function rr():Dynamic;
+	
 	private function rs():Dynamic;
+	
 	private function s():Dynamic;
+	
 	private function ss():Dynamic;
+	
 }

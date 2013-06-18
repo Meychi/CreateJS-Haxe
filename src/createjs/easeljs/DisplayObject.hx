@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import js.html.Point;
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -166,14 +167,23 @@ extern class DisplayObject extends EventDispatcher
 	* Unique ID for this display object. Makes display objects easier for some uses.
 	*/
 	public var id:Float;
+	
 	private var _cacheDataURL:String;
+	
 	private var _cacheDataURLID:Float;
+	
 	private var _cacheOffsetX:Float;
+	
 	private var _cacheOffsetY:Float;
+	
 	private var _cacheScale:Float;
+	
 	private var _matrix:Matrix2D;
+	
 	public static var _hitTestCanvas:Dynamic;
+	
 	public static var _hitTestContext:CanvasRenderingContext2D;
+	
 	public static var _nextCacheID:Float;
 	
 	/**
@@ -412,9 +422,15 @@ extern class DisplayObject extends EventDispatcher
 	* @param y The y position on the stage to transform.
 	*/
 	public function globalToLocal(x:Float, y:Float):Point;
+	
 	private function _applyFilters():Dynamic;
+	
 	private function _applyShadow(ctx:CanvasRenderingContext2D, shadow:Shadow):Dynamic;
+	
 	private function _testHit(ctx:CanvasRenderingContext2D):Bool;
+	
 	private function _tick():Dynamic;
+	
 	private function cloneProps(o:DisplayObject):Dynamic;
+	
 }

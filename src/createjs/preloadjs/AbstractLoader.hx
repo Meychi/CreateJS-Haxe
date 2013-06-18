@@ -6,7 +6,7 @@ package createjs.preloadjs;
 */
 @:native("createjs.AbstractLoader")
 extern class AbstractLoader
-{	
+{
 	/**
 	* A path that will be prepended on to the item's source parameter before it is loaded.
 	*/
@@ -132,5 +132,7 @@ extern class AbstractLoader
 	* @param path The file path to parse.
 	*/
 	private function _parseURI(path:String):Array<Dynamic>;
+	
 	public function toString():String;
+	
 }

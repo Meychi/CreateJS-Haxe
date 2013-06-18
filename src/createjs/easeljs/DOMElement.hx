@@ -32,13 +32,16 @@ import js.html.Element;
 */
 @:native("createjs.DOMElement")
 extern class DOMElement extends DisplayObject
-{	
+{
 	/**
 	* The DOM object to manage.
 	*/
 	public var htmlElement:Element;
+	
 	private var _oldMtx:Dynamic;
+	
 	private var DisplayObject__tick:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -138,5 +141,7 @@ extern class DOMElement extends DisplayObject
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	*/
 	//public function isVisible():Bool;
+	
 	//private function _tick():Dynamic;
+	
 }

@@ -5,7 +5,7 @@ package createjs.easeljs;
 */
 @:native("createjs.Matrix2D")
 extern class Matrix2D
-{	
+{
 	/**
 	* An identity matrix, representing a null transformation. Read-only.
 	*/
@@ -218,4 +218,5 @@ extern class Matrix2D
 	* @param y 
 	*/
 	public function translate(x:Float, y:Float):Matrix2D;
+	
 }

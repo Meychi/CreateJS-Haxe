@@ -61,7 +61,11 @@ extern class MotionGuidePlugin
 	* Installs this plugin for use with TweenJS. Call this once after TweenJS is loaded to enable this plugin.
 	*/
 	public static function install():Dynamic;
+	
 	private static function init():Dynamic;
+	
 	private static function step():Dynamic;
+	
 	private static function tween():Dynamic;
+	
 }

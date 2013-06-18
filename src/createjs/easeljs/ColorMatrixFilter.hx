@@ -22,7 +22,7 @@ package createjs.easeljs;
 */
 @:native("createjs.ColorMatrixFilter")
 extern class ColorMatrixFilter extends Filter
-{	
+{
 	/**
 	* Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
 	*	{{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
@@ -51,5 +51,7 @@ extern class ColorMatrixFilter extends Filter
 	* Returns a clone of this ColorMatrixFilter instance.
 	*/
 	//public function clone():ColorMatrixFilter;
+	
 	//private function initialize(matrix:Array<Dynamic>):Dynamic;
+	
 }

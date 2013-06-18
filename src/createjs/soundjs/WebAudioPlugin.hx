@@ -1,5 +1,9 @@
 package createjs.soundjs;
 
+import js.html.audio.AudioContext;
+import js.html.audio.AudioNode;
+import js.html.audio.GainNode;
+
 /**
 * Play sounds using Web Audio in the browser. The WebAudio plugin has been successfully tested with:
 *	<ul><li>Google Chrome, version 23+ on OS X and Windows</li>
@@ -24,16 +28,16 @@ package createjs.soundjs;
 */
 @:native("createjs.WebAudioPlugin")
 extern class WebAudioPlugin
-{	
+{
 	/**
 	* A DynamicsCompressorNode, which is used to improve sound quality and prevent audio distortion according to http://www.w3.org/TR/webaudio/#DynamicsCompressorNode. It is connected to <code>context.destination</code>.
 	*/
-	public var dynamicsCompressorNode:Dynamic;
+	public var dynamicsCompressorNode:AudioNode;
 	
 	/**
 	* A GainNode for controlling master volume. It is connected to <code>dynamicsCompressorNode</code>.
 	*/
-	public var gainNode:Dynamic;
+	public var gainNode:AudioGainNode;
 	
 	/**
 	* An object hash used internally to store ArrayBuffers, indexed by the source URI used  to load it. This prevents having to load and decode audio files more than once. If a load has been started on a file, <code>arrayBuffers[src]</code> will be set to true. Once load is complete, it is set the the loaded ArrayBuffer instance.
@@ -53,7 +57,7 @@ extern class WebAudioPlugin
 	/**
 	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.
 	*/
-	public var context:Dynamic;
+	public var context:AudioContext;
 	
 	/**
 	* Add loaded results to the preload object hash.
@@ -196,4 +200,5 @@ extern class WebAudioPlugin
 	* @param value The volume to set, between 0 and 1.
 	*/
 	public function setVolume(value:Float):Bool;
+	
 }
