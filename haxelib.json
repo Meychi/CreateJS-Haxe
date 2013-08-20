@@ -1,11 +1,11 @@
 {
-	"name": "createjs",
+	"name": "createjs-full",
 	"license": "MIT",
 	"tags": ["canvas", "html5", "js", "sound", "tween"],
 	"description": "Detailed Haxe externs for the CreateJS libraries.",
 	"contributors": ["Meychi"],
-	"releasenote": "Initial release of the new externs.",
-	"version": "2.0.0",
+	"releasenote": "Initial release of the new externs with detailed docs.",
+	"version": "1.0.0",
 	"url": "https://github.com/Meychi/CreateJS-Haxe",
 	"dependencies": {}
 }
