@@ -365,7 +365,7 @@ extern class Sound
 	*	 * <h4>Example</h4>
 	*	     if (!createjs.initializeDefaultPlugins()) { return; }
 	*/
-	public function initializeDefaultPlugins():Bool;
+	public static function initializeDefaultPlugins():Bool;
 	
 	/**
 	* Mute/Unmute all audio. Note that muted audio still plays at 0 volume. This global mute value is maintained
