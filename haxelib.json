@@ -4,8 +4,8 @@
 	"tags": ["canvas", "html5", "js", "sound", "tween"],
 	"description": "Detailed Haxe externs for the CreateJS libraries.",
 	"contributors": ["Meychi"],
-	"releasenote": "Initial release of the new externs with detailed docs.",
-	"version": "1.0.0",
+	"releasenote": "Manual fixes to the Graphics class",
+	"version": "1.0.1",
 	"url": "https://github.com/Meychi/CreateJS-Haxe",
 	"dependencies": {}
 }
