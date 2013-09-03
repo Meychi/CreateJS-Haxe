@@ -169,7 +169,7 @@ extern class Graphics
 	* @param matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
 	*	will be applied relative to the parent transform.
 	*/
-	public function beginBitmapFill(image:Dynamic, repetition:String, matrix:Matrix2D):Graphics;
+	public function beginBitmapFill(image:Dynamic, ?repetition:String, ?matrix:Matrix2D):Graphics;
 	
 	/**
 	* Begins a pattern fill using the specified image. This ends the current sub-path. Note that unlike bitmap fills,
@@ -472,13 +472,13 @@ extern class Graphics
 	* Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	*	method.
 	*/
-	public function curveTo():Dynamic;
+	public function curveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
 	
 	/**
 	* Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
 	*	method.
 	*/
-	public function drawRect():Dynamic;
+	public function drawRect(x:Float, y:Float, w:Float, h:Float):Graphics;
 	
 	/**
 	* Moves the drawing point to the specified position. A tiny API method "mt" also exists.
