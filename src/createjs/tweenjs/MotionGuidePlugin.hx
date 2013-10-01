@@ -19,7 +19,11 @@ package createjs.tweenjs;
 *	     <LI> path: Required, Array : The x/y points used to draw the path with a moveTo and 1 to n curveTo calls.</LI>
 *	     <LI> start: Optional, 0-1 : Initial position, default 0 except for when continuing along the same path.</LI>
 *	     <LI> end: Optional, 0-1 : Final position, default 1 if not specified.</LI>
-*	     <LI> orient: Optional, bool : Set the target's rotation parallel to the curve at its position.</LI>
+*	     <LI> orient: Optional, string : "fixed"/"auto"/"cw"/"ccw"<UL>
+*					<LI>"fixed" forces the object to face down the path all movement (relative to start rotation),</LI>
+*	     		<LI>"auto" rotates the object along the path relative to the line.</LI>
+*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including flash like behaviour</LI>
+*			</UL></LI>
 *	</UL>
 *	Guide objects should not be shared between tweens even if all properties are identical, the library stores
 *	information on these objects in the background and sharing them can cause unexpected behaviour. Values
@@ -49,13 +53,17 @@ extern class MotionGuidePlugin
 	*	     <LI> path: Required, Array : The x/y points used to draw the path with a moveTo and 1 to n curveTo calls.</LI>
 	*	     <LI> start: Optional, 0-1 : Initial position, default 0 except for when continuing along the same path.</LI>
 	*	     <LI> end: Optional, 0-1 : Final position, default 1 if not specified.</LI>
-	*	     <LI> orient: Optional, bool : Set the target's rotation parallel to the curve at its position.</LI>
+	*	     <LI> orient: Optional, string : "fixed"/"auto"/"cw"/"ccw"<UL>
+	*					<LI>"fixed" forces the object to face down the path all movement (relative to start rotation),</LI>
+	*	     		<LI>"auto" rotates the object along the path relative to the line.</LI>
+	*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including flash like behaviour</LI>
+	*			</UL></LI>
 	*	</UL>
 	*	Guide objects should not be shared between tweens even if all properties are identical, the library stores
 	*	information on these objects in the background and sharing them can cause unexpected behaviour. Values
 	*	outside 0-1 range of tweens will be a "best guess" from the appropriate part of the defined curve.
 	*/
-	public function new():Void;
+	public function new(path:Array<Float>, ?start:Float, ?end:Float, ?orient:String):Void;
 	
 	/**
 	* Installs this plugin for use with TweenJS. Call this once after TweenJS is loaded to enable this plugin.
@@ -65,6 +73,8 @@ extern class MotionGuidePlugin
 	private static function init():Dynamic;
 	
 	private static function step():Dynamic;
+	
+	private static function testRotData():Dynamic;
 	
 	private static function tween():Dynamic;
 	

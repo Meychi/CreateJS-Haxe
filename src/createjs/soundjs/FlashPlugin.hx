@@ -6,8 +6,8 @@ package createjs.soundjs;
 *	plugin is recommended to be included if sound support is required in older browsers such as IE8.
 *	
 *	This plugin requires FlashAudioPlugin.swf and swfObject.js (which is compiled
-*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that <code>FlashPlugin.BASE_PATH</code> is
-*	set when using this plugin, so that the script can find the swf.
+*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/BASE_PATH:property"}}{{/crossLink}}
+*	is set when using this plugin, so that the script can find the swf.
 *	
 *	<h4>Example</h4>
 *	     createjs.FlashPlugin.BASE_PATH = "../src/SoundJS/";
@@ -147,7 +147,7 @@ extern class FlashPlugin
 	public function handleErrorEvent(error:String):Dynamic;
 	
 	/**
-	* Handles events from Flash and routes communication to a <code>SoundLoader</code> via the Flash ID. The method
+	* Handles events from Flash and routes communication to a <code>Loader</code> via the Flash ID. The method
 	*	and arguments from Flash are run directly on the sound loader.
 	* @param flashId Used to identify the loader instance.
 	* @param method Indicates the method to run.
@@ -186,8 +186,8 @@ extern class FlashPlugin
 	*	plugin is recommended to be included if sound support is required in older browsers such as IE8.
 	*	
 	*	This plugin requires FlashAudioPlugin.swf and swfObject.js (which is compiled
-	*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that <code>FlashPlugin.BASE_PATH</code> is
-	*	set when using this plugin, so that the script can find the swf.
+	*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/BASE_PATH:property"}}{{/crossLink}}
+	*	is set when using this plugin, so that the script can find the swf.
 	*	
 	*	<h4>Example</h4>
 	*	     createjs.FlashPlugin.BASE_PATH = "../src/SoundJS/";
@@ -206,7 +206,7 @@ extern class FlashPlugin
 	public function new():Void;
 	
 	/**
-	* Pre-register a sound instance when preloading/setup. Note that the FlashPlugin will return a SoundLoader
+	* Pre-register a sound instance when preloading/setup. Note that the FlashPlugin will return a Loader
 	*	instance for preloading since Flash can not access the browser cache consistently.
 	* @param src The source of the audio
 	* @param instances The number of concurrently playing instances to allow for the channel at any time.
@@ -217,8 +217,9 @@ extern class FlashPlugin
 	* Preload a sound instance. This plugin uses Flash to preload and play all sounds.
 	* @param src The path to the Sound
 	* @param instance Not used in this plugin.
+	* @param basePath A file path to prepend to the src.
 	*/
-	public function preload(src:String, instance:Dynamic):Dynamic;
+	public function preload(src:String, instance:Dynamic, basePath:String):Dynamic;
 	
 	/**
 	* Remove a sound added using {{#crossLink "FlashPlugin/register"}}{{/crossLink}}. Note this does not cancel a
@@ -257,22 +258,22 @@ extern class FlashPlugin
 	private function handleSWFReady(event:Dynamic):Dynamic;
 	
 	/**
-	* Used to couple a Flash loader instance with a <code>SoundLoader</code> instance
-	* @param flashId Used to identify the SoundLoader.
+	* Used to couple a Flash loader instance with a <code>Loader</code> instance
+	* @param flashId Used to identify the Loader.
 	* @param instance The actual instance.
 	*/
-	public function registerPreloadInstance(flashId:String, instance:SoundLoader):Dynamic;
+	public function registerPreloadInstance(flashId:String, instance:Dynamic):Dynamic;
 	
 	/**
 	* Used to couple a Flash sound instance with a {{#crossLink "SoundInstance"}}{{/crossLink}}.
 	* @param flashId Used to identify the SoundInstance.
 	* @param instance The actual instance.
 	*/
-	public function registerSoundInstance(flashId:String, instance:SoundLoader):Dynamic;
+	public function registerSoundInstance(flashId:String, instance:Dynamic):Dynamic;
 	
 	/**
-	* Used to decouple a <code>SoundLoader</code> instance from Flash.
-	* @param flashId Used to identify the SoundLoader.
+	* Used to decouple a <code>Loader</code> instance from Flash.
+	* @param flashId Used to identify the Loader.
 	*/
 	public function unregisterPreloadInstance(flashId:String):Dynamic;
 	
@@ -282,7 +283,7 @@ extern class FlashPlugin
 	* @param flashId Used to identify the SoundInstance.
 	* @param instance The actual instance.
 	*/
-	public function unregisterSoundInstance(flashId:String, instance:SoundLoader):Dynamic;
+	public function unregisterSoundInstance(flashId:String, instance:Dynamic):Dynamic;
 	
 	/**
 	* Used to output traces from Flash to the console, if {{#crossLink "FlashPlugin/showOutput"}}{{/crossLink}} is

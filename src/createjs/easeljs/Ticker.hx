@@ -26,9 +26,39 @@ package createjs.easeljs;
 extern class Ticker
 {
 	/**
-	* Indicates whether Ticker should use <code>requestAnimationFrame</code> if it is supported in the browser. If false, Ticker will use <code>setTimeout</code>. If you use RAF, it is recommended that you set the framerate to a divisor of 60 (ex. 15, 20, 30, 60).
+	* Deprecated in favour of {{#crossLink "Ticker/timingMode"}}{{/crossLink}}, and will be removed in a future version. If true, timingMode will use {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} by default.
 	*/
 	public static var useRAF:Bool;
+	
+	/**
+	* In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely. Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based. You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the tick event object's "delta" properties to make this easier.  Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	*/
+	public static var RAF:String;
+	
+	/**
+	* In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and dispatches the tick when the time is within a certain threshold.  This mode has a higher variance for time between frames than TIMEOUT, but does not require that content be time based as with RAF while gaining the benefits of that API (screen synch, background throttling).  Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so framerates of 10, 12, 15, 20, and 30 work well.  Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	*/
+	public static var RAF_SYNCHED:String;
+	
+	/**
+	* In this mode, Ticker uses the setTimeout API. This provides predictable, adaptive frame timing, but does not provide the benefits of requestAnimationFrame (screen synch, background throttling).
+	*/
+	public static var TIMEOUT:String;
+	
+	/**
+	* Specifies a maximum value for the delta property in the tick event object. This is useful when building time based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep, alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value (ex. maxDelta=50 when running at 40fps).  This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta when using both delta and other values.  If 0, there is no maximum.
+	*/
+	public static var maxDelta:Float;
+	
+	/**
+	* Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
+	*/
+	public static var timingMode:String;
+	
+	/**
+	* Stores the timeout or requestAnimationFrame id.
+	*/
+	private var _timerId:Float;
 	
 	/**
 	* The number of ticks that have passed
@@ -40,41 +70,26 @@ extern class Ticker
 	*/
 	private var _pausedTicks:Float;
 	
+	/**
+	* True if currently using requestAnimationFrame, false if using setTimeout.
+	*/
+	private var _raf:Bool;
+	
 	private var _inited:Bool;
 	
 	private var _interval:Float;
 	
 	private var _lastTime:Float;
 	
-	private var _listeners:Array<Dynamic>;
-	
-	private var _pauseable:Array<Dynamic>;
-	
 	private var _paused:Bool;
 	
 	private var _pausedTime:Float;
-	
-	private var _rafActive:Bool;
 	
 	private var _startTime:Float;
 	
 	private var _tickTimes:Array<Dynamic>;
 	
-	private var _timeoutID:Float;
-	
 	private var _times:Array<Dynamic>;
-	
-	/**
-	* Adds a listener for the tick event. The listener must be either an object exposing a <code>tick</code> method,
-	*	or a function. The listener will be called once each tick / interval. The interval is specified via the 
-	*	<code>.setInterval(ms)</code> method.
-	*	The tick method or function is passed two parameters: the elapsed time between the previous tick and the current
-	*	one, and a boolean indicating whether Ticker is paused.
-	* @param o The object or function to add as a listener.
-	* @param pauseable If false, the listener will continue to have tick called 
-	*	even when Ticker is paused via Ticker.pause(). Default is true.
-	*/
-	public static function addListener(o:Dynamic, ?pauseable:Bool):Dynamic;
 	
 	/**
 	* Changes the "paused" state of the Ticker, which can be retrieved by the {{#crossLink "Ticker/getPaused"}}{{/crossLink}}
@@ -95,21 +110,20 @@ extern class Ticker
 	public static function setPaused(value:Bool):Dynamic;
 	
 	/**
-	* Initializes or resets the timer, clearing all associated listeners and fps measuring data, starting the tick.
-	*	This is called automatically when the first listener is added.
+	* Returns a boolean indicating whether Ticker is currently paused, as set with {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
+	*	When the ticker is paused, all listeners will still receive a tick event, but this value will be false.
+	*	
+	*	Note that in EaselJS v0.5.0 and earlier, "pauseable" listeners would <strong>not</strong> receive the tick
+	*	callback when Ticker was paused. This is no longer the case.
+	*	
+	*	<h4>Example</h4>
+	*	     createjs.Ticker.addEventListener("tick", handleTick);
+	*	     createjs.Ticker.setPaused(true);
+	*	     function handleTick(event) {
+	*	         console.log("Paused:", createjs.Ticker.getPaused());
+	*	     }
 	*/
-	public static function init():Dynamic;
-	
-	/**
-	* Removes all listeners.
-	*/
-	public static function removeAllListeners():Dynamic;
-	
-	/**
-	* Removes the specified listener.
-	* @param o The object or function to remove from listening from the tick event.
-	*/
-	public static function removeListener(o:Dynamic):Dynamic;
+	public static function getPaused():Bool;
 	
 	/**
 	* Returns the actual frames / ticks per second.
@@ -117,6 +131,22 @@ extern class Ticker
 	*	Defaults to the number of ticks per second.
 	*/
 	public static function getMeasuredFPS(?ticks:Float):Float;
+	
+	/**
+	* Returns the average time spent within a tick. This can vary significantly from the value provided by getMeasuredFPS
+	*	because it only measures the time spent within the tick execution stack. 
+	*	
+	*	Example 1: With a target FPS of 20, getMeasuredFPS() returns 20fps, which indicates an average of 50ms between 
+	*	the end of one tick and the end of the next. However, getMeasuredTickTime() returns 15ms. This indicates that 
+	*	there may be up to 35ms of "idle" time between the end of one tick and the start of the next.
+	*	
+	*	Example 2: With a target FPS of 30, getFPS() returns 10fps, which indicates an average of 100ms between the end of
+	*	one tick and the end of the next. However, getMeasuredTickTime() returns 20ms. This would indicate that something
+	*	other than the tick is using ~80ms (another script, DOM rendering, etc).
+	* @param ticks The number of previous ticks over which to measure the average time spent in a tick.
+	*	Defaults to the number of ticks per second. To get only the last tick's time, pass in 1.
+	*/
+	public static function getMeasuredTickTime(?ticks:Float):Float;
 	
 	/**
 	* Returns the current target time between ticks, as set with {{#crossLink "Ticker/setInterval"}}{{/crossLink}}.
@@ -161,14 +191,32 @@ extern class Ticker
 	*/
 	public static function setInterval(interval:Float):Dynamic;
 	
-	private function _getTime():Dynamic;
+	/**
+	* Similar to getTime(), but returns the time included with the current (or most recent) tick event object.
+	* @param runTime [runTime=false] If true, the runTime property will be returned instead of time.
+	*/
+	public function getEventTime(runTime:Bool):Float;
 	
-	private function _handleAF():Dynamic;
+	/**
+	* Starts the tick. This is called automatically when the first listener is added.
+	*/
+	public static function init():Dynamic;
 	
-	private function _handleTimeout():Dynamic;
+	/**
+	* Stops the Ticker and removes all listeners. Use init() to restart the Ticker.
+	*/
+	public static function reset():Dynamic;
 	
-	private function _setupTick():Dynamic;
+	private static function _getTime():Dynamic;
 	
-	private function _tick():Dynamic;
+	private static function _handleRAF():Dynamic;
+	
+	private static function _handleSynch():Dynamic;
+	
+	private static function _handleTimeout():Dynamic;
+	
+	private static function _setupTick():Dynamic;
+	
+	private static function _tick():Dynamic;
 	
 }

@@ -45,21 +45,22 @@ extern class SpriteSheetUtils
 	* @param alphaImage The image (or canvas) containing the alpha channel to use.
 	* @param canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
 	*/
-	public static function mergeAlpha(rbgImage:Image, alphaImage:Image, ?canvas:Canvas):Canvas;
+	public static function mergeAlpha(rbgImage:Image, alphaImage:Image, canvas:Canvas):Canvas;
 	
 	/**
-	* Returns a single frame of the specified sprite sheet as a new PNG image.
+	* Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
+	*	to use a spritesheet frame as the source for a bitmap fill.
 	*	
-	*	<strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "BitmapAnimation"}}{{/crossLink}}
-	*	with a {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
-	*	method and display it with a Bitmap instance. You can also crop an image using the <code>sourceRect</code>
+	*	<strong>WARNING:</strong> In almost all cases it is better to display a single frame using a {{#crossLink "Sprite"}}{{/crossLink}}
+	*	with a {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} call than it is to slice out a frame using this
+	*	method and display it with a Bitmap instance. You can also crop an image using the {{#crossLink "Bitmap/sourceRect"}}{{/crossLink}}
 	*	property of {{#crossLink "Bitmap"}}{{/crossLink}}.
 	*	
 	*	The extractFrame method may cause cross-domain warnings since it accesses pixels directly on the canvas.
 	* @param spriteSheet The SpriteSheet instance to extract a frame from.
-	* @param frame The frame number or animation name to extract. If an animation
+	* @param frameOrAnimation The frame number or animation name to extract. If an animation
 	*	name is specified, only the first frame of the animation will be extracted.
 	*/
-	public static function extractFrame(spriteSheet:Image, frame:Dynamic):Image;
+	public static function extractFrame(spriteSheet:Image, frameOrAnimation:Dynamic):Image;
 	
 }

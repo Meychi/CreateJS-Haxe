@@ -2,12 +2,14 @@ package createjs.easeljs;
 
 /**
 * The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
-*	{{#crossLink "BitmapAnimation"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
-*	automatically call {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}},
+*	{{#crossLink "Sprite"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
+*	automatically call {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}},
 *	to the respective animation labels, add a pointer cursor, and allows the user to define a hit state frame.
 *	
 *	The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
 *	garbage collection.
+*	
+*	Note that over states will not work unless you call {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
 *	
 *	<h4>Example</h4>
 *	
@@ -26,11 +28,6 @@ extern class ButtonHelper
 	public var play:Bool;
 	
 	/**
-	* Read-only. The target for this button helper.
-	*/
-	public var target:Dynamic;
-	
-	/**
 	* The label name or frame number to display when the user mouses out of the target. Defaults to "over".
 	*/
 	public var overLabel:Dynamic;
@@ -45,6 +42,13 @@ extern class ButtonHelper
 	*/
 	public var downLabel:Dynamic;
 	
+	/**
+	* The target for this button helper.
+	*/
+	public var target:Dynamic;
+	
+	private var _isOver:Bool;
+	
 	private var _isPressed:Bool;
 	
 	/**
@@ -55,8 +59,19 @@ extern class ButtonHelper
 	
 	/**
 	* Initialization method.
+	* @param target The instance to manage.
+	* @param outLabel The label or animation to go to when the user rolls out of the button.
+	* @param overLabel The label or animation to go to when the user rolls over the button.
+	* @param downLabel The label or animation to go to when the user presses the button.
+	* @param play If the helper should call "gotoAndPlay" or "gotoAndStop" on the button when changing
+	*	states.
+	* @param hitArea An optional item to use as the hit state for the button. If this is not defined,
+	*	then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
+	*	used for the hitState.
+	* @param hitLabel The label or animation on the hitArea instance that defines the hitArea bounds. If this is
+	*	null, then the default state of the hitArea will be used.
 	*/
-	private function initialize():Dynamic;
+	private function initialize(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:DisplayObject, ?hitLabel:String):Dynamic;
 	
 	/**
 	* Returns a string representation of this object.
@@ -65,12 +80,14 @@ extern class ButtonHelper
 	
 	/**
 	* The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
-	*	{{#crossLink "BitmapAnimation"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
-	*	automatically call {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}},
+	*	{{#crossLink "Sprite"}}{{/crossLink}} instances. This class will intercept mouse events from an object, and
+	*	automatically call {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}},
 	*	to the respective animation labels, add a pointer cursor, and allows the user to define a hit state frame.
 	*	
 	*	The ButtonHelper instance does not need to be added to the stage, but a reference should be maintained to prevent
 	*	garbage collection.
+	*	
+	*	Note that over states will not work unless you call {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}.
 	*	
 	*	<h4>Example</h4>
 	*	
@@ -89,10 +106,10 @@ extern class ButtonHelper
 	*	then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
 	*	used for the hitState.
 	* @param hitLabel The label or animation on the hitArea instance that defines the hitArea bounds. If this is
-	*	null, then the default state of the hitArea will be used.
+	*	null, then the default state of the hitArea will be used. *
 	*/
 	public function new(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:DisplayObject, ?hitLabel:String):Void;
 	
-	private function handleEvent():Dynamic;
+	private function handleEvent(evt:Dynamic):Dynamic;
 	
 }

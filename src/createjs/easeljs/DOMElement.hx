@@ -2,6 +2,7 @@ package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
 import js.html.Element;
+import js.html.Event;
 
 /**
 * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
@@ -38,7 +39,9 @@ extern class DOMElement extends DisplayObject
 	*/
 	public var htmlElement:Element;
 	
-	private var _oldMtx:Dynamic;
+	private var _oldMtx:Matrix2D;
+	
+	private var _visible:Bool;
 	
 	private var DisplayObject__tick:Dynamic;
 	
@@ -80,7 +83,7 @@ extern class DOMElement extends DisplayObject
 	//public function clone():Dynamic;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param ctx The canvas 2D context object to draw into.
@@ -88,12 +91,13 @@ extern class DOMElement extends DisplayObject
 	*	For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	*	into itself).
 	*/
-	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
+	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Bool;
 	
 	/**
 	* Initialization method.
+	* @param htmlElement A reference or id for the DOM element to manage.
 	*/
-	//private function initialize():Dynamic;
+	//private function initialize(htmlElement:Element):Dynamic;
 	
 	/**
 	* Not applicable to DOMElement.
@@ -104,6 +108,11 @@ extern class DOMElement extends DisplayObject
 	* Not applicable to DOMElement.
 	*/
 	//public function globalToLocal():Dynamic;
+	
+	/**
+	* Not applicable to DOMElement.
+	*/
+	//public function hitTest():Dynamic;
 	
 	/**
 	* Not applicable to DOMElement.
@@ -126,11 +135,6 @@ extern class DOMElement extends DisplayObject
 	//public function updateCache():Dynamic;
 	
 	/**
-	* Not applicable to DOMElement.
-	*/
-	public function hitArea():Dynamic;
-	
-	/**
 	* Returns a string representation of this object.
 	*/
 	//public function toString():String;
@@ -142,6 +146,8 @@ extern class DOMElement extends DisplayObject
 	*/
 	//public function isVisible():Bool;
 	
-	//private function _tick():Dynamic;
+	//private function _tick(params:Array<Dynamic>):Dynamic;
+	
+	private function _handleDrawEnd(evt:Event):Dynamic;
 	
 }

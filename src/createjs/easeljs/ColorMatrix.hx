@@ -70,18 +70,25 @@ extern class ColorMatrix extends Array
 	
 	/**
 	* Initialization method.
+	* @param brightness 
+	* @param contrast 
+	* @param saturation 
+	* @param hue 
 	*/
-	private function initialize():Dynamic;
+	private function initialize(brightness:Float, contrast:Float, saturation:Float, hue:Float):Dynamic;
 	
 	/**
 	* Make sure values are within the specified range, hue has a limit of 180, brightness is 255, others are 100.
+	* @param value The raw number
+	* @param limit The maximum that the number can be. The minimum is the limit * -1.
 	*/
-	private function _cleanValue():Dynamic;
+	private function _cleanValue(value:Float, limit:Float):Dynamic;
 	
 	/**
 	* Makes sure matrixes are 5x5 (25 long).
+	* @param matrix 
 	*/
-	private function _fixMatrix():Dynamic;
+	private function _fixMatrix(matrix:Array<Dynamic>):Dynamic;
 	
 	/**
 	* Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
@@ -126,6 +133,6 @@ extern class ColorMatrix extends Array
 	*/
 	public function adjustColor(brightness:Float, contrast:Float, saturation:Float, hue:Float):ColorMatrix;
 	
-	private function _multiplyMatrix():Dynamic;
+	private function _multiplyMatrix(matrix:Array<Dynamic>):Dynamic;
 	
 }

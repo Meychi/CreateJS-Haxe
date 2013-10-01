@@ -9,8 +9,8 @@ package createjs.tweenjs;
 *		    Tween.get(target)
 *		         .wait(500)
 *		         .to({alpha:0, visible:false}, 1000)
-*		         .call(onComplete);
-*		    function onComplete() {
+*		         .call(handleComplete);
+*		    function handleComplete() {
 *		    	//Tween complete
 *		    }
 *	
@@ -30,17 +30,12 @@ package createjs.tweenjs;
 *	See the Tween {{#crossLink "Tween/get"}}{{/crossLink}} method for additional param documentation.
 */
 @:native("createjs.Tween")
-extern class Tween
+extern class Tween extends EventDispatcher
 {
 	/**
 	* Allows you to specify data that will be used by installed plugins. Each plugin uses this differently, but in general you specify data by setting it to a property of pluginData with the same name as the plugin class.
 	*/
 	public var pluginData:Dynamic;
-	
-	/**
-	* Called whenever the tween's position changes with a single parameter referencing this tween instance.
-	*/
-	public var onChange:Dynamic;
 	
 	/**
 	* Causes this tween to continue playing when a global pause is active. For example, if TweenJS is using Ticker, then setting this to true (the default) will cause this tween to be paused when <code>Ticker.setPaused(true)</code> is called. See Tween.tick() for more info. Can be set via the props param.
@@ -83,6 +78,11 @@ extern class Tween
 	private var _prevPosition:Float;
 	
 	/**
+	* Read-only. Indicates the tween's current position is within a passive wait.
+	*/
+	public var passive:Bool;
+	
+	/**
 	* Read-only. Specifies the total duration of this tween in milliseconds (or ticks if useTicks is true). This value is automatically updated as you modify the tween. Changing it directly could result in unexpected behaviour.
 	*/
 	public var duration:Float;
@@ -93,7 +93,7 @@ extern class Tween
 	public var position:Dynamic;
 	
 	/**
-	* Read-only. The target of this tween. This is the object on which the tweened properties will be changed. Changing  this property after the tween is created will not have any effect.
+	* Read-only. The target of this tween. This is the object on which the tweened properties will be changed. Changing this property after the tween is created will not have any effect.
 	*/
 	public var target:Dynamic;
 	
@@ -105,6 +105,8 @@ extern class Tween
 	private var _actions:Array<Dynamic>;
 	
 	private var _curQueueProps:Dynamic;
+	
+	private var _inited:Boolean;
 	
 	private var _initQueueProps:Dynamic;
 	
@@ -129,8 +131,8 @@ extern class Tween
 	*		    Tween.get(target)
 	*		         .wait(500)
 	*		         .to({alpha:0, visible:false}, 1000)
-	*		         .call(onComplete);
-	*		    function onComplete() {
+	*		         .call(handleComplete);
+	*		    function handleComplete() {
 	*		    	//Tween complete
 	*		    }
 	*	
@@ -148,16 +150,31 @@ extern class Tween
 	*	     }
 	*	
 	*	See the Tween {{#crossLink "Tween/get"}}{{/crossLink}} method for additional param documentation.
+	* @param target The target object that will have its properties tweened.
+	* @param props The configuration properties to apply to this tween instance (ex. `{loop:true, paused:true}`.
+	*	All properties default to false. Supported props are:<UL>
+	*	   <LI> loop: sets the loop property on this tween.</LI>
+	*	   <LI> useTicks: uses ticks for all durations instead of milliseconds.</LI>
+	*	   <LI> ignoreGlobalPause: sets the ignoreGlobalPause property on this tween.</LI>
+	*	   <LI> override: if true, `Tween.removeTweens(target)` will be called to remove any other tweens with the same target.
+	*	   <LI> paused: indicates whether to start the tween paused.</LI>
+	*	   <LI> position: indicates the initial position for this tween.</LI>
+	*	   <LI> onChange: specifies a listener for the "change" event.</LI>
+	*	</UL>
+	* @param pluginData An object containing data for use by installed plugins. See individual
+	*	plugins' documentation for details.
 	*/
-	public function new():Void;
+	public function new(target:Dynamic, ?props:Dynamic, ?pluginData:Dynamic):Void;
 	
 	/**
 	* Advances all tweens. This typically uses the Ticker class (available in the EaselJS library), but you can call it
 	*	manually if you prefer to use your own "heartbeat" implementation.
+	*	
+	*	Note: Currently, EaselJS must be included <em>before</em> TweenJS to ensure Ticker exists during initialization.
 	* @param delta The change in time in milliseconds since the last tick. Required unless all tweens have
 	*	<code>useTicks</code> set to true.
-	* @param paused Indicates whether a global pause is in effect. Tweens with <code>ignoreGlobalPause</code> will ignore
-	*	this, but all others will pause if this is true.
+	* @param paused Indicates whether a global pause is in effect. Tweens with <code>ignoreGlobalPause</code>
+	*	will ignore this, but all others will pause if this is true.
 	*/
 	public static function tick(delta:Float, paused:Bool):Dynamic;
 	
@@ -179,9 +196,16 @@ extern class Tween
 	//public function tick(delta:Float):Dynamic;
 	
 	/**
-	* Indicates whether there are any active tweens on the target object (if specified) or in general.
-	* @param target Optional. If not specified, the return value will indicate if there are any active tweens
-	*	on any target.
+	* Handle events that result from Tween being used as an event handler. This is included to allow Tween to handle
+	*	tick events from <code>createjs.Ticker</code>. No other events are handled in Tween.
+	* @param event An event object passed in by the EventDispatcher. Will usually be of type "tick".
+	*/
+	private static function handleEvent(event:Dynamic):Dynamic;
+	
+	/**
+	* Indicates whether there are any active tweens (and how many) on the target object (if specified) or in general.
+	* @param target The target to check for active tweens. If not specified, the return value will indicate
+	*	if there are any active tweens on any target.
 	*/
 	public static function hasActiveTweens(?target:Dynamic):Bool;
 	
@@ -214,8 +238,11 @@ extern class Tween
 	/**
 	* Queues a wait (essentially an empty tween).
 	* @param duration The duration of the wait in milliseconds (or in ticks if <code>useTicks</code> is true).
+	* @param passive Tween properties will not be updated during a passive wait. This
+	*	is mostly useful for use with Timeline's that contain multiple tweens affecting the same target
+	*	at different times.
 	*/
-	public function wait(duration:Float):Tween;
+	public function wait(duration:Float, passive:Bool):Tween;
 	
 	/**
 	* Queues an action to call the specified function.
@@ -249,13 +276,10 @@ extern class Tween
 	
 	/**
 	* Registers or unregisters a tween with the ticking system.
+	* @param tween The tween instance to register or unregister.
+	* @param value If true, the tween is registered. If false the tween is unregistered.
 	*/
-	private static function _register():Dynamic;
-	
-	/**
-	* Remove all tweens. This will stop and clean up all existing tweens.
-	*/
-	public static function removeAllTweens():Dynamic;
+	private static function _register(tween:Tween, value:Bool):Dynamic;
 	
 	/**
 	* Removes all existing tweens for a target. This is called automatically by new tweens if the <code>override</code>
@@ -276,8 +300,7 @@ extern class Tween
 	*	   <LI> override: if true, Tween.removeTweens(target) will be called to remove any other tweens with the same target.
 	*	   <LI> paused: indicates whether to start the tween paused.</LI>
 	*	   <LI> position: indicates the initial position for this tween.</LI>
-	*	   <LI> onChange: specifies an onChange handler for this tween. Note that this is deprecated in favour of the
-	*	   "change" event.</LI>
+	*	   <LI> onChange: specifies a listener for the "change" event.</LI>
 	*	</UL>
 	* @param pluginData An object containing data for use by installed plugins. See individual
 	*	plugins' documentation for details.
@@ -290,6 +313,11 @@ extern class Tween
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
+	/**
+	* Stop and remove all existing tweens.
+	*/
+	public static function removeAllTweens():Dynamic;
 	
 	private function _addAction(o:Dynamic):Dynamic;
 	

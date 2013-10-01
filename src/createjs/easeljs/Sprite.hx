@@ -4,7 +4,7 @@ import js.html.CanvasRenderingContext2D;
 import js.html.Text;
 
 /**
-* Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of
+* Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
 *	images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
 *	images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames,
 *	play frames as an animation, and even sequence animations together.
@@ -12,17 +12,22 @@ import js.html.Text;
 *	See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
 *	
 *	<h4>Example</h4>
-*	     var instance = new createjs.BitmapAnimation(spriteSheet);
+*	     var instance = new createjs.Sprite(spriteSheet);
 *	     instance.gotoAndStop("frameName");
 *	
-*	Currently, you <strong>must</strong> call either {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or
-*	{{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, or nothing will display on stage.
+*	Until {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} is called,
+*	only the first defined frame defined in the sprite sheet will be displayed.
 */
-@:native("createjs.BitmapAnimation")
-extern class BitmapAnimation extends DisplayObject
+@:native("createjs.Sprite")
+extern class Sprite extends DisplayObject
 {
 	/**
-	* Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}}, {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, etc.)
+	* By default Sprite instances advance one frame per tick. Specifying a framerate for the Sprite (or its related SpriteSheet) will cause it to advance based on elapsed time between ticks as appropriate to maintain the target framerate.  For example, if a Sprite with a framerate of 10 is placed on a Stage being updated at 40fps, then the Sprite will advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will vary slightly between frames.  This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+	*/
+	public var framerate:Float;
+	
+	/**
+	* Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "Sprite/stop"}}{{/crossLink}}, {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}, etc.)
 	*/
 	private var _dispatchAnimationEnd:Dynamic;
 	
@@ -32,22 +37,22 @@ extern class BitmapAnimation extends DisplayObject
 	public var paused:Bool;
 	
 	/**
-	* Returns the currently playing animation. READ-ONLY.
-	*/
-	public var currentAnimation:String;
-	
-	/**
-	* Specifies a function to call whenever any animation reaches its end. It will be called with three params: the first will be a reference to this instance, the second will be the name of the animation that just ended, and the third will be the name of the next animation that will be played.
+	* REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Sprite/animationend:event"}}{{/crossLink}} event.
 	*/
 	public var onAnimationEnd:Dynamic;
 	
 	/**
-	* Specifies the current frame index within the current playing animation. When playing normally, this will increase successively from 0 to n-1, where n is the number of frames in the current animation.
+	* Returns the name of the currently playing animation.
+	*/
+	public var currentAnimation:String;
+	
+	/**
+	* Specifies the current frame index within the currently playing animation. When playing normally, this will increase from 0 to n-1, where n is the number of frames in the current animation.  This could be a non-integer value if using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is not an integer.
 	*/
 	public var currentAnimationFrame:Float;
 	
 	/**
-	* The frame that will be drawn when draw is called. Note that with some SpriteSheet data, this will advance non-sequentially. READ-ONLY.
+	* The frame index that will be drawn when draw is called. Note that with some {{#crossLink "SpriteSheet"}}{{/crossLink}} definitions, this will advance non-sequentially. This will always be an integer value.
 	*/
 	public var currentFrame:Float;
 	
@@ -55,11 +60,6 @@ extern class BitmapAnimation extends DisplayObject
 	* The SpriteSheet instance to play back. This includes the source image, frame dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
 	*/
 	public var spriteSheet:SpriteSheet;
-	
-	/**
-	* When used in conjunction with animations having an frequency greater than 1, this lets you offset which tick the playhead will advance on. For example, you could create two BitmapAnimations, both playing an animation with a frequency of 2, but one having offset set to 1. Both instances would advance every second tick, but they would advance on alternating ticks (effectively, one instance would advance on odd ticks, the other on even ticks).
-	*/
-	public var offset:Float;
 	
 	private var _advanceCount:Float;
 	
@@ -71,7 +71,11 @@ extern class BitmapAnimation extends DisplayObject
 	
 	private var DisplayObject_draw:Dynamic;
 	
+	private var DisplayObject_getBounds:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
+	
+	public var offset:Float;
 	
 	/**
 	* Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
@@ -81,8 +85,10 @@ extern class BitmapAnimation extends DisplayObject
 	
 	/**
 	* Advances the playhead. This occurs automatically each tick by default.
+	* @param time The amount of time in ms to advance by. Only applicable if framerate is set on the Sprite
+	*	or its SpriteSheet.
 	*/
-	public function advance():Dynamic;
+	public function advance(?time:Float):Dynamic;
 	
 	/**
 	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
@@ -103,14 +109,7 @@ extern class BitmapAnimation extends DisplayObject
 	//public function updateCache():Dynamic;
 	
 	/**
-	* Begin playing a paused animation. The BitmapAnimation will be paused if either {{#crossLink "BitmapAnimation/stop"}}{{/crossLink}}
-	*	or {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
-	*	unchanged.
-	*/
-	public function play():Dynamic;
-	
-	/**
-	* Displays frames or sequences of frames (ie. animations) from a sprite sheet image. A sprite sheet is a series of
+	* Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
 	*	images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
 	*	images could be combined into a 400x200 sprite sheet (4 frames across by 2 high). You can display individual frames,
 	*	play frames as an animation, and even sequence animations together.
@@ -118,18 +117,19 @@ extern class BitmapAnimation extends DisplayObject
 	*	See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
 	*	
 	*	<h4>Example</h4>
-	*	     var instance = new createjs.BitmapAnimation(spriteSheet);
+	*	     var instance = new createjs.Sprite(spriteSheet);
 	*	     instance.gotoAndStop("frameName");
 	*	
-	*	Currently, you <strong>must</strong> call either {{#crossLink "BitmapAnimation/gotoAndStop"}}{{/crossLink}} or
-	*	{{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}, or nothing will display on stage.
+	*	Until {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} or {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} is called,
+	*	only the first defined frame defined in the sprite sheet will be displayed.
 	* @param spriteSheet The SpriteSheet instance to play back. This includes the source image(s), frame
 	*	dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
+	* @param frameOrAnimation The frame number or animation to play initially.
 	*/
-	public function new(spriteSheet:SpriteSheet):Void;
+	public function new(spriteSheet:SpriteSheet, frameOrAnimation:Dynamic):Void;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param ctx The canvas 2D context object to draw into.
@@ -147,19 +147,27 @@ extern class BitmapAnimation extends DisplayObject
 	/**
 	* Moves the playhead to the specified frame number or animation.
 	* @param frameOrAnimation The frame number or animation that the playhead should move to.
+	* @param frame The frame of the animation to go to. Defaults to 0.
 	*/
-	private function _goto(frameOrAnimation:Dynamic):Dynamic;
+	private function _goto(frameOrAnimation:Dynamic, ?frame:Bool):Dynamic;
 	
 	/**
 	* Normalizes the current frame, advancing animations and dispatching callbacks as appropriate.
 	*/
-	private function _normalizeCurrentFrame():Dynamic;
+	private function _normalizeFrame():Dynamic;
 	
 	/**
-	* Returns a clone of the BitmapAnimation instance. Note that the same SpriteSheet is shared between cloned
+	* Play (unpause) the current animation. The Sprite will be paused if either {{#crossLink "Sprite/stop"}}{{/crossLink}}
+	*	or {{#crossLink "Sprite/gotoAndStop"}}{{/crossLink}} is called. Single frame animations will remain
+	*	unchanged.
+	*/
+	public function play():Dynamic;
+	
+	/**
+	* Returns a clone of the Sprite instance. Note that the same SpriteSheet is shared between cloned
 	*	instances.
 	*/
-	//public function clone():BitmapAnimation;
+	//public function clone():Sprite;
 	
 	/**
 	* Returns a string representation of this object.
@@ -169,11 +177,11 @@ extern class BitmapAnimation extends DisplayObject
 	/**
 	* Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
 	*	the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
-	*	rectangle with [x=-50, y=-40, width=90, height=70].
+	*	rectangle with [x=-50, y=-40, width=90, height=70]. This ignores transformations on the display object.
 	*	
 	*	Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
 	*/
-	public function getBounds():Rectangle;
+	//public function getBounds():Rectangle;
 	
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -197,8 +205,8 @@ extern class BitmapAnimation extends DisplayObject
 	public function gotoAndStop(frameOrAnimation:Dynamic):Dynamic;
 	
 	/**
-	* Stop playing a running animation. The BitmapAnimation will be playing if {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}}
-	*	is called. Note that calling {{#crossLink "BitmapAnimation/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "BitmapAnimation/play"}}{{/crossLink}}
+	* Stop playing a running animation. The Sprite will be playing if {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}
+	*	is called. Note that calling {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}} or {{#crossLink "Sprite/play"}}{{/crossLink}}
 	*	will resume playback.
 	*/
 	public function stop():Dynamic;

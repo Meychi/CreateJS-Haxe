@@ -1,5 +1,7 @@
 package createjs.easeljs;
 
+import js.html.Image;
+
 /**
 * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
 *	you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
@@ -12,7 +14,7 @@ package createjs.easeljs;
 *	to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
 */
 @:native("createjs.SpriteSheetBuilder")
-extern class SpriteSheetBuilder
+extern class SpriteSheetBuilder extends EventDispatcher
 {
 	/**
 	* A number from 0.01 to 0.99 that indicates what percentage of time the builder can use. This can be thought of as the number of seconds per second the builder will use. For example, with a timeSlice value of 0.3, the builder will run 20 times per second, using approximately 15ms per build (30% of available time, or 0.3s per second). Defaults to 0.3.
@@ -20,17 +22,7 @@ extern class SpriteSheetBuilder
 	public var timeSlice:Float;
 	
 	/**
-	* Callback function to call when a build completes. Called with a single parameter pointing back to this instance.
-	*/
-	public var onComplete:Dynamic;
-	
-	/**
-	* Callback to call when an asynchronous build has progress. Called with two parameters, a reference back to this instance, and the current progress value (0-1).
-	*/
-	public var onProgress:Dynamic;
-	
-	/**
-	* Read-only. A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not been initiated.
+	* A value between 0 and 1 that indicates the progress of a build, or -1 if a build has not been initiated.
 	*/
 	public var progress:Float;
 	
@@ -52,7 +44,7 @@ extern class SpriteSheetBuilder
 	/**
 	* The scale to apply when drawing all frames to the sprite sheet. This is multiplied against any scale specified in the addFrame call. This can be used, for example, to generate a sprite sheet at run time that is tailored to the a specific device resolution (ex. tablet vs mobile).
 	*/
-	public var defaultScale:Float;
+	public var scale:Float;
 	
 	/**
 	* The sprite sheet that was generated. This will be null before a build is completed successfully.
@@ -77,7 +69,7 @@ extern class SpriteSheetBuilder
 	* Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
 	*	call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
 	*	a function run immediately before the draw occurs. For example, this allows you to add a single source multiple
-	*	times, but manipulate it or it's children to change it to generate different frames.
+	*	times, but manipulate it or its children to change it to generate different frames.
 	*	
 	*	Note that the source's transformations (x, y, scale, rotate, alpha) will be ignored, except for regX/Y. To apply
 	*	transforms to a source object and have them captured in the sprite sheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
@@ -116,7 +108,7 @@ extern class SpriteSheetBuilder
 	/**
 	* Builds a SpriteSheet instance based on the current frames.
 	*/
-	public function build():Dynamic;
+	public function build():SpriteSheet;
 	
 	/**
 	* Initialization method.
@@ -171,7 +163,9 @@ extern class SpriteSheetBuilder
 	
 	private function _endBuild():Dynamic;
 	
-	private function _fillRow():Float;
+	private function _fillRow(frames:Array<Dynamic>, y:Float, img:Image, dataFrames:Dynamic, pad:Float):Float;
+	
+	private function _getSize():Float;
 	
 	private function _run():Dynamic;
 	

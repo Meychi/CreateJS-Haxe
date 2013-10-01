@@ -23,26 +23,6 @@ extern class AbstractLoader
 	public var loaded:Bool;
 	
 	/**
-	* The callback that is fired when a load starts.
-	*/
-	public var onLoadStart:Dynamic;
-	
-	/**
-	* The callback that is fired when the loader encounters an error.
-	*/
-	public var onError:Dynamic;
-	
-	/**
-	* The callback that is fired when the loader's content has been entirely loaded.
-	*/
-	public var onComplete:Dynamic;
-	
-	/**
-	* The callback that is fired when the overall progress changes.
-	*/
-	public var onProgress:Dynamic;
-	
-	/**
 	* The current load progress (percentage) for this item. This will be a number between 0 and 1.
 	*/
 	public var progress:Float;
@@ -89,27 +69,27 @@ extern class AbstractLoader
 	private function _isCanceled():Bool;
 	
 	/**
-	* Dispatch a complete event (and onComplete callback). Please see the <code>AbstractLoader.complete</code> event
+	* Dispatch a complete event. Please see the {{#crossLink "AbstractLoader/complete:event"}}{{/crossLink}} event
 	*	for details on the event payload.
 	*/
 	private function _sendComplete():Dynamic;
 	
 	/**
-	* Dispatch a loadstart event (and onLoadStart callback). Please see the <code>AbstractLoader.loadstart</code> event
+	* Dispatch a loadstart event. Please see the {{#crossLink "AbstractLoader/loadstart:event"}}{{/crossLink}} event
 	*	for details on the event payload.
 	*/
 	private function _sendLoadStart():Dynamic;
 	
 	/**
-	* Dispatch a progress event (and onProgress callback). Please see the <code>AbstractLoader.progress</code> event
-	*	for details on the event payload.
+	* Dispatch a progress event. Please see the {{#crossLink "AbstractLoader/progress:event"}}{{/crossLink}} event for
+	*	details on the event payload.
 	* @param value The progress of the loaded item, or an object containing <code>loaded</code>
 	*	and <code>total</code> properties.
 	*/
 	private function _sendProgress(value:Dynamic):Dynamic;
 	
 	/**
-	* Dispatch an error event (and onError callback). Please see the <code>AbstractLoader.error</code> event for
+	* Dispatch an error event. Please see the {{#crossLink "AbstractLoader/error:event"}}{{/crossLink}} event for
 	*	details on the event payload.
 	* @param event The event object containing specific error properties.
 	*/

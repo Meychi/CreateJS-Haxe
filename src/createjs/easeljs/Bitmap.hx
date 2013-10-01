@@ -9,8 +9,15 @@ import js.html.CanvasRenderingContext2D;
 *	<h4>Example</h4>
 *	     var bitmap = new createjs.Bitmap("imagePath.jpg");
 *	
-*	Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
-*	will be displayed.
+*	<strong>Notes:</strong>
+*	<ol>
+*	    <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+*	     will be displayed.</li>
+*	    <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
+*	    the Bitmap can be cached.</li>
+*	    <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
+*	    happens in all browsers except recent Firefox builds.</li>
+*	</ol>
 */
 @:native("createjs.Bitmap")
 extern class Bitmap extends DisplayObject
@@ -27,6 +34,8 @@ extern class Bitmap extends DisplayObject
 	
 	private var DisplayObject_draw:Dynamic;
 	
+	private var DisplayObject_getBounds:Dynamic;
+	
 	private var DisplayObject_initialize:Dynamic;
 	
 	/**
@@ -36,9 +45,18 @@ extern class Bitmap extends DisplayObject
 	*	<h4>Example</h4>
 	*	     var bitmap = new createjs.Bitmap("imagePath.jpg");
 	*	
-	*	Note: When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
-	*	will be displayed.
-	* @param imageOrUri The source object or URI to an image to display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use. If it is a URI, a new Image object will be constructed and assigned to the .image property.
+	*	<strong>Notes:</strong>
+	*	<ol>
+	*	    <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+	*	     will be displayed.</li>
+	*	    <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
+	*	    the Bitmap can be cached.</li>
+	*	    <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
+	*	    happens in all browsers except recent Firefox builds.</li>
+	*	</ol>
+	* @param imageOrUri The source object or URI to an image to
+	*	display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
+	*	If it is a URI, a new Image object will be constructed and assigned to the .image property.
 	*/
 	public function new(imageOrUri:Dynamic):Void;
 	
@@ -73,7 +91,7 @@ extern class Bitmap extends DisplayObject
 	//public function updateCache():Dynamic;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -82,12 +100,15 @@ extern class Bitmap extends DisplayObject
 	*	For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	*	into itself).
 	*/
-	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
+	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
 	
 	/**
 	* Initialization method.
+	* @param imageOrUri The source object or URI to an image to
+	*	display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
+	*	If it is a URI, a new Image object will be constructed and assigned to the `.image` property.
 	*/
-	//private function initialize():Dynamic;
+	//private function initialize(imageOrUri:Dynamic):Dynamic;
 	
 	/**
 	* Returns a clone of the Bitmap instance.

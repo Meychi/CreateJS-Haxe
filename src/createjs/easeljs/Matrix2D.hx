@@ -1,5 +1,7 @@
 package createjs.easeljs;
 
+import js.html.Point;
+
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
 */
@@ -7,12 +9,12 @@ package createjs.easeljs;
 extern class Matrix2D
 {
 	/**
-	* An identity matrix, representing a null transformation. Read-only.
+	* An identity matrix, representing a null transformation.
 	*/
 	public static var identity:Matrix2D;
 	
 	/**
-	* Multiplier for converting degrees to radians. Used internally by Matrix2D. Read-only.
+	* Multiplier for converting degrees to radians. Used internally by Matrix2D.
 	*/
 	public static var DEG_TO_RAD:Float;
 	
@@ -118,6 +120,12 @@ extern class Matrix2D
 	public function prepend(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float):Matrix2D;
 	
 	/**
+	* Copies all properties from the specified matrix to this matrix.
+	* @param matrix The matrix to copy properties from.
+	*/
+	public function copy(matrix:Matrix2D):Matrix2D;
+	
+	/**
 	* Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
 	*	may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	*	results.
@@ -155,12 +163,18 @@ extern class Matrix2D
 	* @param regX Optional.
 	* @param regY Optional.
 	*/
-	public function prependTransform(x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, skewX:Float, skewY:Float, ?regX:Float, ?regY:Float):Matrix2D;
+	public function prependTransform(x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, skewX:Float, skewY:Float, regX:Float, regY:Float):Matrix2D;
 	
 	/**
-	* Initialization method.
+	* Initialization method. Can also be used to reinitialize the instance.
+	* @param a Specifies the a property for the new matrix.
+	* @param b Specifies the b property for the new matrix.
+	* @param c Specifies the c property for the new matrix.
+	* @param d Specifies the d property for the new matrix.
+	* @param tx Specifies the tx property for the new matrix.
+	* @param ty Specifies the ty property for the new matrix.
 	*/
-	private function initialize():Matrix2D;
+	public function initialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float):Matrix2D;
 	
 	/**
 	* Inverts the matrix, causing it to perform the opposite transformation.
@@ -171,7 +185,7 @@ extern class Matrix2D
 	* Prepends the specified matrix with this matrix.
 	* @param matrix 
 	*/
-	public function prependMatrix(matrix:Matrix2D):Dynamic;
+	public function prependMatrix(matrix:Matrix2D):Matrix2D;
 	
 	/**
 	* Prepends the specified visual properties to the current matrix.
@@ -182,6 +196,20 @@ extern class Matrix2D
 	public function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String):Matrix2D;
 	
 	/**
+	* Reinitializes all matrix properties to those specified.
+	* @param a Specifies the a property for the new matrix.
+	* @param b Specifies the b property for the new matrix.
+	* @param c Specifies the c property for the new matrix.
+	* @param d Specifies the d property for the new matrix.
+	* @param tx Specifies the tx property for the new matrix.
+	* @param ty Specifies the ty property for the new matrix.
+	* @param alpha desired alpha value
+	* @param shadow desired shadow value
+	* @param compositeOperation desired composite operation value
+	*/
+	public function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String):Matrix2D;
+	
+	/**
 	* Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
 	* @param a Specifies the a property for the new matrix.
 	* @param b Specifies the b property for the new matrix.
@@ -190,7 +218,7 @@ extern class Matrix2D
 	* @param tx Specifies the tx property for the new matrix.
 	* @param ty Specifies the ty property for the new matrix.
 	*/
-	public function new(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float):Void;
+	public function new(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float):Void;
 	
 	/**
 	* Returns a clone of the Matrix2D instance.
@@ -211,6 +239,14 @@ extern class Matrix2D
 	* Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	*/
 	//public function identity():Matrix2D;
+	
+	/**
+	* Transforms a point according to this matrix.
+	* @param x The x component of the point to transform.
+	* @param y The y component of the point to transform.
+	* @param pt An object to copy the result into. If omitted a generic object with x/y properties will be returned.
+	*/
+	public function transformPoint(x:Float, y:Float, ?pt:Dynamic):Point;
 	
 	/**
 	* Translates the matrix on the x and y axes.

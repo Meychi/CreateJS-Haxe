@@ -31,7 +31,7 @@ import js.html.Element;
 *	Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+). HTML Audio is disabled by
 *	default as it can only have one &lt;audio&gt; tag, can not preload or autoplay the audio, can not cache the audio,
 *	and can not play the audio except inside a user initiated event.
-*	
+*	<br /><br />
 *	<b>Android HTML Audio limitations</b><br />
 *	<ul><li>We have no control over audio volume. Only the user can set volume on their device.</li>
 *	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li>
@@ -49,6 +49,11 @@ import js.html.Element;
 @:native("createjs.HTMLAudioPlugin")
 extern class HTMLAudioPlugin
 {
+	/**
+	* Allows users to enable HTML audio on IOS, which is disabled by default. Note this needs to be set before HTMLAudioPlugin is registered with SoundJS. This is not recommend because of severe limitations on IOS devices including: <li>it can only have one &lt;audio&gt; tag</li> <li>can not preload or autoplay the audio</li> <li>can not cache the audio</li> <li>can not play the audio except inside a user initiated event</li>
+	*/
+	public var enableIOS:Bool;
+	
 	/**
 	* Event constant for the "canPlayThrough" event for cleaner code.
 	*/
@@ -80,7 +85,7 @@ extern class HTMLAudioPlugin
 	private var audioSources:Dynamic;
 	
 	/**
-	* The capabilities of the plugin. This is generated via the the SoundInstance {{#crossLink "TMLAudioPlugin/generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for an overview of all of the available properties.
+	* The capabilities of the plugin. This is generated via the the SoundInstance {{#crossLink "HTMLAudioPlugin/generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for an overview of all of the available properties.
 	*/
 	public static var capabilities:Dynamic;
 	
@@ -104,6 +109,13 @@ extern class HTMLAudioPlugin
 	* @param src The sound URI to check.
 	*/
 	public function isPreloadStarted(src:String):Bool;
+	
+	/**
+	* Checks if src was changed on tag used to create instances in TagPool before loading
+	*	Currently PreloadJS does this when a basePath is set, so we are replicating that behavior for internal preloading.
+	* @param event 
+	*/
+	private function handleTagLoad(event:Dynamic):Dynamic;
 	
 	/**
 	* Create a sound instance. If the sound has not been preloaded, it is internally preloaded here.
@@ -133,8 +145,9 @@ extern class HTMLAudioPlugin
 	* Internally preload a sound.
 	* @param src The sound URI to load.
 	* @param instance An object containing a tag property that is an HTML audio tag used to load src.
+	* @param basePath A file path to prepend to the src.
 	*/
-	public function preload(src:String, instance:Dynamic):Dynamic;
+	public function preload(src:String, instance:Dynamic, basePath:String):Dynamic;
 	
 	/**
 	* Play sounds using HTML &lt;audio&gt; tags in the browser. This plugin is the second priority plugin installed
@@ -165,7 +178,7 @@ extern class HTMLAudioPlugin
 	*	Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+). HTML Audio is disabled by
 	*	default as it can only have one &lt;audio&gt; tag, can not preload or autoplay the audio, can not cache the audio,
 	*	and can not play the audio except inside a user initiated event.
-	*	
+	*	<br /><br />
 	*	<b>Android HTML Audio limitations</b><br />
 	*	<ul><li>We have no control over audio volume. Only the user can set volume on their device.</li>
 	*	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li>

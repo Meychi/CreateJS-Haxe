@@ -15,7 +15,7 @@ import js.html.CanvasRenderingContext2D;
 *		    g.beginFill(createjs.Graphics.getRGB(255,0,0));
 *		    g.drawCircle(0,0,3);
 *	
-*		    var s = new Shape(g);
+*		    var s = new createjs.Shape(g);
 *		    	s.x = 100;
 *		    	s.y = 100;
 *	
@@ -72,6 +72,11 @@ import js.html.CanvasRenderingContext2D;
 extern class Graphics
 {
 	/**
+	* Exposes the Command class used internally by Graphics. Useful for extending the Graphics class or injecting functionality.
+	*/
+	public static var Command:Dynamic;
+	
+	/**
 	* Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
 	*/
 	public static var BASE_64:Dynamic;
@@ -94,13 +99,15 @@ extern class Graphics
 	
 	private var _fillInstructions:Array<Dynamic>;
 	
-	private var _ignoreScaleStroke:Bool;
-	
 	private var _instructions:Array<Dynamic>;
 	
 	private var _oldInstructions:Array<Dynamic>;
 	
+	private var _strokeIgnoreScale:Bool;
+	
 	private var _strokeInstructions:Array<Dynamic>;
+	
+	private var _strokeMatrix:Array<Dynamic>;
 	
 	private var _strokeStyleInstructions:Array<Dynamic>;
 	
@@ -296,13 +303,13 @@ extern class Graphics
 	/**
 	* Draws a circle with the specified radius at (x, y).
 	*	
-	*	     var g = new Graphics();
+	*	     var g = new createjs.Graphics();
 	*		    g.setStrokeStyle(1);
-	*		    g.beginStroke(Graphics.getRGB(0,0,0));
-	*		    g.beginFill(Graphics.getRGB(255,0,0));
+	*		    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+	*		    g.beginFill(createjs.Graphics.getRGB(255,0,0));
 	*		    g.drawCircle(0,0,3);
 	*	
-	*		    var s = new Shape(g);
+	*		    var s = new createjs.Shape(g);
 	*			s.x = 100;
 	*			s.y = 100;
 	*	
@@ -320,7 +327,7 @@ extern class Graphics
 	* Draws a line from the current drawing point to the specified position, which become the new current drawing
 	*	point. A tiny API method "lt" also exists.
 	*	
-	*	For detailed information, read the 
+	*	For detailed information, read the
 	*	<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
 	*	whatwg spec</a>.
 	* @param x The x coordinate the drawing point should draw to.
@@ -414,7 +421,7 @@ extern class Graphics
 	public function arc(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, anticlockwise:Bool):Graphics;
 	
 	/**
-	* Draws an arc with the specified control points and radius.  For detailed information, read the 
+	* Draws an arc with the specified control points and radius.  For detailed information, read the
 	*	<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-arcto">
 	*	whatwg spec</a>. A tiny API method "at" also exists.
 	* @param x1 
@@ -443,7 +450,7 @@ extern class Graphics
 	public function drawAsPath(ctx:CanvasRenderingContext2D):Dynamic;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -488,15 +495,52 @@ extern class Graphics
 	public function moveTo(x:Float, y:Float):Graphics;
 	
 	/**
+	* Provides a method for injecting arbitrary Context2D (aka Canvas) API calls into a Graphics queue. The specified
+	*	callback function will be called in sequence with other drawing instructions. The callback will be executed in the
+	*	scope of the target canvas's Context2D object, and will be passed the data object as a parameter.
+	*	
+	*	This is an advanced feature. It can allow for powerful functionality, like injecting output from tools that
+	*	export Context2D instructions, executing raw canvas calls within the context of the display list, or dynamically
+	*	modifying colors or stroke styles within a Graphics instance over time, but it is not intended for general use.
+	*	
+	*	Within a Graphics queue, each path begins by applying the fill and stroke styles and settings, followed by
+	*	drawing instructions, followed by the fill() and/or stroke() commands. This means that within a path, inject() can
+	*	update the fill & stroke styles, but for it to be applied in a predictable manner, you must have begun a fill or
+	*	stroke (as appropriate) normally via the Graphics API. For example:
+	*	
+	*		function setColor(color) {
+	*			this.fillStyle = color;
+	*		}
+	*	
+	*		// this will not draw anything - no fill was begun, so fill() is not called:
+	*		myGraphics.inject(setColor, "red").drawRect(0,0,100,100);
+	*	
+	*		// this will draw the rect in green:
+	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100);
+	*	
+	*		// this will draw both rects in blue, because there is only a single path
+	*		// so the second inject overwrites the first:
+	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
+	*			.inject(setColor, "blue").drawRect(100,0,100,100);
+	*	
+	*		// this will draw the first rect in green, and the second in blue:
+	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
+	*			.beginFill("#000").inject(setColor, "blue").drawRect(100,0,100,100);
+	* @param callback The function to execute.
+	* @param data Arbitrary data that will be passed to the callback when it is executed.
+	*/
+	public function inject(_callback:Dynamic, data:Dynamic):Graphics;
+	
+	/**
 	* Returns a clone of this Graphics instance.
 	*/
 	public function clone():Graphics;
 	
 	/**
-	* Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)", 
+	* Returns a CSS compatible color string based on the specified HSL numeric color values in the format "hsla(360,100,100,1.0)",
 	*	or if alpha is null then in the format "hsl(360,100,100)".
 	*	
-	*	     Graphics.getHSL(150, 100, 70);
+	*	     createjs.Graphics.getHSL(150, 100, 70);
 	*	     // Returns "hsl(150,100,70)"
 	* @param hue The hue component for the color, between 0 and 360.
 	* @param saturation The saturation component for the color, between 0 and 100.
@@ -506,16 +550,16 @@ extern class Graphics
 	public static function getHSL(hue:Float, saturation:Float, lightness:Float, ?alpha:Float):String;
 	
 	/**
-	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format 
+	* Returns a CSS compatible color string based on the specified RGB numeric color values in the format
 	*	"rgba(255,255,255,1.0)", or if alpha is null then in the format "rgb(255,255,255)". For example,
 	*	
-	*	     Graphics.getRGB(50, 100, 150, 0.5);
+	*	     createjs.Graphics.getRGB(50, 100, 150, 0.5);
 	*	     // Returns "rgba(50,100,150,0.5)"
 	*	
 	*	It also supports passing a single hex color value as the first param, and an optional alpha value as the second
 	*	param. For example,
 	*	
-	*	     Graphics.getRGB(0xFF00FF, 0.2);
+	*	     createjs.Graphics.getRGB(0xFF00FF, 0.2);
 	*	     // Returns "rgba(255,0,255,0.2)"
 	* @param r The red component for the color, between 0 and 0xFF (255).
 	* @param g The green component for the color, between 0 and 0xFF (255).
@@ -568,7 +612,7 @@ extern class Graphics
 	*		    g.beginFill(createjs.Graphics.getRGB(255,0,0));
 	*		    g.drawCircle(0,0,3);
 	*	
-	*		    var s = new Shape(g);
+	*		    var s = new createjs.Shape(g);
 	*		    	s.x = 100;
 	*		    	s.y = 100;
 	*	
@@ -629,6 +673,10 @@ extern class Graphics
 	* @param value 
 	*/
 	private function _setProp(name:String, value:String):Dynamic;
+	
+	private function _appendDraw():Dynamic;
+	
+	private function _appendInstructions():Dynamic;
 	
 	private function _newPath():Dynamic;
 	

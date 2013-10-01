@@ -16,14 +16,14 @@ import js.html.audio.GainNode;
 *	releases.  To change plugin priority, check out the Sound API {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} method.
 *	
 *	<h4>Known Browser and OS issues for Web Audio Plugin</h4>
-*	<b>Webkit (Chrome and Safari)</b><br />
+*	<b>Webkit (Chrome and Safari)</b>
 *	<ul><li>AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
-*	are playing a lot of audio files.</li>
-*	
-*	<b>iOS 6 limitations</b><br />
-*	<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
-*	     <li>Despite suggestions to the opposite, we have relative control over audio volume through the gain nodes.</li>
-*			<li>A bug exists that will distort uncached audio when a video element is present in the DOM.</li>
+*	are playing a lot of audio files.</li></ul>
+*	<br />
+*	<b>iOS 6 limitations</b>
+*		<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
+*	 <li>Despite suggestions to the opposite, we have relative control over audio volume through the gain nodes.</li>
+*		<li>A bug exists that will distort uncached audio when a video element is present in the DOM.</li>
 *	</ul>
 */
 @:native("createjs.WebAudioPlugin")
@@ -35,7 +35,7 @@ extern class WebAudioPlugin
 	public var dynamicsCompressorNode:AudioNode;
 	
 	/**
-	* A GainNode for controlling master volume. It is connected to <code>dynamicsCompressorNode</code>.
+	* A GainNode for controlling master volume. It is connected to {{#crossLink "WebAudioPlugin/dynamicsCompressorNode:property"}}{{/crossLink}}.
 	*/
 	public var gainNode:GainNode;
 	
@@ -45,7 +45,7 @@ extern class WebAudioPlugin
 	private var arrayBuffers:Dynamic;
 	
 	/**
-	* The capabilities of the plugin. This is generated via the <code>"WebAudioPlugin/generateCapabilities</code> method and is used internally.
+	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/generateCapabilities:method"}}{{/crossLink}} method and is used internally.
 	*/
 	public static var capabilities:Dynamic;
 	
@@ -58,6 +58,11 @@ extern class WebAudioPlugin
 	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.
 	*/
 	public var context:AudioContext;
+	
+	/**
+	* Value to set panning model to equal power for SoundInstance.  Can be "equalpower" or 0 depending on browser implementation.
+	*/
+	private var panningModel:Dynamic;
 	
 	/**
 	* Add loaded results to the preload object hash.
@@ -95,6 +100,11 @@ extern class WebAudioPlugin
 	public static function isSupported():Bool;
 	
 	/**
+	* Determine if XHR is supported, which is necessary for web audio.
+	*/
+	private static function isFileXHRSupported():Bool;
+	
+	/**
 	* Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/getCapabilities"}}{{/crossLink}}
 	*	method for an overview of plugin capabilities.
 	*/
@@ -114,8 +124,9 @@ extern class WebAudioPlugin
 	* Internally preload a sound. Loading uses XHR2 to load an array buffer for use with WebAudio.
 	* @param src The sound URI to load.
 	* @param instance Not used in this plugin.
+	* @param basePath A file path to prepend to the src.
 	*/
-	private function preload(src:String, instance:Dynamic):Dynamic;
+	private function preload(src:String, instance:Dynamic, basePath:String):Dynamic;
 	
 	/**
 	* Mute all sounds via the plugin.
@@ -136,14 +147,14 @@ extern class WebAudioPlugin
 	*	releases.  To change plugin priority, check out the Sound API {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} method.
 	*	
 	*	<h4>Known Browser and OS issues for Web Audio Plugin</h4>
-	*	<b>Webkit (Chrome and Safari)</b><br />
+	*	<b>Webkit (Chrome and Safari)</b>
 	*	<ul><li>AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
-	*	are playing a lot of audio files.</li>
-	*	
-	*	<b>iOS 6 limitations</b><br />
-	*	<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
-	*	     <li>Despite suggestions to the opposite, we have relative control over audio volume through the gain nodes.</li>
-	*			<li>A bug exists that will distort uncached audio when a video element is present in the DOM.</li>
+	*	are playing a lot of audio files.</li></ul>
+	*	<br />
+	*	<b>iOS 6 limitations</b>
+	*		<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
+	*	 <li>Despite suggestions to the opposite, we have relative control over audio volume through the gain nodes.</li>
+	*		<li>A bug exists that will distort uncached audio when a video element is present in the DOM.</li>
 	*	</ul>
 	*/
 	public function new():Void;
@@ -151,7 +162,7 @@ extern class WebAudioPlugin
 	/**
 	* Plays an empty sound in the web audio context.  This is used to enable web audio on iOS devices, as they
 	*	require the first sound to be played inside of a user initiated event (touch/click).  This is called when
-	*	{{#crossLink "WebAudioPlugin"}}{{/crossLink}} is initialized (by {{#crossLink "Sound/initializeDefaultPlugins"}}{{/crossLink}}
+	*	{{#crossLink "WebAudioPlugin"}}{{/crossLink}} is initialized (by Sound {{#crossLink "Sound/initializeDefaultPlugins"}}{{/crossLink}}
 	*	for example).
 	*	
 	*	<h4>Example</h4>
@@ -164,7 +175,7 @@ extern class WebAudioPlugin
 	
 	/**
 	* Pre-register a sound for preloading and setup. This is called by {{#crossLink "Sound"}}{{/crossLink}}.
-	*	Note that WebAudio provides a <code>WebAudioLoader</code> instance, which <a href="http://preloadjs.com">PreloadJS</a>
+	*	Note that WebAudio provides a <code>Loader</code> instance, which <a href="http://preloadjs.com">PreloadJS</a>
 	*	can use to assist with preloading.
 	* @param src The source of the audio
 	* @param instances The number of concurrently playing instances to allow for the channel at any time.
@@ -200,5 +211,13 @@ extern class WebAudioPlugin
 	* @param value The volume to set, between 0 and 1.
 	*/
 	public function setVolume(value:Float):Bool;
+	
+	/**
+	* Set up compatibility if only deprecated web audio calls are supported.
+	*	See http://www.w3.org/TR/webaudio/#DeprecationNotes
+	*	Needed so we can support new browsers that don't support deprecated calls (Firefox) as well as old browsers that
+	*	don't support new calls.
+	*/
+	private function compatibilitySetUp():Dynamic;
 	
 }

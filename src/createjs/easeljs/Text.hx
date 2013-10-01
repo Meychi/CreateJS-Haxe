@@ -21,28 +21,33 @@ import js.html.Text;
 *	before it can be displayed.
 *	
 *	<strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
-*	browsers will render Text exactly the same. *
+*	browsers will render Text exactly the same.
 */
 @:native("createjs.Text")
 extern class Text extends DisplayObject
 {
 	/**
-	* "ideographic", or "bottom". For detailed information view the  <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "top".
+	* If greater than 0, the text will be drawn as a stroke (outline) of the specified width.
 	*/
-	public var textBaseline:String;
+	public var outline:Float;
 	
 	/**
-	* Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null,  the text will not be wrapped.
+	* Indicates the line height (vertical distance between baselines) for multi-line text. If null or 0, the value of getMeasuredLineHeight is used.
+	*/
+	public var lineHeight:Float;
+	
+	/**
+	* Indicates the maximum width for a line of text before it is wrapped to multiple lines. If null, the text will not be wrapped.
 	*/
 	public var lineWidth:Float;
 	
 	/**
-	* shrunk to make it fit in this width. For detailed information view the  <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>.
+	* Lookup table for the ratio to offset bounds y calculations based on the textBaseline property.
 	*/
-	public var maxWidth:Float;
+	public static var H_OFFSETS:Dynamic;
 	
 	/**
-	* The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000".
+	* The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex. "#F00"). Default is "#000". It will also accept valid canvas fillStyle values.
 	*/
 	public var color:String;
 	
@@ -52,9 +57,14 @@ extern class Text extends DisplayObject
 	public var font:String;
 	
 	/**
-	* The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed  information view the  <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "left".
+	* The horizontal text alignment. Any of "start", "end", "left", "right", and "center". For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "left".
 	*/
 	public var textAlign:String;
+	
+	/**
+	* The maximum width to draw the text. If maxWidth is specified (not null), the text will be condensed or shrunk to make it fit in this width. For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>.
+	*/
+	public var maxWidth:Float;
 	
 	/**
 	* The text to display.
@@ -62,9 +72,9 @@ extern class Text extends DisplayObject
 	public var text:String;
 	
 	/**
-	* the value of getMeasuredLineHeight is used.
+	* The vertical alignment point on the font. Any of "top", "hanging", "middle", "alphabetic", "ideographic", or "bottom". For detailed information view the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#text-styles"> whatwg spec</a>. Default is "top".
 	*/
-	public var lineHeight:Float;
+	public var textBaseline:String;
 	
 	private var _workingContext:CanvasRenderingContext2D;
 	
@@ -72,9 +82,9 @@ extern class Text extends DisplayObject
 	
 	private var DisplayObject_draw:Dynamic;
 	
-	private var DisplayObject_initialize:Dynamic;
+	private var DisplayObject_getBounds:Dynamic;
 	
-	public var outline:Bool;
+	private var DisplayObject_initialize:Dynamic;
 	
 	/**
 	* Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the
@@ -94,7 +104,7 @@ extern class Text extends DisplayObject
 	*	before it can be displayed.
 	*	
 	*	<strong>Note:</strong> Text can be expensive to generate, so cache instances where possible. Be aware that not all
-	*	browsers will render Text exactly the same. *
+	*	browsers will render Text exactly the same.
 	* @param text The text to display.
 	* @param font The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
 	*	36px Arial").
@@ -105,15 +115,17 @@ extern class Text extends DisplayObject
 	
 	/**
 	* Draws multiline text.
+	* @param ctx 
+	* @param o 
 	*/
-	private function _getWorkingContext():Float;
+	private function _drawText(ctx:CanvasRenderingContext2D, o:Dynamic):Dynamic;
 	
 	/**
-	* Draws the Text into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the Text into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param ctx The canvas 2D context object to draw into.
-	* @param ignoreCache Indicates whether the draw operation should ignore any current cache. 
+	* @param ignoreCache Indicates whether the draw operation should ignore any current cache.
 	*	For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
 	*	into itself).
 	*/
@@ -121,8 +133,13 @@ extern class Text extends DisplayObject
 	
 	/**
 	* Initialization method.
+	* @param text The text to display.
+	* @param font The font style to use. Any valid value for the CSS font attribute is acceptable (ex. "bold
+	*	36px Arial").
+	* @param color The color to draw the text in. Any valid value for the CSS color attribute is acceptable (ex.
+	*	"#F00", "red", or "#FF0000").
 	*/
-	//private function initialize():Dynamic;
+	//private function initialize(?text:String, ?font:String, ?color:String):Dynamic;
 	
 	/**
 	* Returns a clone of the Text instance.
@@ -136,7 +153,7 @@ extern class Text extends DisplayObject
 	
 	/**
 	* Returns an approximate line height of the text, ignoring the lineHeight property. This is based on the measured
-	*	width of a "M" character multiplied by 1.2, which approximates em for most fonts.
+	*	width of a "M" character multiplied by 1.2, which provides an approximate line height for most fonts.
 	*/
 	public function getMeasuredLineHeight():Float;
 	
@@ -148,7 +165,7 @@ extern class Text extends DisplayObject
 	public function getMeasuredHeight():Float;
 	
 	/**
-	* Returns the measured, untransformed width of the text without wrapping.
+	* Returns the measured, untransformed width of the text without wrapping. Use getBounds for a more robust value.
 	*/
 	public function getMeasuredWidth():Float;
 	
@@ -161,6 +178,8 @@ extern class Text extends DisplayObject
 	
 	//private function cloneProps(o:Text):Dynamic;
 	
-	private function _drawTextLine(ctx:CanvasRenderingContext2D, text:Text, y:Float):Dynamic;
+	private function _drawTextLine(ctx:CanvasRenderingContext2D, text:String, y:Float):Dynamic;
+	
+	private function _getWorkingContext(ctx:CanvasRenderingContext2D):CanvasRenderingContext2D;
 	
 }

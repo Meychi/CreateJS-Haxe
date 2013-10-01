@@ -10,12 +10,12 @@ import js.html.CanvasRenderingContext2D;
 *	<h4>Example</h4>
 *	     myInstance.filters = [
 *	         new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
-*	         new createjs.BoxBlurFilter(5, 5, 10)
+*	         new createjs.BlurFilter(5, 5, 10)
 *	     ];
 *	     myInstance.cache(0,0, 100, 100);
 *	
 *	Note that each filter can implement a {{#crossLink "Filter/getBounds"}}{{/crossLink}} method, which returns the
-*	margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BoxBlurFilter"}}{{/crossLink}}
+*	margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
 *	will cause an object to feather outwards, resulting in a margin around the shape.
 *	
 *	<h4>EaselJS Filters</h4>
@@ -23,7 +23,7 @@ import js.html.CanvasRenderingContext2D;
 *	version of EaselJS. To use them, you must include them manually in the HTML.
 *	<ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
 *	     <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
-*	     <li>{{#crossLink "BoxBlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
+*	     <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
 *	     <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
 *	     <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
 *	</ul>
@@ -52,12 +52,12 @@ extern class Filter
 	*	<h4>Example</h4>
 	*	     myInstance.filters = [
 	*	         new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
-	*	         new createjs.BoxBlurFilter(5, 5, 10)
+	*	         new createjs.BlurFilter(5, 5, 10)
 	*	     ];
 	*	     myInstance.cache(0,0, 100, 100);
 	*	
 	*	Note that each filter can implement a {{#crossLink "Filter/getBounds"}}{{/crossLink}} method, which returns the
-	*	margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BoxBlurFilter"}}{{/crossLink}}
+	*	margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
 	*	will cause an object to feather outwards, resulting in a margin around the shape.
 	*	
 	*	<h4>EaselJS Filters</h4>
@@ -65,7 +65,7 @@ extern class Filter
 	*	version of EaselJS. To use them, you must include them manually in the HTML.
 	*	<ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
 	*	     <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
-	*	     <li>{{#crossLink "BoxBlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
+	*	     <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
 	*	     <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
 	*	     <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
 	*	</ul>
@@ -83,7 +83,7 @@ extern class Filter
 	public function clone():Filter;
 	
 	/**
-	* Returns a rectangle with values indicating the margins required to draw the filter.
+	* Returns a rectangle with values indicating the margins required to draw the filter or null.
 	*	For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
 	*	(but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
 	*/

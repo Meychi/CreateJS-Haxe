@@ -2,7 +2,7 @@ package createjs.easeljs;
 
 /**
 * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
-*	modern Android browser) and IE10.
+*	modern Android browser) and the Pointer API (IE).
 *	
 *	Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application.
 *	Note that you do not have to check if touch is supported to enable it, as it will fail gracefully if it is not
@@ -43,20 +43,22 @@ extern class Touch
 	*/
 	public static function isSupported():Bool;
 	
-	private function _handleEnd():Dynamic;
+	private function _handleEnd(stage:Stage, id:Dynamic, e:Dynamic):Dynamic;
 	
-	private function _handleMove():Dynamic;
+	private function _handleMove(stage:Stage, id:Dynamic, e:Dynamic, x:Float, y:Float):Dynamic;
 	
-	private function _handleStart():Dynamic;
+	private function _handleStart(stage:Stage, id:Dynamic, e:Dynamic, x:Float, y:Float):Dynamic;
+	
+	private static function _IE_disable(stage:Stage):Dynamic;
 	
 	private static function _IE_enable(stage:Stage):Dynamic;
 	
-	private static function _IE_handleEvent():Dynamic;
+	private static function _IE_handleEvent(stage:Stage, e:Dynamic):Dynamic;
 	
 	private static function _IOS_disable(stage:Stage):Dynamic;
 	
 	private static function _IOS_enable(stage:Stage):Dynamic;
 	
-	private static function _IOS_handleEvent():Dynamic;
+	private static function _IOS_handleEvent(stage:Stage, e:Dynamic):Dynamic;
 	
 }

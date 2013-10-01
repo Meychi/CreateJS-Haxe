@@ -39,17 +39,17 @@ import js.html.audio.GainNode;
 extern class SoundInstance
 {
 	/**
-	* A Timout created by <code>Sound</code> when this SoundInstance is played with a delay. This allows SoundInstance to remove the delay if stop or pause or cleanup are called before playback begins.
+	* A Timeout created by {{#crossLink "Sound"}}{{/crossLink}} when this SoundInstance is played with a delay. This allows SoundInstance to remove the delay if stop or pause or cleanup are called before playback begins.
 	*/
 	private var delayTimeoutId:Dynamic;
 	
 	/**
-	* Determines if the audio is currently muted. Use <code>getMute</code> and <code>setMute</code> to access.
+	* Determines if the audio is currently muted. Use {{#crossLink "SoundInstance/getMute:method"}}{{/crossLink}} and {{#crossLink "SoundInstance/setMute:method"}}{{/crossLink}} to access.
 	*/
 	private var muted:Bool;
 	
 	/**
-	* Determines if the audio is currently paused. Use <code>pause()</code> and <code>resume()</code> to set.
+	* Determines if the audio is currently paused. Use {{#crossLink "SoundInstance/pause:method"}}{{/crossLink}} and {{#crossLink "SoundInstance/resume:method"}}{{/crossLink}} to set.
 	*/
 	private var paused:Bool;
 	
@@ -59,57 +59,28 @@ extern class SoundInstance
 	private var offset:Float;
 	
 	/**
-	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. A panNode allowing left and right audio channel panning only. Connected to our <code>WebAudioPlugin.gainNode</code> that sequences to <code>context.destination</code>.
+	* NOTE this only exists as a {{#crossLink "WebAudioPlugin"}}{{/crossLink}} property and is only intended for use by advanced users. A panNode allowing left and right audio channel panning only. Connected to our WebAudioPlugin {{#crossLink "WebAudioPlugin/gainNode:property"}}{{/crossLink}} that sequences to <code>context.destination</code>.
 	*/
 	public var panNode:Dynamic;
 	
 	/**
-	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. GainNode for controlling <code>SoundInstance</code> volume. Connected to <code>panNode</code>.
+	* NOTE this only exists as a {{#crossLink "WebAudioPlugin"}}{{/crossLink}} property and is only intended for use by advanced users. GainNode for controlling <code>SoundInstance</code> volume. Connected to {{#crossLink "SoundInstance/panNode:property"}}{{/crossLink}}.
 	*/
 	public var gainNode:GainNode;
 	
 	/**
-	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. sourceNode is the audio source. Connected to <code>gainNode</code>.
+	* NOTE this only exists as a {{#crossLink "WebAudioPlugin"}}{{/crossLink}} property and is only intended for use by advanced users. sourceNode is the audio source. Connected to {{#crossLink "SoundInstance/gainNode:property"}}{{/crossLink}}.
 	*/
 	public var sourceNode:AudioSourceNode;
 	
 	/**
-	* NOTE this only exists as a <code>WebAudioPlugin</code> property and is only intended for use by advanced users. sourceNodeNext is the audio source for the next loop, inserted in a look ahead approach to allow for smooth looping. Connected to <code>gainNode</code>.
+	* NOTE this only exists as a {{#crossLink "WebAudioPlugin"}}{{/crossLink}} property and is only intended for use by advanced users. sourceNodeNext is the audio source for the next loop, inserted in a look ahead approach to allow for smooth looping. Connected to {{#crossLink "SoundInstance/gainNode:property"}}{{/crossLink}}.
 	*/
 	private var sourceNodeNext:AudioSourceNode;
 	
-	/**
-	* The callback that is fired when a sound has been interrupted.
-	*/
-	public var onPlayInterrupted:Dynamic;
 	
 	/**
-	* The callback that is fired when a sound has completed playback, but has loops remaining.
-	*/
-	public var onLoop:Dynamic;
-	
-	/**
-	* The callback that is fired when a sound has completed playback.
-	*/
-	public var onComplete:Dynamic;
-	
-	/**
-	* The callback that is fired when a sound has failed to start.
-	*/
-	public var onPlayFailed:Dynamic;
-	
-	/**
-	* The callback that is fired when a sound is ready to play.
-	*/
-	public var onReady:Dynamic;
-	
-	/**
-	* The callback that is fired when playback has started successfully.
-	*/
-	public var onPlaySucceeded:Dynamic;
-	
-	/**
-	* The length of the audio clip, in milliseconds. Use <code>getDuration</code> to access.
+	* The length of the audio clip, in milliseconds. Use {{#crossLink "SoundInstance/getDuration:method"}}{{/crossLink}} to access.
 	*/
 	private var pan:Float;
 	
@@ -119,7 +90,7 @@ extern class SoundInstance
 	private var remainingLoops:Float;
 	
 	/**
-	* The play state of the sound. Play states are defined as constants on <code>Sound</code>.
+	* The play state of the sound. Play states are defined as constants on {{#crossLink "Sound"}}{{/crossLink}}.
 	*/
 	public var playState:String;
 	
@@ -134,19 +105,19 @@ extern class SoundInstance
 	private var src:String;
 	
 	/**
-	* The time in milliseconds before the sound starts. Note this is handled by <code>Sound</code>.
+	* The time in milliseconds before the sound starts. Note this is handled by {{#crossLink "Sound"}}{{/crossLink}}.
 	*/
 	private var delay:Float;
 	
 	/**
-	* The unique ID of the instance. This is set by <code>Sound</code>.
+	* The unique ID of the instance. This is set by {{#crossLink "Sound"}}{{/crossLink}}.
 	*/
 	public var uniqueId:Dynamic;
 	
 	/**
-	* The volume of the sound, between 0 and 1. Use <code>getVolume</code> and <code>setVolume</code> to access.
+	* The volume of the sound, between 0 and 1. Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower and Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "SoundInstance/setVolume"}}{{/crossLink}} and {{#crossLink "SoundInstance/getVolume"}}{{/crossLink}}.  The actual output volume of a sound can be calculated using: <code>myInstance.volume * createjs.Sound.getVolume();</code>
 	*/
-	private var volume:Float;
+	public var volume:Float;
 	
 	/**
 	* Timeout that is created internally to handle sound playing to completion. Stored so we can remove it when stop, pause, or cleanup are called
@@ -233,16 +204,6 @@ extern class SoundInstance
 	public function getDuration():Float;
 	
 	/**
-	* Get the left/right pan of the instance. Note in WebAudioPlugin this only gives us the "x" value of what is
-	*	actually 3D audio.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    var myPan = myInstance.getPan();
-	*/
-	public function getPan():Float;
-	
-	/**
 	* Get the mute value of the instance.
 	*	
 	*	<h4>Example</h4>
@@ -261,12 +222,6 @@ extern class SoundInstance
 	public function getPosition():Float;
 	
 	/**
-	* Get the volume of the instance. The actual output volume of a sound can be calculated using:
-	*	<code>myInstance.getVolume() * createjs.Sound.getVolume();</code>
-	*/
-	public function getVolume():Dynamic;
-	
-	/**
 	* Initialize the SoundInstance. This is called from the constructor.
 	* @param src The source of the audio.
 	* @param owner The plugin that created this instance.
@@ -280,12 +235,6 @@ extern class SoundInstance
 	private function updateVolume():Bool;
 	
 	/**
-	* Mute and unmute the sound. <strong>Please use {{#crossLink "SoundInstance/setMute"}}{{/crossLink}} instead</strong>.
-	* @param value If the sound should be muted or not.
-	*/
-	public function mute(value:Bool):Bool;
-	
-	/**
 	* Mute and unmute the sound. Muted sounds will still play at 0 volume. Note that an unmuted sound may still be
 	*	silent depending on {{#crossLink "Sound"}}{{/crossLink}} volume, instance volume, and Sound mute.
 	*	
@@ -295,6 +244,54 @@ extern class SoundInstance
 	* @param value If the sound should be muted.
 	*/
 	public function setMute(value:Bool):Bool;
+	
+	/**
+	* NOTE that you can get volume directly, and getPan remains to allow support for IE8 with FlashPlugin.
+	*	
+	*	Get the left/right pan of the instance. Note in WebAudioPlugin this only gives us the "x" value of what is
+	*	actually 3D audio.
+	*	
+	*	<h4>Example</h4>
+	*	
+	*	    var myPan = myInstance.getPan();
+	*/
+	public function getPan():Float;
+	
+	/**
+	* NOTE that you can get volume directly, and getVolume remains to allow support for IE8 with FlashPlugin.
+	*	
+	*	Get the volume of the instance. The actual output volume of a sound can be calculated using:
+	*	<code>myInstance.getVolume() * createjs.Sound.getVolume();</code>
+	*/
+	public function getVolume():Dynamic;
+	
+	/**
+	* NOTE that you can set pan directly, and getPan remains to allow support for IE8 with FlashPlugin.
+	*	
+	*	Set the left(-1)/right(+1) pan of the instance. Note that {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}} does not
+	*	support panning, and only simple left/right panning has been implemented for {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
+	*	The default pan value is 0 (center).
+	*	
+	*	<h4>Example</h4>
+	*	
+	*	    myInstance.setPan(-1);  // to the left!
+	* @param value The pan value, between -1 (left) and 1 (right).
+	*/
+	public function setPan(value:Float):Float;
+	
+	/**
+	* NOTE that you can set volume directly, and setVolume remains to allow support for IE8 with FlashPlugin.
+	*	Set the volume of the instance. You can retrieve the volume using {{#crossLink "SoundInstance/getVolume"}}{{/crossLink}}.
+	*	
+	*	<h4>Example</h4>
+	*	
+	*	     myInstance.setVolume(0.5);
+	*	
+	*	Note that the master volume set using the Sound API method {{#crossLink "Sound/setVolume"}}{{/crossLink}}
+	*	will be applied to the instance volume.
+	* @param value The volume to set, between 0 and 1.
+	*/
+	public function setVolume(value:Dynamic):Bool;
 	
 	/**
 	* Pause the instance. Paused audio will stop at the current time, and can be resumed using
@@ -311,11 +308,16 @@ extern class SoundInstance
 	*	with the Sound API {{#crossLink "Sound/createInstance"}}{{/crossLink}} or {{#crossLink "Sound/play"}}{{/crossLink}}).
 	*	
 	*	<h4>Example</h4>
-	*	
 	*	     var myInstance = createjs.Sound.createInstance(mySrc);
 	*	     myInstance.play(createjs.Sound.INTERRUPT_ANY);
-	* @param interrupt How this sound interrupts other instances with the same source. Interrupt values
-	*	are defined as constants on {{#crossLink "Sound"}}{{/crossLink}}. The default value is <code>Sound.INTERRUPT_NONE</code>.
+	*	     // alternatively, we can pass in options we want to set in an object
+	*	     myInstance.play({offset:1, loop:2, pan:0.5});
+	* @param interrupt How to interrupt any currently playing instances of audio with the same source,
+	*	if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
+	*	constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior"}}{{/crossLink}}.
+	*	<br /><strong>OR</strong><br />
+	*	This parameter can be an object that contains any or all optional properties by name, including: interrupt,
+	*	delay, offset, loop, volume, and pan (see the above code sample).
 	* @param delay The delay in milliseconds before the sound starts
 	* @param offset How far into the sound to begin playback, in milliseconds.
 	* @param loop The number of times to loop the audio. Use -1 for infinite loops.
@@ -323,7 +325,13 @@ extern class SoundInstance
 	* @param pan The pan of the sound between -1 (left) and 1 (right). Note that pan is not supported
 	*	for HTML Audio.
 	*/
-	public function play(?interrupt:String, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Dynamic;
+	public function play(?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Dynamic;
+	
+	/**
+	* REMOVED. <strong>Please use {{#crossLink "SoundInstance/setMute"}}{{/crossLink}} instead</strong>.
+	* @param value If the sound should be muted or not.
+	*/
+	public function mute(value:Bool):Bool;
 	
 	/**
 	* Resume an instance that has been paused using {{#crossLink "SoundInstance/pause"}}{{/crossLink}}. Audio that
@@ -338,18 +346,6 @@ extern class SoundInstance
 	public function resume():Bool;
 	
 	/**
-	* Set the left(-1)/right(+1) pan of the instance. Note that {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}} does not
-	*	support panning, and only simple left/right panning has been implemented for {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
-	*	The default pan value is 0 (center).
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    myInstance.setPan(-1);  // to the left!
-	* @param value The pan value, between -1 (left) and 1 (right).
-	*/
-	public function setPan(value:Float):Float;
-	
-	/**
 	* Set the position of the playhead in the instance. This can be set while a sound is playing, paused, or even
 	*	stopped.
 	*	
@@ -359,19 +355,6 @@ extern class SoundInstance
 	* @param value The position to place the playhead, in milliseconds.
 	*/
 	public function setPosition(value:Float):Dynamic;
-	
-	/**
-	* Set the volume of the instance. You can retrieve the volume using {{#crossLink "SoundInstance/getVolume"}}{{/crossLink}}.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	     myInstance.setVolume(0.5);
-	*	
-	*	Note that the master volume set using the Sound API method {{#crossLink "Sound/setVolume"}}{{/crossLink}}
-	*	will be applied to the instance volume.
-	* @param value The volume to set, between 0 and 1.
-	*/
-	public function setVolume(value:Dynamic):Bool;
 	
 	/**
 	* Stop playback of the instance. Stopped sounds will reset their position to 0, and calls to {{#crossLink "SoundInstance/resume"}}{{/crossLink}}

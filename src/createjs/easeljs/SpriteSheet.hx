@@ -17,6 +17,10 @@ package createjs.easeljs;
 *	<h4>SpriteSheet Format</h4>
 *	
 *	     data = {
+*	         // DEFINING FRAMERATE:
+*	         // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+*	         // for more information.
+*	         framerate: 20,
 *	
 *	         // DEFINING IMAGES:
 *	         // list of images or image URIs to use. SpriteSheet can handle preloading.
@@ -39,14 +43,12 @@ package createjs.easeljs;
 *	
 *	         // DEFINING ANIMATIONS:
 *	
-*		        // simple animation definitions. Define a consecutive range of frames.
-*		        // also optionally define a "next" animation name for sequencing.
-*		        // setting next to false makes it pause when it reaches the end.
+*		        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
+*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
 *		        animations: {
-*		        	// start, end, next, frequency
+*		        	// start, end, next, speed
 *		        	run: [0,8],
-*		        	jump: [9,12,"run",2],
-*		        	stand: 13
+*		        	jump: [9,12,"run",2]
 *		        }
 *	
 *	         // the complex approach which specifies every frame in the animation by index.
@@ -57,7 +59,7 @@ package createjs.easeljs;
 *	         	jump: {
 *	         		frames: [1,4,5,6,1],
 *	         		next: "run",
-*	         		frequency: 2
+*	         		speed: 2
 *	         	},
 *	         	stand: { frames: [7] }
 *	         }
@@ -68,7 +70,7 @@ package createjs.easeljs;
 *		        	jump: {
 *		        		frames: [8,9,10,9,8],
 *		        		next: "run",
-*		        		frequency: 2
+*		        		speed: 2
 *		        	},
 *		        	stand: 7
 *		        }
@@ -84,21 +86,21 @@ package createjs.easeljs;
 *	         animations: {run:[0,4], jump:[5,8,"run"]}
 *	     };
 *	     var spriteSheet = new createjs.SpriteSheet(data);
-*	     var animation = new createjs.BitmapAnimation(spriteSheet);
-*	     animation.gotoAndPlay("run");
+*	     var animation = new createjs.Sprite(spriteSheet, "run");
 */
 @:native("createjs.SpriteSheet")
-extern class SpriteSheet
+extern class SpriteSheet extends EventDispatcher
 {
 	/**
-	* Read-only property indicating whether all images are finished loading.
+	* Indicates whether all images are finished loading.
 	*/
 	public var complete:Bool;
 	
+	
 	/**
-	* The onComplete callback is called when all images are loaded. Note that this only fires if the images were not fully loaded when the sprite sheet was initialized. You should check the complete property  to prior to adding an onComplete handler. Ex. <pre><code>var sheet = new SpriteSheet(data); if (!sheet.complete) {  &nbsp; // not preloaded, listen for onComplete:  &nbsp; sheet.onComplete = handler; }</code></pre>
+	* Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See Sprite.framerate for more information.
 	*/
-	public var onComplete:Dynamic;
+	public var framerate:Float;
 	
 	private var _animations:Dynamic;
 	
@@ -137,6 +139,10 @@ extern class SpriteSheet
 	*	<h4>SpriteSheet Format</h4>
 	*	
 	*	     data = {
+	*	         // DEFINING FRAMERATE:
+	*	         // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+	*	         // for more information.
+	*	         framerate: 20,
 	*	
 	*	         // DEFINING IMAGES:
 	*	         // list of images or image URIs to use. SpriteSheet can handle preloading.
@@ -159,14 +165,12 @@ extern class SpriteSheet
 	*	
 	*	         // DEFINING ANIMATIONS:
 	*	
-	*		        // simple animation definitions. Define a consecutive range of frames.
-	*		        // also optionally define a "next" animation name for sequencing.
-	*		        // setting next to false makes it pause when it reaches the end.
+	*		        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
+	*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
 	*		        animations: {
-	*		        	// start, end, next, frequency
+	*		        	// start, end, next, speed
 	*		        	run: [0,8],
-	*		        	jump: [9,12,"run",2],
-	*		        	stand: 13
+	*		        	jump: [9,12,"run",2]
 	*		        }
 	*	
 	*	         // the complex approach which specifies every frame in the animation by index.
@@ -177,7 +181,7 @@ extern class SpriteSheet
 	*	         	jump: {
 	*	         		frames: [1,4,5,6,1],
 	*	         		next: "run",
-	*	         		frequency: 2
+	*	         		speed: 2
 	*	         	},
 	*	         	stand: { frames: [7] }
 	*	         }
@@ -188,7 +192,7 @@ extern class SpriteSheet
 	*		        	jump: {
 	*		        		frames: [8,9,10,9,8],
 	*		        		next: "run",
-	*		        		frequency: 2
+	*		        		speed: 2
 	*		        	},
 	*		        	stand: 7
 	*		        }
@@ -204,11 +208,10 @@ extern class SpriteSheet
 	*	         animations: {run:[0,4], jump:[5,8,"run"]}
 	*	     };
 	*	     var spriteSheet = new createjs.SpriteSheet(data);
-	*	     var animation = new createjs.BitmapAnimation(spriteSheet);
-	*	     animation.gotoAndPlay("run");
-	* @param data 
+	*	     var animation = new createjs.Sprite(spriteSheet, "run");
+	* @param data An object describing the SpriteSheet data.
 	*/
-	public function new(data:Void):Void;
+	public function new(data:Dynamic):Void;
 	
 	/**
 	* Returns a clone of the SpriteSheet instance.
@@ -216,16 +219,19 @@ extern class SpriteSheet
 	public function clone():SpriteSheet;
 	
 	/**
-	* Returns a Rectangle instance defining the bounds of the specified frame relative to the origin. For example, a
-	*	90 x 70 frame with a regX of 50 and a regY of 40 would return a rectangle with [x=-50, y=-40, width=90, height=70].
-	* @param frameIndex The index of the frame.
-	*/
-	public function getFrameBounds(frameIndex:Float):Rectangle;
-	
-	/**
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
+	/**
+	* Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
+	*	to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
+	*	
+	*	     [x=-50, y=-40, width=90, height=70]
+	* @param frameIndex The index of the frame.
+	* @param rectangle A Rectangle instance to copy the values into. By default a new instance is created.
+	*/
+	public function getFrameBounds(frameIndex:Float, ?rectangle:Rectangle):Rectangle;
 	
 	/**
 	* Returns an array of all available animation names as strings.
@@ -233,20 +239,23 @@ extern class SpriteSheet
 	public function getAnimations():Array<Dynamic>;
 	
 	/**
-	* Returns an object defining the specified animation. The returned object has a
-	*	frames property containing an array of the frame id's in the animation, a frequency
-	*	property indicating the advance frequency for this animation, a name property, 
-	*	and a next property, which specifies the default next animation. If the animation
-	*	loops, the name and next property will be the same.
+	* Returns an object defining the specified animation. The returned object contains:<UL>
+	*	    <LI>frames: an array of the frame ids in the animation</LI>
+	*	    <LI>speed: the playback speed for this animation</LI>
+	*	    <LI>name: the name of the animation</LI>
+	*	    <LI>next: the default animation to play next. If the animation loops, the name and next property will be the
+	*	    same.</LI>
+	*	</UL>
 	* @param name The name of the animation to get.
 	*/
 	public function getAnimation(name:String):Dynamic;
 	
 	/**
-	* Returns an object specifying the image and source rect of the specified frame. The returned object
-	*	has an image property holding a reference to the image object in which the frame is found,
-	*	and a rect property containing a Rectangle instance which defines the boundaries for the
-	*	frame within that image.
+	* Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
+	*	    <LI>an image property holding a reference to the image object in which the frame is found</LI>
+	*	    <LI>a rect property containing a Rectangle instance which defines the boundaries for the frame within that
+	*	    image.</LI>
+	*	</UL>
 	* @param frameIndex The index of the frame.
 	*/
 	public function getFrame(frameIndex:Float):Dynamic;
@@ -262,6 +271,6 @@ extern class SpriteSheet
 	
 	private function _handleImageLoad():Dynamic;
 	
-	private function initialize():Dynamic;
+	private function initialize(data:Dynamic):Dynamic;
 	
 }

@@ -13,7 +13,7 @@ extern class MovieClipPlugin
 	*/
 	public function new():Void;
 	
-	private function init():Dynamic;
+	private function init(tween:Tween, prop:String, value:Dynamic):Dynamic;
 	
 	private function install():Dynamic;
 	
@@ -21,6 +21,6 @@ extern class MovieClipPlugin
 	
 	private function step():Dynamic;
 	
-	private function tween():Dynamic;
+	public function tween(tween:Tween, prop:String, value:Dynamic, startValues:Array<Dynamic>, endValues:Array<Dynamic>, ratio:Float, wait:Dynamic, end:Dynamic):Dynamic;
 	
 }

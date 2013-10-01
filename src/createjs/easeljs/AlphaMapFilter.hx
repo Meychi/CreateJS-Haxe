@@ -60,4 +60,9 @@ extern class AlphaMapFilter extends Filter
 	*/
 	public function new(alphaMap:Dynamic):Void;
 	
+	/**
+	* Returns a clone of this object.
+	*/
+	//public function clone():AlphaMapFilter;
+	
 }

@@ -27,9 +27,19 @@ extern class Rectangle
 	public var y:Float;
 	
 	/**
-	* Initialization method.
+	* Copies all properties from the specified rectangle to this rectangle.
+	* @param rectangle The rectangle to copy properties from.
 	*/
-	private function initialize():Dynamic;
+	public function copy(rectangle:Rectangle):Rectangle;
+	
+	/**
+	* Initialization method. Can also be used to reinitialize the instance.
+	* @param x X position.
+	* @param y Y position.
+	* @param width The width of the Rectangle.
+	* @param height The height of the Rectangle.
+	*/
+	public function initialize(?x:Float, ?y:Float, ?width:Float, ?height:Float):Rectangle;
 	
 	/**
 	* Represents a rectangle as defined by the points (x, y) and (x+width, y+height).

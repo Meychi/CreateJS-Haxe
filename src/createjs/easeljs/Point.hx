@@ -22,9 +22,17 @@ extern class Point
 	public var y:Float;
 	
 	/**
-	* Initialization method.
+	* Copies all properties from the specified point to this point.
+	* @param point The point to copy properties from.
 	*/
-	private function initialize():Dynamic;
+	public function copy(point:Point):Point;
+	
+	/**
+	* Initialization method. Can also be used to reinitialize the instance.
+	* @param x X position.
+	* @param y Y position.
+	*/
+	public function initialize(?x:Float, ?y:Float):Point;
 	
 	/**
 	* Represents a point on a 2 dimensional x / y coordinate system.

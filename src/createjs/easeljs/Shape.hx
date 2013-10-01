@@ -14,7 +14,7 @@ import js.html.CanvasRenderingContext2D;
 *	<h4>Example</h4>
 *	     var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
 *	     var shape = new createjs.Shape(graphics);
-*	     
+*	
 *	     //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
 *	     var shape = new createjs.Shape();
 *	     shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
@@ -43,16 +43,16 @@ extern class Shape extends DisplayObject
 	*	<h4>Example</h4>
 	*	     var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
 	*	     var shape = new createjs.Shape(graphics);
-	*	     
+	*	
 	*	     //Alternatively use can also use the graphics property of the Shape class to renderer the same as above.
 	*	     var shape = new createjs.Shape();
 	*	     shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
 	* @param graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 	*/
-	public function new(?graphics:Graphics):Void;
+	public function new(graphics:Graphics):Void;
 	
 	/**
-	* Draws the Shape into the specified context ignoring it's visible, alpha, shadow, and transform. Returns true if
+	* Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if
 	*	the draw was handled (useful for overriding functionality).
 	*	
 	*	<i>NOTE: This method is mainly for internal use, though it may be useful for advanced uses.</i>
@@ -60,7 +60,7 @@ extern class Shape extends DisplayObject
 	* @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
 	*	used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	*/
-	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
+	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
 	
 	/**
 	* Initialization method.
@@ -69,7 +69,7 @@ extern class Shape extends DisplayObject
 	//private function initialize(graphics:Graphics):Dynamic;
 	
 	/**
-	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to 
+	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
 	*	their defaults (for example .parent).
 	* @param recursive If true, this Shape's {{#crossLink "Graphics"}}{{/crossLink}} instance will also be
 	*	cloned. If false, the Graphics instance will be shared with the new Shape.

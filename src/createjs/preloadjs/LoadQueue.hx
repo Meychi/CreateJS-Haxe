@@ -33,6 +33,31 @@ package createjs.preloadjs;
 *	
 *	     queue.load();
 *	
+*	<b>File Types</b><br />
+*	The file type of a manifest item is auto-determined by the file extension. The pattern matching in PreloadJS
+*	should handle the majority of standard file and url formats, and works with common file extensions. If you have
+*	either a non-standard file extension, or are serving the file using a proxy script, then you can pass in a
+*	<code>type</code> property with any manifest item.
+*	
+*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.LoadQueue.SOUND});
+*	
+*	     // Note that PreloadJS will not read a file extension from the query string
+*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg"}, type:createjs.LoadQueue.IMAGE});
+*	
+*	Supported types include:
+*	<ul>
+*	    <li>createjs.LoadQueue.BINARY (Raw binary data via XHR)</li>
+*	    <li>createjs.LoadQueue.CSS (CSS files)</li>
+*	    <li>createjs.LoadQueue.IMAGE (Common image formats)</li>
+*	    <li>createjs.LoadQueue.JAVASCRIPT (JavaScript files)</li>
+*	    <li>createjs.LoadQueue.JSON (JSON data)</li>
+*	    <li>createjs.LoadQueue.JSONP (JSON files cross-domain)</li>
+*	    <li>createjs.LoadQueue.SOUND (Audio file formats)</li>
+*	    <li>createjs.LoadQueue.SVG (SVG files)</li>
+*	    <li>createjs.LoadQueue.TEXT (Text files - XHR only)</li>
+*	    <li>createjs.LoadQueue.XML (XML data)</li>
+*	</ul>
+*	
 *	<b>Handling Results</b><br />
 *	When a file is finished downloading, a "fileload" event is dispatched. In an example above, there is an event
 *	listener snippet for fileload. Loaded files are always an object that can be used immediately, including:
@@ -80,15 +105,17 @@ package createjs.preloadjs;
 *	     queue.installPlugin(createjs.Sound);
 *	
 *	<h4>Known Browser Issues</h4>
-*	<ul><li>Browsers without audio support can not load audio files.</li>
-*	     <li>Audio tags will only download until their <code>canPlayThrough</code> event is fired. Browsers other
-*	     than Chrome will continue to download in the background.</li>
-*	     <li>When loading scripts using tags, they are automatically added to the document.</li>
-*	     <li>Scripts loaded via XHR may not be properly inspectable with browser tools.</li>
-*	     <li>IE6 and IE7 (and some other browsers) may not be able to load XML, Text, or JSON, since they require
-*	     XHR to work.</li>
-*	     <li>Content loaded via tags will not show progress, and although they can be canceled, they will continue
-*	     to download in the background.</li>
+*	<ul>
+*	    <li>Browsers without audio support can not load audio files.</li>
+*	    <li>Safari on Mac OS X can only play HTML audio if QuickTime is installed</li>
+*	    <li>HTML Audio tags will only download until their <code>canPlayThrough</code> event is fired. Browsers other
+*	    than Chrome will continue to download in the background.</li>
+*	    <li>When loading scripts using tags, they are automatically added to the document.</li>
+*	    <li>Scripts loaded via XHR may not be properly inspectable with browser tools.</li>
+*	    <li>IE6 and IE7 (and some other browsers) may not be able to load XML, Text, or JSON, since they require
+*	    XHR to work.</li>
+*	    <li>Content loaded via tags will not show progress, and will continue to download in the background when
+*	    canceled, although no events will be dispatched.</li>
 *	</ul>
 */
 @:native("createjs.LoadQueue")
@@ -169,15 +196,6 @@ extern class LoadQueue extends AbstractLoader
 	*/
 	public var maintainScriptOrder:Bool;
 	
-	/**
-	* The callback that is fired when an individual file is loaded.
-	*/
-	public var onFileLoad:Dynamic;
-	
-	/**
-	* The callback that is fired when an individual files progress changes.
-	*/
-	public var onFileProgress:Dynamic;
 	
 	/**
 	* The next preload queue to process when this one is complete. If an error is thrown in the current queue, and <code>loadQueue.stopOnError</code> is <code>true</code>, the next queue will not be processed.
@@ -220,9 +238,14 @@ extern class LoadQueue extends AbstractLoader
 	public static var JAVASCRIPT:String;
 	
 	/**
-	* The preload type for jsonp files, usually with the "json" file extension. You are required to pass a callback parameter when loading jsonp.
+	* The preload type for json files, usually with the "json" file extension. JSON data is loaded and parsed into a JavaScript object.
 	*/
 	public static var JSON:String;
+	
+	/**
+	* The preload type for jsonp files, usually with the "json" file extension. JSOON data is loaded and parsed into a JavaScript object. You are required to pass a callback parameter that matches the jsonp result.
+	*/
+	public static var JSONP:String;
 	
 	/**
 	* The preload type for sound files, usually mp3, ogg, or wav. Audio is loaded into an AUDIO tag.
@@ -255,15 +278,6 @@ extern class LoadQueue extends AbstractLoader
 	public var useXHR:Bool;
 	
 	/**
-	* A function proxy for PreloadJS methods. By default, JavaScript methods do not maintain scope, so passing a
-	*	method as a callback will result in the method getting called in the scope of the caller. Using a proxy
-	*	ensures that the method gets called in the correct scope.
-	* @param method The function to call
-	* @param scope The scope to call the method name on
-	*/
-	private static function proxy(method:Dynamic, scope:Dynamic):Dynamic;
-	
-	/**
 	* A load item is completed or was canceled, and needs to be removed from the LoadQueue.
 	* @param loader A loader instance to remove.
 	*/
@@ -276,6 +290,7 @@ extern class LoadQueue extends AbstractLoader
 	*	method.
 	* @param value The item to add to the queue.
 	* @param basePath A path to prepend to the item's source.
+	*		Sources beginning with http:// or similar will not receive a base path.
 	*/
 	private function _addItem(value:Dynamic, basePath:String):Dynamic;
 	
@@ -315,8 +330,9 @@ extern class LoadQueue extends AbstractLoader
 	/**
 	* Create a loader for a load item.
 	* @param item A formatted load item that can be used to generate a loader.
+	* @param basePath A path that will be prepended on to the source parameter of all items in the queue before they are loaded. Note that a basePath provided to any loadFile or loadManifest call will override the basePath specified on the LoadQueue constructor.
 	*/
-	private function _createLoader(item:Dynamic):AbstractLoader;
+	private function _createLoader(item:Dynamic, basePath:String):AbstractLoader;
 	
 	/**
 	* Create a refined load item, which contains all the required properties (src, type, extension, tag). The type of
@@ -346,7 +362,7 @@ extern class LoadQueue extends AbstractLoader
 	private function isBinary(type:String):Dynamic;
 	
 	/**
-	* Dispatch a fileload event (and onFileLoad callback). Please see the <code>LoadQueue.fileload</code> event for
+	* Dispatch a fileload event. Please see the {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event for
 	*	details on the event payload.
 	* @param item The item that is being loaded.
 	* @param loader 
@@ -362,7 +378,7 @@ extern class LoadQueue extends AbstractLoader
 	private function _sendFileProgress(item:Dynamic, progress:Float):Dynamic;
 	
 	/**
-	* Dispatch a filestart event immediately before a file has started to load. Please see the <code>LoadQueue.filestart</code>
+	* Dispatch a filestart event immediately before a file starts to load. Please see the {{#crossLink "LoadQueue/filestart:event"}}{{/crossLink}}
 	*	event for details on the event payload.
 	* @param loader 
 	*/
@@ -403,8 +419,9 @@ extern class LoadQueue extends AbstractLoader
 	* @param loadNow Kick off an immediate load (true) or wait for a load call (false). The default
 	*	value is true. If the queue is paused using {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}}, and the value is
 	*	true, the queue will resume automatically.
-	* @param basePath An optional base path prepended to the file source when the file is loaded. The load
-	*	item will not be modified.
+	* @param basePath An optional base path prepended to the file source when the file is loaded.
+	*	Sources beginning with http:// or similar will not receive a base path.
+	*	The load item will not be modified.
 	*/
 	public function loadFile(file:Dynamic, ?loadNow:Bool, ?basePath:String):Dynamic;
 	
@@ -434,6 +451,7 @@ extern class LoadQueue extends AbstractLoader
 	*	value is true. If the queue is paused using {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}} and this value is
 	*	true, the queue will resume automatically.
 	* @param basePath An optional base path prepended to each of the files' source when the file is loaded.
+	*	Sources beginning with http:// or similar will not receive a base path.
 	*	The load items will not be modified.
 	*/
 	public function loadManifest(manifest:Array<Dynamic>, ?loadNow:Bool, ?basePath:String):Dynamic;
@@ -528,8 +546,8 @@ extern class LoadQueue extends AbstractLoader
 	public function remove(idsOrUrls:Dynamic):Dynamic;
 	
 	/**
-	* The callback that is fired when a loader encounters an error. The queue will continue loading unless
-	*	<code>stopOnError</code> is set to <code>true</code>.
+	* The callback that is fired when a loader encounters an error. The queue will continue loading unless {{#crossLink "LoadQueue/stopOnError:property"}}{{/crossLink}}
+	*	is set to `true`.
 	* @param event The error event, containing relevant error information.
 	*/
 	private function _handleFileError(event:Dynamic):Dynamic;
@@ -566,6 +584,31 @@ extern class LoadQueue extends AbstractLoader
 	*	Note that a paused queue will automatically resume when new files are added to it.
 	*	
 	*	     queue.load();
+	*	
+	*	<b>File Types</b><br />
+	*	The file type of a manifest item is auto-determined by the file extension. The pattern matching in PreloadJS
+	*	should handle the majority of standard file and url formats, and works with common file extensions. If you have
+	*	either a non-standard file extension, or are serving the file using a proxy script, then you can pass in a
+	*	<code>type</code> property with any manifest item.
+	*	
+	*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.LoadQueue.SOUND});
+	*	
+	*	     // Note that PreloadJS will not read a file extension from the query string
+	*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg"}, type:createjs.LoadQueue.IMAGE});
+	*	
+	*	Supported types include:
+	*	<ul>
+	*	    <li>createjs.LoadQueue.BINARY (Raw binary data via XHR)</li>
+	*	    <li>createjs.LoadQueue.CSS (CSS files)</li>
+	*	    <li>createjs.LoadQueue.IMAGE (Common image formats)</li>
+	*	    <li>createjs.LoadQueue.JAVASCRIPT (JavaScript files)</li>
+	*	    <li>createjs.LoadQueue.JSON (JSON data)</li>
+	*	    <li>createjs.LoadQueue.JSONP (JSON files cross-domain)</li>
+	*	    <li>createjs.LoadQueue.SOUND (Audio file formats)</li>
+	*	    <li>createjs.LoadQueue.SVG (SVG files)</li>
+	*	    <li>createjs.LoadQueue.TEXT (Text files - XHR only)</li>
+	*	    <li>createjs.LoadQueue.XML (XML data)</li>
+	*	</ul>
 	*	
 	*	<b>Handling Results</b><br />
 	*	When a file is finished downloading, a "fileload" event is dispatched. In an example above, there is an event
@@ -614,21 +657,24 @@ extern class LoadQueue extends AbstractLoader
 	*	     queue.installPlugin(createjs.Sound);
 	*	
 	*	<h4>Known Browser Issues</h4>
-	*	<ul><li>Browsers without audio support can not load audio files.</li>
-	*	     <li>Audio tags will only download until their <code>canPlayThrough</code> event is fired. Browsers other
-	*	     than Chrome will continue to download in the background.</li>
-	*	     <li>When loading scripts using tags, they are automatically added to the document.</li>
-	*	     <li>Scripts loaded via XHR may not be properly inspectable with browser tools.</li>
-	*	     <li>IE6 and IE7 (and some other browsers) may not be able to load XML, Text, or JSON, since they require
-	*	     XHR to work.</li>
-	*	     <li>Content loaded via tags will not show progress, and although they can be canceled, they will continue
-	*	     to download in the background.</li>
+	*	<ul>
+	*	    <li>Browsers without audio support can not load audio files.</li>
+	*	    <li>Safari on Mac OS X can only play HTML audio if QuickTime is installed</li>
+	*	    <li>HTML Audio tags will only download until their <code>canPlayThrough</code> event is fired. Browsers other
+	*	    than Chrome will continue to download in the background.</li>
+	*	    <li>When loading scripts using tags, they are automatically added to the document.</li>
+	*	    <li>Scripts loaded via XHR may not be properly inspectable with browser tools.</li>
+	*	    <li>IE6 and IE7 (and some other browsers) may not be able to load XML, Text, or JSON, since they require
+	*	    XHR to work.</li>
+	*	    <li>Content loaded via tags will not show progress, and will continue to download in the background when
+	*	    canceled, although no events will be dispatched.</li>
 	*	</ul>
 	* @param useXHR Determines whether the preload instance will favor loading with XHR (XML HTTP Requests),
 	*	or HTML tags. When this is <code>false</code>, LoadQueue will use tag loading when possible, and fall back on XHR
 	*	when necessary.
 	* @param basePath A path that will be prepended on to the source parameter of all items in the queue
-	*	before they are loaded. Note that a basePath provided to any loadFile or loadManifest call will override the
+	*	before they are loaded.  Sources beginning with http:// or similar will not receive a base path.
+	*	Note that a basePath provided to any loadFile or loadManifest call will override the
 	*	basePath specified on the LoadQueue constructor.
 	*/
 	public function new(?useXHR:Bool, basePath:String):Void;

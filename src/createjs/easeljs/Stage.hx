@@ -25,27 +25,22 @@ import js.html.MouseEvent;
 extern class Stage extends Container
 {
 	/**
-	* Calls the {{#crossLink "Stage/update"}}{{/crossLink}} method. Useful for adding stage as a listener to {{#crossLink "Ticker"}}{{/crossLink}} directly.
-	*/
-	public var tick:Dynamic;
-	
-	/**
-	* Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a "tick" event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using:       Ticker.addEventListener("tick", myStage");  Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
+	* Default event handler that calls the Stage {{#crossLink "Stage/update"}}{{/crossLink}} method when a {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event is received. This allows you to register a Stage instance as a event listener on {{#crossLink "Ticker"}}{{/crossLink}} directly, using:       Ticker.addEventListener("tick", myStage");  Note that if you subscribe to ticks using this pattern, then the tick event object will be passed through to display object tick handlers, instead of <code>delta</code> and <code>paused</code> parameters.
 	*/
 	public var handleEvent:Dynamic;
 	
 	/**
-	* Holds objects with data for each active pointer id. Each object has the following properties: x, y, event, target, overTarget, overX, overY, inBounds
+	* Holds objects with data for each active pointer id. Each object has the following properties: x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
 	*/
 	private var _pointerData:Dynamic;
 	
 	/**
-	* If true, mouse move events will continue to be called when the mouse leaves the target canvas. See mouseInBounds, and MouseEvent.x/y/rawX/rawY.
+	* If true, mouse move events will continue to be called when the mouse leaves the target canvas. See {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}} x/y/rawX/rawY.
 	*/
 	public var mouseMoveOutside:Bool;
 	
 	/**
-	* If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas. You can call
+	* If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
 	*/
 	public var tickOnUpdate:Bool;
 	
@@ -60,9 +55,14 @@ extern class Stage extends Container
 	public var autoClear:Bool;
 	
 	/**
-	* Indicates whether this stage should use the snapToPixel property of display objects when rendering them. See DisplayObject.snapToPixel for more information.
+	* Indicates whether this stage should use the {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of display objects when rendering them.
 	*/
 	public var snapToPixelEnabled:Bool;
+	
+	/**
+	* NOTE: this name is not final. Feedback is appreciated.  The stage assigned to this property will have mouse interactions relayed to it after this stage handles them. This can be useful in cases where you have multiple canvases layered on top of one another and want your mouse events to pass through. For example, this would relay mouse events from topStage to bottomStage:       topStage.nextStage = bottomStage;  Note that each stage handles the interactions independently. As such, you could have a click register on an object in the top stage, and another click register in the bottom stage. Consider using a single canvas with cached {{#crossLink "Container"}}{{/crossLink}} instances instead of multiple canvases.  MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.  In most instances, you will also want to disable DOM events for the next stage to avoid duplicate interactions. myNextStage.enableDOMEvents(false);
+	*/
+	public var nextStage:Stage;
 	
 	/**
 	* Number of active pointers.
@@ -70,34 +70,24 @@ extern class Stage extends Container
 	private var _pointerCount:Dynamic;
 	
 	/**
-	* READ-ONLY. The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false.
-	*/
-	public var mouseX:Float;
-	
-	/**
-	* READ-ONLY. The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false.
-	*/
-	public var mouseY:Float;
-	
-	/**
 	* The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render).  When changing the canvas property you must disable the events on the old canvas, and enable events on the new canvas or mouse events will not work as expected. For example:       myStage.enableDOMEvents(false);      myStage.canvas = anotherCanvas;      myStage.enableDOMEvents(true);
 	*/
 	public var canvas:Dynamic;
 	
 	/**
-	* The onMouseDown callback is called when the user presses the mouse button over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance.
+	* The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false.
 	*/
-	public var onMouseDown:Dynamic;
+	public var mouseX:Float;
 	
 	/**
-	* The onMouseMove callback is called when the user moves the mouse over the canvas.  The handler is passed a single param containing the corresponding MouseEvent instance.
+	* The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent position over the canvas, and mouseInBounds will be set to false.
 	*/
-	public var onMouseMove:Dynamic;
+	public var mouseY:Float;
 	
 	/**
-	* The onMouseUp callback is called when the user releases the mouse button anywhere that the page can detect it.  The handler is passed a single param containing the corresponding MouseEvent instance.
+	* The ID of the primary pointer.
 	*/
-	public var onMouseUp:Dynamic;
+	private var _primaryPointerID:Dynamic;
 	
 	private var _mouseOverIntervalID:Float;
 	
@@ -125,25 +115,37 @@ extern class Stage extends Container
 	public function new(canvas:Dynamic):Void;
 	
 	/**
-	* Clears the target canvas. Useful if <code>autoClear</code> is set to false.
+	* Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	*/
 	public function clear():Dynamic;
 	
 	/**
-	* Each time the update method is called, the stage will tick any descendants exposing a tick method (ex. {{#crossLink "BitmapAnimation"}}{{/crossLink}})
-	*	and render its entire display list to the canvas. Any parameters passed to update will be passed on to any
-	*	<code>tick</code> event handlers.
+	* Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
+	*	and then render the display list to the canvas. Any parameters passed to `update()` will be passed on to any
+	*	{{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
+	*	
+	*	Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	*	a tick event object (or equivalent) be passed as the first parameter to update(). For example:
+	*	
+	*	     Ticker.addEventListener("tick", handleTick);
+	*		    function handleTick(evtObj) {
+	*		     	// do some work here, then update the stage, passing through the event object:
+	*		    	myStage.update(evtObj);
+	*		    }
+	* @param params Params to include when ticking descendants. The first param should usually be a tick event.
 	*/
-	public function update():Dynamic;
+	public function update(?params:Dynamic):Dynamic;
 	
 	/**
-	* Enables or disables (by passing a frequency of 0) mouse over events (mouseover and mouseout) for this stage's
-	*	display list. These events can be expensive to generate, so they are disabled by default. The frequency of
-	*	the events can be controlled independently of mouse move events via the optional <code>frequency</code> parameter.
+	* Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
+	*	and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
+	*	and {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}) for this stage's display list. These events can
+	*	be expensive to generate, so they are disabled by default. The frequency of the events can be controlled
+	*	independently of mouse move events via the optional `frequency` parameter.
 	*	
 	*	<h4>Example</h4>
 	*	     var stage = new createjs.Stage("canvasId");
-	*	     stage.enableMouseOver(10);
+	*	     stage.enableMouseOver(10); // 10 updates per second
 	* @param frequency Optional param specifying the maximum number of times per second to broadcast
 	*	mouse over/out events. Set to 0 to disable mouse over events completely. Maximum is 50. A lower frequency is less
 	*	responsive, but uses less CPU.
@@ -151,9 +153,9 @@ extern class Stage extends Container
 	public function enableMouseOver(?frequency:Float):Dynamic;
 	
 	/**
-	* Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas).
-	*	It is good practice to disable events when disposing of a Stage instance, otherwise the stage will
-	*	continue to receive events from the page.
+	* Enables or disables the event listeners that stage adds to DOM elements (window, document and canvas). It is good
+	*	practice to disable events when disposing of a Stage instance, otherwise the stage will continue to receive
+	*	events from the page.
 	*	
 	*	When changing the canvas property you must disable the events on the old canvas, and enable events on the
 	*	new canvas or mouse events will not work as expected. For example:
@@ -172,6 +174,11 @@ extern class Stage extends Container
 	//private function initialize(canvas:Dynamic):Dynamic;
 	
 	/**
+	* Returns a clone of this Stage.
+	*/
+	//public function clone():Stage;
+	
+	/**
 	* Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	*	be specified as the src value of an image element.
 	* @param backgroundColor The background color to be used for the generated image. The value can be any value HTML color
@@ -186,6 +193,8 @@ extern class Stage extends Container
 	*/
 	//public function toString():String;
 	
+	private function _dispatchMouseEvent(target:DisplayObject, type:String, bubbles:Bool, pointerId:Float, o:Dynamic, ?nativeEvent:MouseEvent):Dynamic;
+	
 	private function _getElementRect(e:Element):Dynamic;
 	
 	private function _getPointerData(id:Float):Dynamic;
@@ -198,14 +207,14 @@ extern class Stage extends Container
 	
 	private function _handleMouseUp(e:MouseEvent):Dynamic;
 	
-	private function _handlePointerDown(id:Float, e:Event, x:Float, y:Float):Dynamic;
+	private function _handlePointerDown(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
 	
 	private function _handlePointerMove(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
 	
 	private function _handlePointerUp(id:Float, e:Event, clear:Bool):Dynamic;
 	
-	private function _testMouseOver():Dynamic;
+	private function _testMouseOver(clear:Bool):Dynamic;
 	
-	private function _updatePointerPosition(id:Float, pageX:Float, pageY:Float):Dynamic;
+	private function _updatePointerPosition(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
 	
 }

@@ -22,6 +22,11 @@ import js.html.CanvasRenderingContext2D;
 extern class Container extends DisplayObject
 {
 	/**
+	* Indicates whether the children of this container are independently enabled for mouse/pointer interaction. If false, the children will be aggregated under the container - for example, a click on a child shape would trigger a click event on the container.
+	*/
+	public var mouseChildren:Bool;
+	
+	/**
 	* The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is included for advanced uses.
 	*/
 	public var children:Array<Dynamic>;
@@ -29,6 +34,8 @@ extern class Container extends DisplayObject
 	private var DisplayObject__tick:Dynamic;
 	
 	private var DisplayObject_draw:Dynamic;
+	
+	private var DisplayObject_getBounds:Dynamic;
 	
 	private var DisplayObject_initialize:Dynamic;
 	
@@ -93,7 +100,7 @@ extern class Container extends DisplayObject
 	public function setChildIndex(child:DisplayObject, index:Float):Dynamic;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -265,8 +272,10 @@ extern class Container extends DisplayObject
 	*/
 	//public function hitTest(x:Float, y:Float):Bool;
 	
-	//private function _tick():Dynamic;
+	//private function _getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
 	
-	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouseEvents:Float):Array<Dynamic>;
+	//private function _tick(params:Array<Dynamic>):Dynamic;
+	
+	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouse:Bool):Array<Dynamic>;
 	
 }

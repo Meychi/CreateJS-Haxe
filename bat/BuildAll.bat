@@ -1,3 +1,5 @@
+haxelib run buildhx CreateJS.xml
+pause
 haxelib run buildhx EaselJS.xml
 pause
 haxelib run buildhx PreloadJS.xml

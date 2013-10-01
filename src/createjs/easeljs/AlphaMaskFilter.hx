@@ -78,4 +78,9 @@ extern class AlphaMaskFilter extends Filter
 	*/
 	//public function applyFilter(ctx:CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float):Bool;
 	
+	/**
+	* Returns a clone of this object.
+	*/
+	//public function clone():AlphaMaskFilter;
+	
 }

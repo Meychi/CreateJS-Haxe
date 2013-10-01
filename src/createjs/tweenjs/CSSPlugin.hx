@@ -8,6 +8,8 @@ package createjs.tweenjs;
 *	
 *	You can adjust the CSS properties it will work with by modifying the <code>cssSuffixMap</code> property. Currently,
 *	the top, left, bottom, right, width, height have a "px" suffix appended.
+*	
+*	Please note that the CSS Plugin is not included in the TweenJS minified file.
 */
 @:native("createjs.CSSPlugin")
 extern class CSSPlugin
@@ -27,6 +29,8 @@ extern class CSSPlugin
 	*	
 	*	You can adjust the CSS properties it will work with by modifying the <code>cssSuffixMap</code> property. Currently,
 	*	the top, left, bottom, right, width, height have a "px" suffix appended.
+	*	
+	*	Please note that the CSS Plugin is not included in the TweenJS minified file.
 	*/
 	public function new():Void;
 	

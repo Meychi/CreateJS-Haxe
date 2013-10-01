@@ -23,7 +23,7 @@ extern class ColorFilter extends Filter
 	/**
 	* Alpha channel multiplier.
 	*/
-	public var redMultiplier:Float;
+	public var alphaMultiplier:Float;
 	
 	/**
 	* Alpha channel offset (added to value).
@@ -49,6 +49,11 @@ extern class ColorFilter extends Filter
 	* Green channel offset (added to value).
 	*/
 	public var greenOffset:Float;
+	
+	/**
+	* Red channel multiplier.
+	*/
+	public var redMultiplier:Float;
 	
 	/**
 	* Red channel offset (added to value).
@@ -88,8 +93,20 @@ extern class ColorFilter extends Filter
 	
 	/**
 	* Initialization method.
+	* @param redMultiplier The amount to multiply against the red channel. This is a range between 0 and 1.
+	* @param greenMultiplier The amount to multiply against the green channel. This is a range between 0 and 1.
+	* @param blueMultiplier The amount to multiply against the blue channel. This is a range between 0 and 1.
+	* @param alphaMultiplier The amount to multiply against the alpha channel. This is a range between 0 and 1.
+	* @param redOffset The amount to add to the red channel after it has been multiplied. This is a range
+	*	between -255 and 255.
+	* @param greenOffset The amount to add to the green channel after it has been multiplied. This is a range
+	*	between -255 and 255.
+	* @param blueOffset The amount to add to the blue channel after it has been multiplied. This is a range
+	*	between -255 and 255.
+	* @param alphaOffset The amount to add to the alpha channel after it has been multiplied. This is a range
+	*	between -255 and 255.
 	*/
-	//private function initialize():Dynamic;
+	//private function initialize(?redMultiplier:Float, ?greenMultiplier:Float, ?blueMultiplier:Float, ?alphaMultiplier:Float, ?redOffset:Float, ?greenOffset:Float, ?blueOffset:Float, ?alphaOffset:Float):Dynamic;
 	
 	/**
 	* Returns a clone of this ColorFilter instance.

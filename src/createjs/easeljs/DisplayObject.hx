@@ -14,22 +14,22 @@ import js.html.Point;
 extern class DisplayObject extends EventDispatcher
 {
 	/**
-	* A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to use this property. If null it will use the default cursor.
+	* A CSS cursor (ex. "pointer", "help", "text", etc) that will be displayed when the user hovers over this display object. You must enable mouseover events using the {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} method to use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
 	*/
 	public var cursor:String;
 	
 	/**
-	* A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}. The hit area will have its transformation applied relative to this display object's coordinate space (as though the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested using only its own `alpha` value regardless of the alpha value on the target display object, or the target's ancestors (parents).  Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
+	* A display object that will be tested when checking mouse interactions or testing {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}. The hit area will have its transformation applied relative to this display object's coordinate space (as though the hit test object were a child of this display object and relative to its regX/Y). The hitArea will be tested using only its own `alpha` value regardless of the alpha value on the target display object, or the target's ancestors (parents).  If set on a {{#crossLink "Container"}}{{/crossLink}}, children of the Container will not receive mouse events. This is similar to setting {{#crossLink "mouseChildren"}}{{/crossLink}} to false.  Note that hitArea is NOT currently used by the `hitTest()` method, nor is it supported for {{#crossLink "Stage"}}{{/crossLink}}.
 	*/
 	public var hitArea:DisplayObject;
 	
 	/**
-	* A reference to the Container or Stage object that contains this display object, or null if it has not been added to one. READ-ONLY.
+	* A reference to the {{#crossLink "Container"}}{{/crossLink}} or {{#crossLink "Stage"}}{{/crossLink}} object that contains this display object, or null if it has not been added to one.
 	*/
 	public var parent:Container;
 	
 	/**
-	* A shadow object that defines the shadow to render on this display object. Set to null to remove a shadow. If null, this property is inherited from the parent container.
+	* A shadow object that defines the shadow to render on this display object. Set to `null` to remove a shadow. If null, this property is inherited from the parent container.
 	*/
 	public var shadow:Shadow;
 	
@@ -39,27 +39,27 @@ extern class DisplayObject extends EventDispatcher
 	public var mask:Shape;
 	
 	/**
-	* An array of Filter objects to apply to this display object. Filters are only applied / updated when `cache()` or `updateCache()` is called on the display object, and only apply to the area that is cached.
+	* An array of Filter objects to apply to this display object. Filters are only applied / updated when {{#crossLink "cache"}}{{/crossLink}} or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is cached.
 	*/
 	public var filters:Array<Dynamic>;
 	
 	/**
-	* An optional name for this display object. Included in toString(). Useful for debugging.
+	* An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for debugging.
 	*/
 	public var name:String;
 	
 	/**
-	* If a cache is active, this returns the canvas that holds the cached version of this display object. See cache() for more information. READ-ONLY.
+	* If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}} for more information.
 	*/
 	public var cacheCanvas:Dynamic;
 	
 	/**
-	* Indicates whether the display object should have it's x & y position rounded prior to drawing it to stage. Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects). This only applies if the enclosing stage has snapPixelsEnabled set to true. The snapToPixel property is true by default for Bitmap and BitmapAnimation instances, and false for all other display objects. <br/><br/> Note that this applies only rounds the display object's local position. You should ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this by setting the ancestors' snapToPixel property to true.
+	* Indicates whether the display object should have its x & y position rounded prior to drawing it to stage. Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects). This only applies if the enclosing stage has {{#crossLink "Stage/snapPixelsEnabled:property"}}{{/crossLink}} set to `true`. The snapToPixel property is `true` by default for {{#crossLink "Bitmap"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}} instances, and `false` for all other display objects.  Note that this applies only rounds the display object's local position. You should ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this by setting the ancestors' snapToPixel property to `true`.
 	*/
 	public var snapToPixel:Bool;
 	
 	/**
-	* Indicates whether this display object should be rendered to the canvas and included when running Stage.getObjectsUnderPoint().
+	* Indicates whether this display object should be rendered to the canvas and included when running the Stage {{#crossLink "Stage/getObjectsUnderPoint"}}{{/crossLink}} method.
 	*/
 	public var visible:Bool;
 	
@@ -68,13 +68,14 @@ extern class DisplayObject extends EventDispatcher
 	*/
 	public var mouseEnabled:Bool;
 	
+	
 	/**
-	* Returns an ID number that uniquely identifies the current cache for this display object. This can be used to * determine if the cache has changed since a previous check.
+	* Returns an ID number that uniquely identifies the current cache for this display object. This can be used to determine if the cache has changed since a previous check.
 	*/
 	public var cacheID:Float;
 	
 	/**
-	* Suppresses errors generated when using features like hitTest, mouse events, and getObjectsUnderPoint with cross domain content
+	* Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}} with cross domain content.
 	*/
 	public static var suppressCrossDomainErrors:Bool;
 	
@@ -84,7 +85,7 @@ extern class DisplayObject extends EventDispatcher
 	public var alpha:Float;
 	
 	/**
-	* The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If null, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing"> whatwg spec on compositing</a>.
+	* The composite operation indicates how the pixels of this display object will be composited with the elements behind it. If `null`, this property is inherited from the parent container. For more information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing"> whatwg spec on compositing</a>.
 	*/
 	public var compositeOperation:String;
 	
@@ -99,44 +100,19 @@ extern class DisplayObject extends EventDispatcher
 	public var skewY:Float;
 	
 	/**
-	* The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display object to twice it's nominal width. To horizontally flip an object, set the scale to a negative number.
+	* The factor to stretch this display object horizontally. For example, setting scaleX to 2 will stretch the display object to twice its nominal width. To horizontally flip an object, set the scale to a negative number.
 	*/
 	public var scaleX:Float;
 	
 	/**
-	* The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half it's nominal height. To vertically flip an object, set the scale to a negative number.
+	* The factor to stretch this display object vertically. For example, setting scaleY to 0.5 will stretch the display object to half its nominal height. To vertically flip an object, set the scale to a negative number.
 	*/
 	public var scaleY:Float;
 	
 	/**
-	* The onClick callback is called when the user presses down on and then releases the mouse button over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onClick handler is set on a container, it will receive the event if any of its children are clicked.
+	* The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
 	*/
-	public var onClick:Dynamic;
-	
-	/**
-	* The onDoubleClick callback is called when the user double clicks over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. If an onDoubleClick handler is set on a container, it will receive the event if any of its children are clicked.
-	*/
-	public var onDoubleClick:Dynamic;
-	
-	/**
-	* The onMouseOut callback is called when the user rolls off of the display object. You must enable this event using stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	*/
-	public var onMouseOut:Dynamic;
-	
-	/**
-	* The onMouseOver callback is called when the user rolls over the display object. You must enable this event using stage.enableMouseOver(). The handler is passed a single param containing the corresponding MouseEvent instance.
-	*/
-	public var onMouseOver:Dynamic;
-	
-	/**
-	* The onPress callback is called when the user presses down on their mouse over this display object. The handler is passed a single param containing the corresponding MouseEvent instance. You can subscribe to the onMouseMove and onMouseUp callbacks of the event object to receive these events until the user releases the mouse button. If an onPress handler is set on a container, it will receive the event if any of its children are clicked.
-	*/
-	public var onPress:Dynamic;
-	
-	/**
-	* The onTick callback is called on each display object on a stage whenever the stage updates. This occurs immediately before the rendering (draw) pass. When stage.update() is called, first all display objects on the stage have onTick called, then all of the display objects are drawn to stage. Children will have their `onTick` called in order of their depth prior to onTick being called on their parent.  Any parameters passed in to `stage.update()` are passed on to the `onTick()` handlers. For example, if you call `stage.update("hello")`, all of the display objects with a handler will have `onTick("hello")` called.
-	*/
-	public var onTick:Dynamic;
+	public var regX:Float;
 	
 	/**
 	* The rotation in degrees for this display object.
@@ -149,17 +125,7 @@ extern class DisplayObject extends EventDispatcher
 	public var x:Float;
 	
 	/**
-	* The x offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50.
-	*/
-	public var regX:Float;
-	
-	/**
-	* The y (vertical) position of the display object, relative to its parent.
-	*/
-	public var y:Float;
-	
-	/**
-	* The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around it's center, you would set regX and regY to 50.
+	* The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
 	*/
 	public var regY:Float;
 	
@@ -167,6 +133,8 @@ extern class DisplayObject extends EventDispatcher
 	* Unique ID for this display object. Makes display objects easier for some uses.
 	*/
 	public var id:Float;
+	
+	private var _bounds:Rectangle;
 	
 	private var _cacheDataURL:String;
 	
@@ -180,11 +148,29 @@ extern class DisplayObject extends EventDispatcher
 	
 	private var _matrix:Matrix2D;
 	
+	private var _rectangle:Rectangle;
+	
 	public static var _hitTestCanvas:Dynamic;
 	
 	public static var _hitTestContext:CanvasRenderingContext2D;
 	
 	public static var _nextCacheID:Float;
+	
+	public var y:Float;
+	
+	/**
+	* Allows you to manually specify the bounds of an object that either cannot calculate their own bounds (ex. Shape &
+	*	Text) for future reference, or so the object can be included in Container bounds. Manually set bounds will always
+	*	override calculated bounds.
+	*	
+	*	The bounds should be specified in the object's local (untransformed) coordinates. For example, a Shape instance
+	*	with a 25px radius circle centered at 0,0 would have bounds of (-25, -25, 50, 50).
+	* @param x The x origin of the bounds. Pass null to remove the manual bounds.
+	* @param y The y origin of the bounds.
+	* @param width The width of the bounds.
+	* @param height The height of the bounds.
+	*/
+	public function setBounds(x:Float, y:Float, width:Float, height:Float):Dynamic;
 	
 	/**
 	* Applies this display object's transformation, alpha, globalCompositeOperation, clipping path (mask), and shadow
@@ -211,7 +197,7 @@ extern class DisplayObject extends EventDispatcher
 	* Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
 	*	that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	*	this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
-	*	cached display object can be moved, rotated, faded, etc freely, however if it's content changes, you must
+	*	cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must
 	*	manually update the cache by calling <code>updateCache()</code> or <code>cache()</code> again. You must specify
 	*	the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached
 	*	using this display object's coordinates.
@@ -224,7 +210,10 @@ extern class DisplayObject extends EventDispatcher
 	*	     myShape.cache(-25, -25, 50, 50);
 	*	
 	*	Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
-	*	class for more information.
+	*	class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
+	*	
+	*	Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
+	*	will add padding to the canvas dimensions.
 	* @param x The x coordinate origin for the cache region.
 	* @param y The y coordinate origin for the cache region.
 	* @param width The width of the cache region.
@@ -236,7 +225,7 @@ extern class DisplayObject extends EventDispatcher
 	public function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float):Dynamic;
 	
 	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
+	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns <code>true</code> if the draw was handled (useful for overriding functionality).
 	*	
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -244,7 +233,7 @@ extern class DisplayObject extends EventDispatcher
 	* @param ignoreCache Indicates whether the draw operation should ignore any current cache. For example,
 	*	used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	*/
-	public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Dynamic;
+	public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
 	
 	/**
 	* Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
@@ -255,13 +244,6 @@ extern class DisplayObject extends EventDispatcher
 	*	If null, a new Matrix2D object is returned.
 	*/
 	public function getConcatenatedMatrix(?mtx:Matrix2D):Matrix2D;
-	
-	/**
-	* Indicates whether the display object has a listener of the corresponding event types.
-	* @param typeMask A bitmask indicating which event types to look for. Bit 1 specifies press &
-	*	click & double click, bit 2 specifies it should look for mouse over and mouse out. This implementation may change.
-	*/
-	private function _hasMouseHandler(typeMask:Float):Bool;
 	
 	/**
 	* Initialization method.
@@ -301,7 +283,7 @@ extern class DisplayObject extends EventDispatcher
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
-	*	reverted to their defaults (for example .parent).
+	*	reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
 	*/
 	public function clone():DisplayObject;
 	
@@ -309,7 +291,7 @@ extern class DisplayObject extends EventDispatcher
 	* Returns a data URL for the cache, or null if this display object is not cached.
 	*	Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
 	*/
-	public function getCacheDataURL():Dynamic;
+	public function getCacheDataURL():String;
 	
 	/**
 	* Returns a matrix based on this object's transform.
@@ -319,9 +301,78 @@ extern class DisplayObject extends EventDispatcher
 	public function getMatrix(?matrix:Matrix2D):Matrix2D;
 	
 	/**
+	* Returns a rectangle representing this object's bounds in its local coordinate system (ie. with no transformation).
+	*	Objects that have been cached will return the bounds of the cache.
+	*	
+	*	Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
+	*	{{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
+	*	bounds.
+	*	
+	*	<table>
+	*		<tr><td><b>All</b></td><td>
+	*			All display objects support setting bounds manually using setBounds(). Likewise, display objects that
+	*			have been cached using cache() will return the bounds of their cache. Manual and cache bounds will override
+	*			the automatic calculations listed below.
+	*		</td></tr>
+	*		<tr><td><b>Bitmap</b></td><td>
+	*			Returns the width and height of the sourceRect (if specified) or image, extending from (x=0,y=0).
+	*		</td></tr>
+	*		<tr><td><b>Sprite</b></td><td>
+	*			Returns the bounds of the current frame. May have non-zero x/y if a frame registration point was specified
+	*			in the spritesheet data. See also {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}}
+	*		</td></tr>
+	*		<tr><td><b>Container</b></td><td>
+	*			Returns the aggregate (combined) bounds of all children that return a non-null value from getBounds().
+	*		</td></tr>
+	*		<tr><td><b>Shape</b></td><td>
+	*			Does not currently support automatic bounds calculations. Use setBounds() to manually define bounds.
+	*		</td></tr>
+	*		<tr><td><b>Text</b></td><td>
+	*			Returns approximate bounds. Horizontal values (x/width) are quite accurate, but vertical values (y/height) are
+	*			not, especially when using textBaseline values other than "top".
+	*		</td></tr>
+	*		<tr><td><b>BitmapText</b></td><td>
+	*			Returns approximate bounds. Values will be more accurate if spritesheet frame registration points are close
+	*			to (x=0,y=0).
+	*		</td></tr>
+	*	</table>
+	*	
+	*	Bounds can be expensive to calculate for some objects (ex. text, or containers with many children), and
+	*	are recalculated each time you call getBounds(). You can prevent recalculation on static objects by setting the
+	*	bounds explicitly:
+	*	
+	*		var bounds = obj.getBounds();
+	*		obj.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+	*		// getBounds will now use the set values, instead of recalculating
+	*	
+	*	To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
+	*	values if you need to retain it.
+	*	
+	*		var myBounds = obj.getBounds().clone();
+	*		// OR:
+	*		myRect.copy(obj.getBounds());
+	*/
+	public function getBounds():Rectangle;
+	
+	/**
+	* Returns a rectangle representing this object's bounds in its parent's coordinate system (ie. with transformations applied).
+	*	Objects that have been cached will return the transformed bounds of the cache.
+	*	
+	*	Not all display objects can calculate their own bounds (ex. Shape). For these objects, you can use 
+	*	{{#crossLink "DisplayObject/setBounds"}}{{/crossLink}} so that they are included when calculating Container
+	*	bounds.
+	*	
+	*	To reduce memory impact, the returned Rectangle instance may be reused internally; clone the instance or copy its
+	*	values if you need to retain it.
+	*	
+	*	Container instances calculate aggregate bounds for all children that return bounds via getBounds.
+	*/
+	public function getTransformedBounds():Rectangle;
+	
+	/**
 	* Returns a string representation of this object.
 	*/
-	public override function toString():String;
+	public function toString():String;
 	
 	/**
 	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.
@@ -400,7 +451,7 @@ extern class DisplayObject extends EventDispatcher
 	*	     var pt = this.localToGlobal(x, y);
 	*	     pt = target.globalToLocal(pt.x, pt.y);
 	* @param x The x position in the source display object to transform.
-	* @param y The y position on the stage to transform.
+	* @param y The y position on the source display object to transform.
 	* @param target The target display object to which the coordinates will be transformed.
 	*/
 	public function localToLocal(x:Float, y:Float, target:DisplayObject):Point;
@@ -423,13 +474,19 @@ extern class DisplayObject extends EventDispatcher
 	*/
 	public function globalToLocal(x:Float, y:Float):Point;
 	
+	private function _applyFilterBounds(x:Float, y:Float, width:Float, height:Float):Rectangle;
+	
 	private function _applyFilters():Dynamic;
 	
 	private function _applyShadow(ctx:CanvasRenderingContext2D, shadow:Shadow):Dynamic;
 	
+	private function _getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
+	
 	private function _testHit(ctx:CanvasRenderingContext2D):Bool;
 	
-	private function _tick():Dynamic;
+	private function _tick(params:Array<Dynamic>):Dynamic;
+	
+	private function _transformBounds(bounds:Rectangle, matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
 	
 	private function cloneProps(o:DisplayObject):Dynamic;
 	
