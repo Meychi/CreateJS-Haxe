@@ -1,5 +1,7 @@
 package createjs.tweenjs;
 
+import createjs.EventDispatcher;
+
 /**
 * A Tween instance tweens properties for a single target. Instance methods can be chained for easy construction and sequencing:
 *	
@@ -106,7 +108,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _curQueueProps:Dynamic;
 	
-	private var _inited:Boolean;
+	private var _inited:Bool;
 	
 	private var _initQueueProps:Dynamic;
 	
@@ -118,7 +120,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _useTicks:Bool;
 	
-	public static var _listeners:Array<Tween>;
+	public static var _tweens:Array<Tween>;
 	
 	public static var _plugins:Dynamic;
 	
@@ -312,7 +314,7 @@ extern class Tween extends EventDispatcher
 	/**
 	* Returns a string representation of this object.
 	*/
-	public function toString():String;
+	public override function toString():String;
 	
 	/**
 	* Stop and remove all existing tweens.

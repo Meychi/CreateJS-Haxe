@@ -49,7 +49,7 @@ extern class Shape extends DisplayObject
 	*	     shape.graphics.beginFill("#ff0000").drawRect(0, 0, 100, 100);
 	* @param graphics Optional. The graphics instance to display. If null, a new Graphics instance will be created.
 	*/
-	public function new(graphics:Graphics):Void;
+	public function new(?graphics:Graphics):Void;
 	
 	/**
 	* Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if

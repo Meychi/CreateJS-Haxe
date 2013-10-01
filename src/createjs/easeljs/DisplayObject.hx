@@ -372,7 +372,7 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	* Returns a string representation of this object.
 	*/
-	public function toString():String;
+	public override function toString():String;
 	
 	/**
 	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.

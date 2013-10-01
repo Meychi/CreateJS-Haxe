@@ -79,7 +79,7 @@ extern class EventDispatcher
 	* @param data Arbitrary data that will be included as the second parameter when the listener is called.
 	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
 	*/
-	public function on(type:String, listener:Dynamic, ?scope:Dynamic, ?once:Bool, ?data:*, ?useCapture:Bool):Dynamic;
+	public function on(type:String, listener:Dynamic, ?scope:Dynamic, ?once:Bool, ?data:Dynamic, ?useCapture:Bool):Dynamic;
 	
 	/**
 	* A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
