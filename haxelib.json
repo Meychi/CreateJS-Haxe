@@ -4,8 +4,8 @@
 	"tags": ["canvas", "html5", "js", "sound", "tween"],
 	"description": "Detailed Haxe externs for the CreateJS libraries.",
 	"contributors": ["Meychi"],
-	"releasenote": "Manual fixes to the Graphics class",
-	"version": "1.0.1",
+	"releasenote": "Updated to EaselJS 0.7.0, TweenJS 0.5.0, SoundJS 0.5.0, PreloadJS 0.4.0",
+	"version": "1.1.0",
 	"url": "https://github.com/Meychi/CreateJS-Haxe",
 	"dependencies": {}
 }
