@@ -113,7 +113,7 @@ extern class Sound
 	/**
 	* An array of extensions to attempt to use when loading sound, if the default is unsupported by the active plugin. These are applied in order, so if you try to Load Thunder.ogg in a browser that does not support ogg, and your extensions array is ["mp3", "m4a", "wav"] it will check mp3 support, then m4a, then wav. The audio files need to exist in the same location, as only the extension is altered.  Note that regardless of which file is loaded, you can call {{#crossLink "Sound/createInstance"}}{{/crossLink}} and {{#crossLink "Sound/play"}}{{/crossLink}} using the same id or full source path passed for loading. <h4>Example</h4> 	var manifest = [ 		{src:"myPath/mySound.ogg", id:"example"}, 	]; 	createjs.Sound.alternateExtensions = ["mp3"]; // now if ogg is not supported, SoundJS will try asset0.mp3 	createjs.Sound.addEventListener("fileload", handleLoad); // call handleLoad when each sound loads 	createjs.Sound.registerManifest(manifest, assetPath); 	// ... 	createjs.Sound.play("myPath/mySound.ogg"); // works regardless of what extension is supported.  Note calling with ID is a better approach
 	*/
-	public var alternateExtensions:Array<Dynamic>;
+	public static var alternateExtensions:Array<Dynamic>;
 	
 	/**
 	* An object hash storing sound sources via there corresponding ID.

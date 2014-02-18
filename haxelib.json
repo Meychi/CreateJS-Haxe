@@ -4,8 +4,8 @@
 	"tags": ["canvas", "html5", "js", "sound", "tween"],
 	"description": "Detailed Haxe externs for the CreateJS libraries.",
 	"contributors": ["Meychi"],
-	"releasenote": "Added missing SoundJS event listener methods.",
-	"version": "1.3.1",
+	"releasenote": "Fixed Sound.alternateExtensions.",
+	"version": "1.3.2",
 	"url": "https://github.com/Meychi/CreateJS-Haxe",
 	"dependencies": {}
 }
