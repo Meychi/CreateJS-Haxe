@@ -123,6 +123,11 @@ extern class ColorMatrix extends Array
 	public function clone():ColorMatrix;
 	
 	/**
+	* Returns a string representation of this object.
+	*/
+	public override function toString():String;
+	
+	/**
 	* Shortcut method to adjust brightness, contrast, saturation and hue.
 	*	Equivalent to calling adjustHue(hue), adjustContrast(contrast),
 	*	adjustBrightness(brightness), adjustSaturation(saturation), in that order.

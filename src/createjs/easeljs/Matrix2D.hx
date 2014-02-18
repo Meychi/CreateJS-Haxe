@@ -64,6 +64,11 @@ extern class Matrix2D
 	public var shadow:Shadow;
 	
 	/**
+	* Property representing the value for visible that will be applied to a display object. This is not part of matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
+	*/
+	public var visible:Bool;
+	
+	/**
 	* Appends the specified matrix properties with this matrix. All parameters are required.
 	* @param a 
 	* @param b 
@@ -85,8 +90,9 @@ extern class Matrix2D
 	* @param alpha desired alpha value
 	* @param shadow desired shadow value
 	* @param compositeOperation desired composite operation value
+	* @param visible desired visible value
 	*/
-	public function appendProperties(alpha:Float, shadow:Shadow, compositeOperation:String):Matrix2D;
+	public function appendProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool):Matrix2D;
 	
 	/**
 	* Applies a rotation transformation to the matrix.
@@ -192,8 +198,9 @@ extern class Matrix2D
 	* @param alpha desired alpha value
 	* @param shadow desired shadow value
 	* @param compositeOperation desired composite operation value
+	* @param visible desired visible value
 	*/
-	public function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String):Matrix2D;
+	public function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool):Matrix2D;
 	
 	/**
 	* Reinitializes all matrix properties to those specified.
@@ -206,8 +213,9 @@ extern class Matrix2D
 	* @param alpha desired alpha value
 	* @param shadow desired shadow value
 	* @param compositeOperation desired composite operation value
+	* @param visible desired visible value
 	*/
-	public function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String):Matrix2D;
+	public function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String, ?visible:Bool):Matrix2D;
 	
 	/**
 	* Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.

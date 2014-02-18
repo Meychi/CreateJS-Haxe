@@ -18,7 +18,7 @@ package createjs.easeljs;
 *	
 *	     data = {
 *	         // DEFINING FRAMERATE:
-*	         // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+*	         // this specifies the framerate that will be set on the SpriteSheet. See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}}
 *	         // for more information.
 *	         framerate: 20,
 *	
@@ -44,7 +44,7 @@ package createjs.easeljs;
 *	         // DEFINING ANIMATIONS:
 *	
 *		        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
-*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
+*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed".
 *		        animations: {
 *		        	// start, end, next, speed
 *		        	run: [0,8],
@@ -76,6 +76,10 @@ package createjs.easeljs;
 *		        }
 *	     }
 *	
+*	<strong>Note that the <code>speed</code> property was added in EaselJS 0.7.0. Earlier versions had a <code>frequency</code>
+*	property instead, which was the inverse of speed. For example, a value of "4" would be 1/4 normal speed in earlier
+*	versions, but us 4x normal speed in 0.7.0+.</strong>
+*	
 *	<h4>Example</h4>
 *	To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with two
 *	animations, "run" looping from frame 0-4 inclusive, and "jump" playing from frame 5-8 and sequencing back to run:
@@ -87,6 +91,11 @@ package createjs.easeljs;
 *	     };
 *	     var spriteSheet = new createjs.SpriteSheet(data);
 *	     var animation = new createjs.Sprite(spriteSheet, "run");
+*	
+*	
+*	<strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
+*	using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
+*	setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
 */
 @:native("createjs.SpriteSheet")
 extern class SpriteSheet extends EventDispatcher
@@ -95,7 +104,6 @@ extern class SpriteSheet extends EventDispatcher
 	* Indicates whether all images are finished loading.
 	*/
 	public var complete:Bool;
-	
 	
 	/**
 	* Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See Sprite.framerate for more information.
@@ -140,7 +148,7 @@ extern class SpriteSheet extends EventDispatcher
 	*	
 	*	     data = {
 	*	         // DEFINING FRAMERATE:
-	*	         // this specifies the framerate that will be set on the SpriteSheet. See Spritesheet.framerate
+	*	         // this specifies the framerate that will be set on the SpriteSheet. See {{#crossLink "SpriteSheet/framerate:property"}}{{/crossLink}}
 	*	         // for more information.
 	*	         framerate: 20,
 	*	
@@ -166,7 +174,7 @@ extern class SpriteSheet extends EventDispatcher
 	*	         // DEFINING ANIMATIONS:
 	*	
 	*		        // simple animation definitions. Define a consecutive range of frames (begin to end inclusive).
-	*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed"
+	*		        // optionally define a "next" animation to sequence to (or false to stop) and a playback "speed".
 	*		        animations: {
 	*		        	// start, end, next, speed
 	*		        	run: [0,8],
@@ -198,6 +206,10 @@ extern class SpriteSheet extends EventDispatcher
 	*		        }
 	*	     }
 	*	
+	*	<strong>Note that the <code>speed</code> property was added in EaselJS 0.7.0. Earlier versions had a <code>frequency</code>
+	*	property instead, which was the inverse of speed. For example, a value of "4" would be 1/4 normal speed in earlier
+	*	versions, but us 4x normal speed in 0.7.0+.</strong>
+	*	
 	*	<h4>Example</h4>
 	*	To define a simple sprite sheet, with a single image "sprites.jpg" arranged in a regular 50x50 grid with two
 	*	animations, "run" looping from frame 0-4 inclusive, and "jump" playing from frame 5-8 and sequencing back to run:
@@ -209,6 +221,11 @@ extern class SpriteSheet extends EventDispatcher
 	*	     };
 	*	     var spriteSheet = new createjs.SpriteSheet(data);
 	*	     var animation = new createjs.Sprite(spriteSheet, "run");
+	*	
+	*	
+	*	<strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
+	*	using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
+	*	setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
 	* @param data An object describing the SpriteSheet data.
 	*/
 	public function new(data:Dynamic):Void;

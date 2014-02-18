@@ -22,6 +22,11 @@ import js.html.CanvasRenderingContext2D;
 extern class Container extends DisplayObject
 {
 	/**
+	* If false, the tick will not be propagated to children of this Container. This can provide some performance benefits. In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	*/
+	public var tickChildren:Bool;
+	
+	/**
 	* Indicates whether the children of this container are independently enabled for mouse/pointer interaction. If false, the children will be aggregated under the container - for example, a click on a child shape would trigger a click event on the container.
 	*/
 	public var mouseChildren:Bool;
@@ -119,10 +124,11 @@ extern class Container extends DisplayObject
 	/**
 	* Performs an array sort operation on the child list.
 	*	
-	*	<h4>Example</h4>
-	*	     var sortFunction = function(item1, item2, options) {
-	*	         if (item1 > item2) { return 1; }
-	*	         if (item1 < item2) { return -1; }
+	*	<h4>Example: Display children with a higher y in front.</h4>
+	*	
+	*	     var sortFunction = function(obj1, obj2, options) {
+	*	         if (obj1.y > obj2.y) { return 1; }
+	*	         if (obj1.y < obj2.y) { return -1; }
 	*	         return 0;
 	*	     }
 	*	     container.sortChildren(sortFunction);
@@ -276,6 +282,6 @@ extern class Container extends DisplayObject
 	
 	//private function _tick(params:Array<Dynamic>):Dynamic;
 	
-	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouse:Bool):Array<Dynamic>;
+	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouse:Bool, activeListener:Bool):Array<Dynamic>;
 	
 }

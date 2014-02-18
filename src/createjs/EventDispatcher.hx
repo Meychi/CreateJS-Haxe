@@ -15,7 +15,7 @@ package createjs;
 *	{{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
 *	{{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
 *	
-*	Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllListeners"}}{{/crossLink}}
+*	Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
 *	method, which can be used to listeners for all events, or listeners for a specific event. The Event object also 
 *	includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
 *	
@@ -141,7 +141,7 @@ extern class EventDispatcher
 	*	{{#crossLink "EventDispatcher/off"}}{{/crossLink}} method is merely an alias to
 	*	{{#crossLink "EventDispatcher/removeEventListener"}}{{/crossLink}}.
 	*	
-	*	Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllListeners"}}{{/crossLink}}
+	*	Another addition to the DOM Level 2 model is the {{#crossLink "EventDispatcher/removeAllEventListeners"}}{{/crossLink}}
 	*	method, which can be used to listeners for all events, or listeners for a specific event. The Event object also 
 	*	includes a {{#crossLink "Event/remove"}}{{/crossLink}} method which removes the active listener.
 	*	
@@ -174,7 +174,18 @@ extern class EventDispatcher
 	public function new():Void;
 	
 	/**
-	* Indicates whether there is at least one listener for the specified event type and `useCapture` value.
+	* Indicates whether there is at least one listener for the specified event type on this object or any of its
+	*	ancestors (parent, parent's parent, etc). A return value of true indicates that if a bubbling event of the
+	*	specified type is dispatched from this object, it will trigger at least one listener.
+	*	
+	*	This is similar to {{#crossLink "EventDispatcher/hasEventListener"}}{{/crossLink}}, but it searches the entire
+	*	event flow for a listener, not just this object.
+	* @param type The string type of the event.
+	*/
+	public function willTrigger(type:String):Bool;
+	
+	/**
+	* Indicates whether there is at least one listener for the specified event type.
 	* @param type The string type of the event.
 	*/
 	public function hasEventListener(type:String):Bool;
@@ -190,7 +201,7 @@ extern class EventDispatcher
 	*	<h4>Example</h4>
 	*	
 	*	     // Remove all listeners
-	*	     displayObject.removeAllEvenListeners();
+	*	     displayObject.removeAllEventListeners();
 	*	
 	*	     // Remove all click listeners
 	*	     displayObject.removeAllEventListeners("click");

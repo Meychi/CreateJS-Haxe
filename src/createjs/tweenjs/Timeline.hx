@@ -27,7 +27,6 @@ extern class Timeline extends EventDispatcher
 	*/
 	public var position:Dynamic;
 	
-	
 	private var _labelList:Array<Object>;
 	
 	private var _labels:Dynamic;

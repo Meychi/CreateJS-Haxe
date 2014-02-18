@@ -54,7 +54,12 @@ extern class DisplayObject extends EventDispatcher
 	public var cacheCanvas:Dynamic;
 	
 	/**
-	* Indicates whether the display object should have its x & y position rounded prior to drawing it to stage. Snapping to whole pixels can result in a sharper and faster draw for images (ex. Bitmap & cached objects). This only applies if the enclosing stage has {{#crossLink "Stage/snapPixelsEnabled:property"}}{{/crossLink}} set to `true`. The snapToPixel property is `true` by default for {{#crossLink "Bitmap"}}{{/crossLink}} and {{#crossLink "Sprite"}}{{/crossLink}} instances, and `false` for all other display objects.  Note that this applies only rounds the display object's local position. You should ensure that all of the display object's ancestors (parent containers) are also on a whole pixel. You can do this by setting the ancestors' snapToPixel property to `true`.
+	* If false, the tick will not run on this display object (or its children). This can provide some performance benefits. In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	*/
+	public var tickEnabled:Bool;
+	
+	/**
+	* Indicates whether the display object should be drawn to a whole pixel when {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
 	*/
 	public var snapToPixel:Bool;
 	
@@ -64,10 +69,14 @@ extern class DisplayObject extends EventDispatcher
 	public var visible:Bool;
 	
 	/**
-	* Indicates whether to include this object when running mouse interactions. Setting this to `false` for children of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is clicked. Note that setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} method from returning the child.
+	* Indicates whether to include this object when running mouse interactions. Setting this to `false` for children of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is clicked. Setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} method from returning the child.  <strong>Note:</strong> In EaselJS 0.7.0, the mouseEnabled property will not work properly with nested Containers. Please check out the latest NEXT version in <a href="https://github.com/CreateJS/EaselJS/tree/master/lib">GitHub</a> for an updated version with this issue resolved. The fix will be provided in the next release of EaselJS.
 	*/
 	public var mouseEnabled:Bool;
 	
+	/**
+	* Listing of mouse event names. Used in _hasMouseEventListener.
+	*/
+	public static var _MOUSE_EVENTS:Array<Dynamic>;
 	
 	/**
 	* Returns an ID number that uniquely identifies the current cache for this display object. This can be used to determine if the cache has changed since a previous check.
@@ -155,6 +164,8 @@ extern class DisplayObject extends EventDispatcher
 	public static var _hitTestContext:CanvasRenderingContext2D;
 	
 	public static var _nextCacheID:Float;
+	
+	public static var _snapToPixelEnabled:Bool;
 	
 	public var y:Float;
 	
@@ -244,6 +255,11 @@ extern class DisplayObject extends EventDispatcher
 	*	If null, a new Matrix2D object is returned.
 	*/
 	public function getConcatenatedMatrix(?mtx:Matrix2D):Matrix2D;
+	
+	/**
+	* Indicates whether the display object has any mouse event listeners or a cursor.
+	*/
+	private function _isMouseOpaque():Bool;
 	
 	/**
 	* Initialization method.

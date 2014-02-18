@@ -4,15 +4,14 @@ import js.html.Element;
 
 /**
 * Play sounds using HTML &lt;audio&gt; tags in the browser. This plugin is the second priority plugin installed
-*	by default, after the {{#crossLink "WebAudioPlugin"}}{{/crossLink}}, which is supported on Chrome, Safari, and
-*	iOS. This handles audio in all other modern browsers. For older browsers that do not support html audio, include
-*	and install the {{#crossLink "FlashPlugin"}}{{/crossLink}}.
+*	by default, after the {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.  For older browsers that do not support html
+*	audio, include and install the {{#crossLink "FlashPlugin"}}{{/crossLink}}.
 *	
 *	<h4>Known Browser and OS issues for HTML Audio</h4>
 *	<b>All browsers</b><br />
 *	Testing has shown in all browsers there is a limit to how many audio tag instances you are allowed.  If you exceed
 *	this limit, you can expect to see unpredictable results.  This will be seen as soon as you register sounds, as
-*	tags are precreated to all Chrome to load them.  Please use {{#crossLink "Sound.MAX_INSTANCES"}}{{/crossLink}} as
+*	tags are precreated to allow Chrome to load them.  Please use {{#crossLink "Sound.MAX_INSTANCES"}}{{/crossLink}} as
 *	a guide to how many total audio tags you can safely use in all browsers.
 *	
 *	<b>IE 9 html limitations</b><br />
@@ -28,15 +27,19 @@ import js.html.Element;
 *	<ul><li>Safari requires Quicktime to be installed for audio playback.</li></ul>
 *	
 *	<b>iOS 6 limitations</b><br />
-*	Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+). HTML Audio is disabled by
-*	default as it can only have one &lt;audio&gt; tag, can not preload or autoplay the audio, can not cache the audio,
-*	and can not play the audio except inside a user initiated event.
-*	<br /><br />
-*	<b>Android HTML Audio limitations</b><br />
+*	<ul><li>Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+)</li>
+*			<li>HTML Audio is disabled by default because</li>
+*			<li>can only have one &lt;audio&gt; tag</li>
+*			<li>can not preload or autoplay the audio</li>
+*			<li>can not cache the audio</li>
+*			<li>can not play the audio except inside a user initiated event.</li>
+*	</ul>
+*	
+*	<b>Android Native Browser limitations</b><br />
 *	<ul><li>We have no control over audio volume. Only the user can set volume on their device.</li>
-*	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li>
+*	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li></ul>
 *	<b> Android Chrome 26.0.1410.58 specific limitations</b><br />
-*			<li>Chrome reports true when you run createjs.Sound.BrowserDetect.isChrome, but is a different browser
+*	<ul><li>Chrome reports true when you run createjs.Sound.BrowserDetect.isChrome, but is a different browser
 *	     with different abilities.</li>
 *	     <li>Can only play 1 sound at a time.</li>
 *	     <li>Sound is not cached.</li>
@@ -57,37 +60,32 @@ extern class HTMLAudioPlugin
 	/**
 	* Event constant for the "canPlayThrough" event for cleaner code.
 	*/
-	public static var AUDIO_READY:String;
+	public static var _AUDIO_READY:String;
 	
 	/**
 	* Event constant for the "ended" event for cleaner code.
 	*/
-	public static var AUDIO_ENDED:String;
-	
-	/**
-	* Event constant for the "error" event for cleaner code.
-	*/
-	public static var AUDIO_ERROR:String;
+	public static var _AUDIO_ENDED:String;
 	
 	/**
 	* Event constant for the "seeked" event for cleaner code.  We utilize this event for maintaining loop events.
 	*/
-	public static var AUDIO_SEEKED:String;
+	public static var _AUDIO_SEEKED:String;
 	
 	/**
 	* Event constant for the "stalled" event for cleaner code.
 	*/
-	public static var AUDIO_STALLED:String;
+	public static var _AUDIO_STALLED:String;
 	
 	/**
 	* Object hash indexed by the source of each file to indicate if an audio source is loaded, or loading.
 	*/
-	private var audioSources:Dynamic;
+	private var _audioSources:Dynamic;
 	
 	/**
-	* The capabilities of the plugin. This is generated via the the SoundInstance {{#crossLink "HTMLAudioPlugin/generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for an overview of all of the available properties.
+	* The capabilities of the plugin. This is generated via the the SoundInstance {{#crossLink "HTMLAudioPlugin/_generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for an overview of all of the available properties.
 	*/
-	public static var capabilities:Dynamic;
+	public static var _capabilities:Dynamic;
 	
 	/**
 	* The default number of instances to allow.  Passed back to {{#crossLink "Sound"}}{{/crossLink}} when a source is registered using the {{#crossLink "Sound/register"}}{{/crossLink}} method.  This is only used if a value is not provided.  <b>NOTE this property only exists as a limitation of HTML audio.</b>
@@ -102,20 +100,13 @@ extern class HTMLAudioPlugin
 	/**
 	* An initialization function run by the constructor
 	*/
-	private function init():Dynamic;
+	private function _init():Dynamic;
 	
 	/**
 	* Checks if preloading has started for a specific source.
 	* @param src The sound URI to check.
 	*/
 	public function isPreloadStarted(src:String):Bool;
-	
-	/**
-	* Checks if src was changed on tag used to create instances in TagPool before loading
-	*	Currently PreloadJS does this when a basePath is set, so we are replicating that behavior for internal preloading.
-	* @param event 
-	*/
-	private function handleTagLoad(event:Dynamic):Dynamic;
 	
 	/**
 	* Create a sound instance. If the sound has not been preloaded, it is internally preloaded here.
@@ -127,7 +118,15 @@ extern class HTMLAudioPlugin
 	* Create an HTML audio tag.
 	* @param src The source file to set for the audio tag.
 	*/
-	private function createTag(src:String):Element;
+	private function _createTag(src:String):Element;
+	
+	/**
+	* Deprecated as this will not be required with new approach to basePath.
+	*	Checks if src was changed on tag used to create instances in TagPool before loading
+	*	Currently PreloadJS does this when a basePath is set, so we are replicating that behavior for internal preloading.
+	* @param event 
+	*/
+	private function _handleTagLoad(event:Dynamic):Dynamic;
 	
 	/**
 	* Determine if the plugin can be used in the current browser/OS. Note that HTML audio is available in most modern
@@ -139,27 +138,25 @@ extern class HTMLAudioPlugin
 	* Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/getCapabilities"}}{{/crossLink}}
 	*	method for an overview of plugin capabilities.
 	*/
-	private static function generateCapabiities():Dynamic;
+	private static function _generateCapabilities():Dynamic;
 	
 	/**
 	* Internally preload a sound.
 	* @param src The sound URI to load.
 	* @param instance An object containing a tag property that is an HTML audio tag used to load src.
-	* @param basePath A file path to prepend to the src.
 	*/
-	public function preload(src:String, instance:Dynamic, basePath:String):Dynamic;
+	public function preload(src:String, instance:Dynamic):Dynamic;
 	
 	/**
 	* Play sounds using HTML &lt;audio&gt; tags in the browser. This plugin is the second priority plugin installed
-	*	by default, after the {{#crossLink "WebAudioPlugin"}}{{/crossLink}}, which is supported on Chrome, Safari, and
-	*	iOS. This handles audio in all other modern browsers. For older browsers that do not support html audio, include
-	*	and install the {{#crossLink "FlashPlugin"}}{{/crossLink}}.
+	*	by default, after the {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.  For older browsers that do not support html
+	*	audio, include and install the {{#crossLink "FlashPlugin"}}{{/crossLink}}.
 	*	
 	*	<h4>Known Browser and OS issues for HTML Audio</h4>
 	*	<b>All browsers</b><br />
 	*	Testing has shown in all browsers there is a limit to how many audio tag instances you are allowed.  If you exceed
 	*	this limit, you can expect to see unpredictable results.  This will be seen as soon as you register sounds, as
-	*	tags are precreated to all Chrome to load them.  Please use {{#crossLink "Sound.MAX_INSTANCES"}}{{/crossLink}} as
+	*	tags are precreated to allow Chrome to load them.  Please use {{#crossLink "Sound.MAX_INSTANCES"}}{{/crossLink}} as
 	*	a guide to how many total audio tags you can safely use in all browsers.
 	*	
 	*	<b>IE 9 html limitations</b><br />
@@ -175,15 +172,19 @@ extern class HTMLAudioPlugin
 	*	<ul><li>Safari requires Quicktime to be installed for audio playback.</li></ul>
 	*	
 	*	<b>iOS 6 limitations</b><br />
-	*	Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+). HTML Audio is disabled by
-	*	default as it can only have one &lt;audio&gt; tag, can not preload or autoplay the audio, can not cache the audio,
-	*	and can not play the audio except inside a user initiated event.
-	*	<br /><br />
-	*	<b>Android HTML Audio limitations</b><br />
+	*	<ul><li>Note it is recommended to use {{#crossLink "WebAudioPlugin"}}{{/crossLink}} for iOS (6+)</li>
+	*			<li>HTML Audio is disabled by default because</li>
+	*			<li>can only have one &lt;audio&gt; tag</li>
+	*			<li>can not preload or autoplay the audio</li>
+	*			<li>can not cache the audio</li>
+	*			<li>can not play the audio except inside a user initiated event.</li>
+	*	</ul>
+	*	
+	*	<b>Android Native Browser limitations</b><br />
 	*	<ul><li>We have no control over audio volume. Only the user can set volume on their device.</li>
-	*	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li>
+	*	     <li>We can only play audio inside a user event (touch/click).  This currently means you cannot loop sound or use a delay.</li></ul>
 	*	<b> Android Chrome 26.0.1410.58 specific limitations</b><br />
-	*			<li>Chrome reports true when you run createjs.Sound.BrowserDetect.isChrome, but is a different browser
+	*	<ul><li>Chrome reports true when you run createjs.Sound.BrowserDetect.isChrome, but is a different browser
 	*	     with different abilities.</li>
 	*	     <li>Can only play 1 sound at a time.</li>
 	*	     <li>Sound is not cached.</li>
@@ -198,7 +199,7 @@ extern class HTMLAudioPlugin
 	/**
 	* Pre-register a sound instance when preloading/setup. This is called by {{#crossLink "Sound"}}{{/crossLink}}.
 	*	Note that this provides an object containing a tag used for preloading purposes, which
-	*	<a href="http://preloadjs.com">PreloadJS</a> can use to assist with preloading.
+	*	<a href="http://preloadjs.com" target="_blank">PreloadJS</a> can use to assist with preloading.
 	* @param src The source of the audio
 	* @param instances The number of concurrently playing instances to allow for the channel at any time.
 	*/

@@ -22,7 +22,7 @@ extern class TagLoader extends AbstractLoader
 	/**
 	* Determines if the load item is an audio tag, since we take some specific approaches to properly load audio.
 	*/
-	public var _isAudio:Bool;
+	private var _isAudio:Bool;
 	
 	/**
 	* The HTML tag or JavaScript object this loader uses to preload content. Note that a tag may be a custom object that matches the API of an HTML tag (load method, onload callback). For example, flash audio from SoundJS passes in a custom object to handle preloading for Flash audio and WebAudio.

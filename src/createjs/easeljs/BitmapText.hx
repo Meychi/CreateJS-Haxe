@@ -1,7 +1,5 @@
 package createjs.easeljs;
 
-import js.html.CanvasRenderingContext2D;
-
 /**
 * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
 *	using new line characters, but automatic wrapping is not supported. See the 
@@ -17,7 +15,12 @@ extern class BitmapText extends DisplayObject
 	public var spriteSheet:String;
 	
 	/**
-	* If a space character is not defined in the sprite sheet, then empty pixels equal to spaceWidth will be inserted instead. If  0, then it will use a value calculated by checking for the width of the "1", "E", or "A" character (in that order). If those characters are not defined, it will use the width of the first frame of the sprite sheet.
+	* BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be retained, slightly increasing memory use, but reducing instantiation.
+	*/
+	public static var maxPoolSize:Float;
+	
+	/**
+	* If a space character is not defined in the sprite sheet, then empty pixels equal to spaceWidth will be inserted instead. If 0, then it will use a value calculated by checking for the width of the "1", "l", "E", or "A" character (in that order). If those characters are not defined, it will use the width of the first frame of the sprite sheet.
 	*/
 	public var spaceWidth:Float;
 	
@@ -36,9 +39,13 @@ extern class BitmapText extends DisplayObject
 	*/
 	public var letterSpacing:Float;
 	
-	private var DisplayObject_draw:Dynamic;
+	private var _oldProps:Dynamic;
 	
-	private var DisplayObject_initialize:Dynamic;
+	private var Container_getBounds:Dynamic;
+	
+	private var Container_initialize:Dynamic;
+	
+	private var DisplayObject_draw:Dynamic;
 	
 	/**
 	* Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
@@ -49,17 +56,6 @@ extern class BitmapText extends DisplayObject
 	* @param spriteSheet The spritesheet that defines the character glyphs.
 	*/
 	public function new(?text:String, ?spriteSheet:SpriteSheet):Void;
-	
-	/**
-	* Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	*	Returns true if the draw was handled (useful for overriding functionality).
-	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	* @param ctx The canvas 2D context object to draw into.
-	* @param ignoreCache Indicates whether the draw operation should ignore any current cache.
-	*	For example, used for drawing the cache (to prevent it from simply drawing an existing cache back
-	*	into itself).
-	*/
-	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
 	
 	/**
 	* Initialization method.
@@ -79,8 +75,10 @@ extern class BitmapText extends DisplayObject
 	
 	private function _getFrame(character:String, spriteSheet:SpriteSheet):Dynamic;
 	
-	private function _getLineHeight(ss:SpriteSheet):Dynamic;
+	private function _getFrameIndex(character:String, spriteSheet:SpriteSheet):Float;
 	
-	private function _getSpaceWidth(ss:SpriteSheet):Dynamic;
+	private function _getLineHeight(ss:SpriteSheet):Float;
+	
+	private function _getSpaceWidth(ss:SpriteSheet):Float;
 	
 }

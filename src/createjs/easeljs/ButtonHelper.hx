@@ -23,6 +23,11 @@ package createjs.easeljs;
 extern class ButtonHelper
 {
 	/**
+	* Enables or disables the button functionality on the target.
+	*/
+	public var enabled:Bool;
+	
+	/**
 	* If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	*/
 	public var play:Bool;
@@ -46,6 +51,8 @@ extern class ButtonHelper
 	* The target for this button helper.
 	*/
 	public var target:Dynamic;
+	
+	private var _enabled:Bool;
 	
 	private var _isOver:Bool;
 	
@@ -77,6 +84,11 @@ extern class ButtonHelper
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
+	/**
+	* Returns enabled state of this instance.
+	*/
+	public function getEnabled():Bool;
 	
 	/**
 	* The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or

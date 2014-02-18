@@ -45,6 +45,11 @@ extern class Stage extends Container
 	public var tickOnUpdate:Bool;
 	
 	/**
+	* Indicates whether display objects should be rendered on whole pixels. You can set the {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of display objects to false to enable/disable this behaviour on a per instance basis.
+	*/
+	public var snapToPixelEnabled:Bool;
+	
+	/**
 	* Indicates whether the mouse is currently within the bounds of the canvas.
 	*/
 	public var mouseInBounds:Bool;
@@ -55,19 +60,14 @@ extern class Stage extends Container
 	public var autoClear:Bool;
 	
 	/**
-	* Indicates whether this stage should use the {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of display objects when rendering them.
-	*/
-	public var snapToPixelEnabled:Bool;
-	
-	/**
-	* NOTE: this name is not final. Feedback is appreciated.  The stage assigned to this property will have mouse interactions relayed to it after this stage handles them. This can be useful in cases where you have multiple canvases layered on top of one another and want your mouse events to pass through. For example, this would relay mouse events from topStage to bottomStage:       topStage.nextStage = bottomStage;  Note that each stage handles the interactions independently. As such, you could have a click register on an object in the top stage, and another click register in the bottom stage. Consider using a single canvas with cached {{#crossLink "Container"}}{{/crossLink}} instances instead of multiple canvases.  MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.  In most instances, you will also want to disable DOM events for the next stage to avoid duplicate interactions. myNextStage.enableDOMEvents(false);
-	*/
-	public var nextStage:Stage;
-	
-	/**
 	* Number of active pointers.
 	*/
 	private var _pointerCount:Dynamic;
+	
+	/**
+	* Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them. This can be useful in cases where you have multiple layered canvases and want user interactions events to pass through. For example, this would relay mouse events from topStage to bottomStage:       topStage.nextStage = bottomStage;  To disable relaying, set nextStage to null.  MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings of the top-most stage, but are only processed if the target stage has mouse over interactions enabled. Considerations when using roll over in relay targets:<OL> <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI> <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI> <LI> All relay targets will share the frequency value of the top-most stage</LI> </OL> To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing 30 as it's desired frequency): 	topStage.nextStage = targetStage; 	topStage.enableMouseOver(10); 	targetStage.enableMouseOver(30);  If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its DOM events using:  	targetStage.enableDOMEvents(false);
+	*/
+	public var nextStage:Stage;
 	
 	/**
 	* The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render).  When changing the canvas property you must disable the events on the old canvas, and enable events on the new canvas or mouse events will not work as expected. For example:       myStage.enableDOMEvents(false);      myStage.canvas = anotherCanvas;      myStage.enableDOMEvents(true);
@@ -91,7 +91,9 @@ extern class Stage extends Container
 	
 	private var _mouseOverIntervalID:Float;
 	
-	public static var _snapToPixelEnabled:Bool;
+	private var _nextStage:Stage;
+	
+	private var _prevStage:Stage;
 	
 	/**
 	* A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
@@ -199,7 +201,7 @@ extern class Stage extends Container
 	
 	private function _getPointerData(id:Float):Dynamic;
 	
-	private function _handleDoubleClick(e:MouseEvent):Dynamic;
+	private function _handleDoubleClick(e:MouseEvent, owner:Stage):Dynamic;
 	
 	private function _handleMouseDown(e:MouseEvent):Dynamic;
 	
@@ -207,13 +209,13 @@ extern class Stage extends Container
 	
 	private function _handleMouseUp(e:MouseEvent):Dynamic;
 	
-	private function _handlePointerDown(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
+	private function _handlePointerDown(id:Float, e:Event, pageX:Float, pageY:Float, owner:Stage):Dynamic;
 	
-	private function _handlePointerMove(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
+	private function _handlePointerMove(id:Float, e:Event, pageX:Float, pageY:Float, owner:Stage):Dynamic;
 	
-	private function _handlePointerUp(id:Float, e:Event, clear:Bool):Dynamic;
+	private function _handlePointerUp(id:Float, e:Event, clear:Bool, owner:Stage):Dynamic;
 	
-	private function _testMouseOver(clear:Bool):Dynamic;
+	private function _testMouseOver(clear:Bool, owner:Stage, eventTarget:Stage):Dynamic;
 	
 	private function _updatePointerPosition(id:Float, e:Event, pageX:Float, pageY:Float):Dynamic;
 	

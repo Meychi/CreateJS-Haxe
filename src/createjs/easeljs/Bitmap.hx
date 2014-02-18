@@ -17,6 +17,9 @@ import js.html.CanvasRenderingContext2D;
 *	    the Bitmap can be cached.</li>
 *	    <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
 *	    happens in all browsers except recent Firefox builds.</li>
+*	    <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+*	    methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+*	    `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
 *	</ol>
 */
 @:native("createjs.Bitmap")
@@ -53,6 +56,9 @@ extern class Bitmap extends DisplayObject
 	*	    the Bitmap can be cached.</li>
 	*	    <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
 	*	    happens in all browsers except recent Firefox builds.</li>
+	*	    <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+	*	    methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+	*	    `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
 	*	</ol>
 	* @param imageOrUri The source object or URI to an image to
 	*	display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.

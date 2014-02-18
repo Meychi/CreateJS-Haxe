@@ -11,6 +11,11 @@ package createjs.preloadjs;
 extern class XHRLoader extends AbstractLoader
 {
 	/**
+	* A list of XMLHTTP object IDs to try when building an ActiveX object for XHR requests in earlier versions of IE.
+	*/
+	private var ACTIVEX_VERSIONS:Array<Dynamic>;
+	
+	/**
 	* A manual load timeout that is used for browsers that do not support the onTimeout event on XHR (XHR level 1, typically IE9).
 	*/
 	private var _loadTimeout:Float;
@@ -19,6 +24,11 @@ extern class XHRLoader extends AbstractLoader
 	* A reference to the XHR request used to load the content.
 	*/
 	private var _request:Dynamic;
+	
+	/**
+	* See {{#crossLink "LoadQueue/_crossOrigin:property"}}{{/crossLink}}
+	*/
+	private var _crossOrigin:String;
 	
 	/**
 	* The browser's XHR (XMLHTTPRequest) version. Supported versions are 1 and 2. There is no official way to detect the version, so we use capabilities to make a best guess.
@@ -48,8 +58,10 @@ extern class XHRLoader extends AbstractLoader
 	*	cross-domain loading.
 	* @param item The object that defines the file to load. Please see the {{#crossLink "LoadQueue/loadFile"}}{{/crossLink}}
 	*	for an overview of supported file properties.
+	* @param crossOrigin An optional flag to support images loaded from a CORS-enabled server. Please see
+	*	{{#crossLink "LoadQueue/_crossOrigin:property"}}{{/crossLink}} for more info.
 	*/
-	public function new(item:Dynamic):Void;
+	public function new(item:Dynamic, ?crossOrigin:String):Void;
 	
 	/**
 	* A request has completed (or failed or canceled), and needs to be disposed.

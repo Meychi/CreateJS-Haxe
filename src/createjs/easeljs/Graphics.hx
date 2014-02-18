@@ -435,10 +435,13 @@ extern class Graphics
 	/**
 	* Draws an ellipse (oval) with a specified width (w) and height (h). Similar to {{#crossLink "Graphics/drawCircle"}}{{/crossLink}},
 	*	except the width and height can be different. A tiny API method "de" also exists.
-	* @param x x coordinate center point of ellipse.
-	* @param y y coordinate center point of ellipse.
-	* @param w height (horizontal diameter) of ellipse. The horizontal radius will be half of this number.
-	* @param h width (vertical diameter) of ellipse. The vertical radius will be half of this number.
+	* @param x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	*	which draws from center.
+	* @param y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	*	which draws from the center.
+	* @param w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+	*	number.
+	* @param h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
 	*/
 	public function drawEllipse(x:Float, y:Float, w:Float, h:Float):Graphics;
 	

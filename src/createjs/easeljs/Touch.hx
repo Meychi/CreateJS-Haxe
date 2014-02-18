@@ -2,11 +2,10 @@ package createjs.easeljs;
 
 /**
 * Global utility for working with multi-touch enabled devices in EaselJS. Currently supports W3C Touch API (iOS and
-*	modern Android browser) and the Pointer API (IE).
+*	modern Android browser) and the Pointer API (IE), including ms-prefixed events in IE10, and unprefixed in IE11.
 *	
-*	Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application.
-*	Note that you do not have to check if touch is supported to enable it, as it will fail gracefully if it is not
-*	supported.
+*	Ensure that you {{#crossLink "Touch/disable"}}{{/crossLink}} touch when cleaning up your application. You do not have
+*	to check if touch is supported to enable it, as it will fail gracefully if it is not supported.
 *	
 *	<h4>Example</h4>
 *	
@@ -21,25 +20,26 @@ package createjs.easeljs;
 extern class Touch
 {
 	/**
-	* Enables touch interaction for the specified EaselJS stage. Currently supports iOS (and compatible browsers, such
-	*	as modern Android browsers), and IE10. Supports both single touch and multi-touch modes. Extends the EaselJS
-	*	MouseEvent model, but without support for double click or over/out events. See <code>MouseEvent.pointerID</code>
+	* Enables touch interaction for the specified EaselJS {{#crossLink "Stage"}}{{/crossLink}}. Currently supports iOS
+	*	(and compatible browsers, such as modern Android browsers), and IE10/11. Supports both single touch and
+	*	multi-touch modes. Extends the EaselJS {{#crossLink "MouseEvent"}}{{/crossLink}} model, but without support for
+	*	double click or over/out events. See the MouseEvent {{#crossLink "MouseEvent/pointerId:property"}}{{/crossLink}}
 	*	for more information.
-	* @param stage The stage to enable touch on.
-	* @param singleTouch If true, only a single touch will be active at a time.
-	* @param allowDefault If true, then default gesture actions (ex. scrolling, zooming) will be
+	* @param stage The {{#crossLink "Stage"}}{{/crossLink}} to enable touch on.
+	* @param singleTouch If `true`, only a single touch will be active at a time.
+	* @param allowDefault If `true`, then default gesture actions (ex. scrolling, zooming) will be
 	*	allowed when the user is interacting with the target canvas.
 	*/
 	public static function enable(stage:Stage, ?singleTouch:Bool, ?allowDefault:Bool):Bool;
 	
 	/**
-	* Removes all listeners that were set up when calling Touch.enable on a stage.
-	* @param stage The stage to disable touch on.
+	* Removes all listeners that were set up when calling `Touch.enable()` on a stage.
+	* @param stage The {{#crossLink "Stage"}}{{/crossLink}} to disable touch on.
 	*/
 	public static function disable(stage:Stage):Dynamic;
 	
 	/**
-	* Returns true if touch is supported in the current browser.
+	* Returns `true` if touch is supported in the current browser.
 	*/
 	public static function isSupported():Bool;
 	

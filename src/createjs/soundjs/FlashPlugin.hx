@@ -5,12 +5,12 @@ package createjs.soundjs;
 *	{{#crossLink "Sound"}}{{/crossLink}} using the {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} method. This
 *	plugin is recommended to be included if sound support is required in older browsers such as IE8.
 *	
-*	This plugin requires FlashAudioPlugin.swf and swfObject.js (which is compiled
-*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/BASE_PATH:property"}}{{/crossLink}}
+*	This plugin requires FlashAudioPlugin.swf and swfObject.js, which is compiled
+*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/swfPath:property"}}{{/crossLink}}
 *	is set when using this plugin, so that the script can find the swf.
 *	
 *	<h4>Example</h4>
-*	     createjs.FlashPlugin.BASE_PATH = "../src/SoundJS/";
+*	     createjs.FlashPlugin.swfPath = "../src/SoundJS/";
 *	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashPlugin]);
 *	     // Adds FlashPlugin as a fallback if WebAudio and HTMLAudio do not work.
 *	
@@ -18,10 +18,10 @@ package createjs.soundjs;
 *	will have an id of "flashAudioContainer". The container DIV is positioned 1 pixel off-screen to the left to avoid
 *	showing the 1x1 pixel white square.
 *	
-*	<h4>Known Browser and OS issues for HTML Audio</h4>
+*	<h4>Known Browser and OS issues for Flash Audio</h4>
 *	<b>All browsers</b><br />
 *	<ul><li> There can be a delay in flash player starting playback of audio.  This has been most noticeable in Firefox.
-*	Unfortunely this is an issue with the flash player and therefore cannot be addressed by SoundJS.</li></ul>
+*	Unfortunely this is an issue with the flash player and the browser and therefore cannot be addressed by SoundJS.</li></ul>
 */
 @:native("createjs.FlashPlugin")
 extern class FlashPlugin
@@ -34,22 +34,22 @@ extern class FlashPlugin
 	/**
 	* A hash of Sound Preload instances indexed by the related ID in Flash. This lookup is required to connect a preloading sound in Flash with its respective instance in JavaScript.
 	*/
-	private var flashPreloadInstances:Dynamic;
+	private var _flashPreloadInstances:Dynamic;
 	
 	/**
 	* A hash of Sound Preload instances indexed by the src. This lookup is required to load sounds if internal preloading is tried when flash is not ready.
 	*/
-	private var preloadInstances:Dynamic;
+	private var _preloadInstances:Dynamic;
 	
 	/**
 	* A hash of SoundInstances indexed by the related ID in Flash. This lookup is required to connect sounds in JavaScript to their respective instances in Flash.
 	*/
-	private var flashInstances:Dynamic;
+	private var _flashInstances:Dynamic;
 	
 	/**
 	* A reference to the DIV container that gets created to hold the Flash instance.
 	*/
-	private var container:HTMLDivElement;
+	private var _container:HTMLDivElement;
 	
 	/**
 	* A reference to the Flash instance that gets created.
@@ -59,12 +59,12 @@ extern class FlashPlugin
 	/**
 	* An array of Sound Preload instances that are waiting to preload. Once Flash is initialized, the queued instances are preloaded.
 	*/
-	private var queuedInstances:Dynamic;
+	private var _queuedInstances:Dynamic;
 	
 	/**
 	* An object hash indexed by ID that indicates if each source is loaded or loading.
 	*/
-	private var audioSources:Dynamic;
+	private var _audioSources:Dynamic;
 	
 	/**
 	* Determines if the Flash object has been created and initialized. This is required to make <code>ExternalInterface</code> calls from JavaScript to Flash.
@@ -77,29 +77,29 @@ extern class FlashPlugin
 	public static var buildDate:String;
 	
 	/**
-	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for a list of available capabilities.
+	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/_generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for a list of available capabilities.
 	*/
-	public static var capabilities:Dynamic;
+	public static var _capabilities:Dynamic;
 	
 	/**
 	* The id name of the DIV that gets created for Flash content.
 	*/
-	private var CONTAINER_ID:String;
+	private var _CONTAINER_ID:String;
 	
 	/**
 	* The id name of the DIV wrapper that contains the Flash content.
 	*/
-	private var WRAPPER_ID:String;
+	private var _WRAPPER_ID:String;
 	
 	/**
 	* The internal volume value of the plugin.
 	*/
-	private var volume:Float;
+	private var _volume:Float;
 	
 	/**
 	* The path relative to the HTML page that the FlashAudioPlugin.swf resides. Note if this is not correct, this plugin will not work.
 	*/
-	public static var BASE_PATH:String;
+	public static var swfPath:String;
 	
 	/**
 	* The version string for this release.
@@ -109,7 +109,7 @@ extern class FlashPlugin
 	/**
 	* An initialization function run by the constructor
 	*/
-	private function init():Dynamic;
+	private function _init():Dynamic;
 	
 	/**
 	* Checks if preloading has started for a specific source. If the source is found, we can assume it is loading,
@@ -133,7 +133,7 @@ extern class FlashPlugin
 	* Determine the capabilities of the plugin. Used internally. Please see the Sound API {{#crossLink "Sound/getCapabilities"}}{{/crossLink}}
 	*	method for an overview of plugin capabilities.
 	*/
-	private static function generateCapabiities():Dynamic;
+	private static function _generateCapabilities():Dynamic;
 	
 	/**
 	* Get the master volume of the plugin, which affects all SoundInstances.
@@ -141,37 +141,9 @@ extern class FlashPlugin
 	public function getVolume():Dynamic;
 	
 	/**
-	* Handles error events from Flash. Note this function currently does not process any events.
-	* @param error Indicates the error.
-	*/
-	public function handleErrorEvent(error:String):Dynamic;
-	
-	/**
-	* Handles events from Flash and routes communication to a <code>Loader</code> via the Flash ID. The method
-	*	and arguments from Flash are run directly on the sound loader.
-	* @param flashId Used to identify the loader instance.
-	* @param method Indicates the method to run.
-	*/
-	public function handlePreloadEvent(flashId:String, method:String):Dynamic;
-	
-	/**
-	* Handles events from Flash intended for the FlashPlugin class. Currently only a "ready" event is processed.
-	* @param method Indicates the method to run.
-	*/
-	public function handleEvent(method:String):Dynamic;
-	
-	/**
-	* Handles events from Flash, and routes communication to a {{#crossLink "SoundInstance"}}{{/crossLink}} via
-	*	the Flash ID. The method and arguments from Flash are run directly on the sound instance.
-	* @param flashId Used to identify the SoundInstance.
-	* @param method Indicates the method to run.
-	*/
-	public function handleSoundEvent(flashId:String, method:String):Dynamic;
-	
-	/**
 	* Internal function used to set the gain value for master audio.  Should not be called externally.
 	*/
-	private function updateVolume():Bool;
+	private function _updateVolume():Bool;
 	
 	/**
 	* Mute all sounds via the plugin.
@@ -185,12 +157,12 @@ extern class FlashPlugin
 	*	{{#crossLink "Sound"}}{{/crossLink}} using the {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} method. This
 	*	plugin is recommended to be included if sound support is required in older browsers such as IE8.
 	*	
-	*	This plugin requires FlashAudioPlugin.swf and swfObject.js (which is compiled
-	*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/BASE_PATH:property"}}{{/crossLink}}
+	*	This plugin requires FlashAudioPlugin.swf and swfObject.js, which is compiled
+	*	into the minified FlashPlugin-X.X.X.min.js file. You must ensure that {{#crossLink "FlashPlugin/swfPath:property"}}{{/crossLink}}
 	*	is set when using this plugin, so that the script can find the swf.
 	*	
 	*	<h4>Example</h4>
-	*	     createjs.FlashPlugin.BASE_PATH = "../src/SoundJS/";
+	*	     createjs.FlashPlugin.swfPath = "../src/SoundJS/";
 	*	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashPlugin]);
 	*	     // Adds FlashPlugin as a fallback if WebAudio and HTMLAudio do not work.
 	*	
@@ -198,10 +170,10 @@ extern class FlashPlugin
 	*	will have an id of "flashAudioContainer". The container DIV is positioned 1 pixel off-screen to the left to avoid
 	*	showing the 1x1 pixel white square.
 	*	
-	*	<h4>Known Browser and OS issues for HTML Audio</h4>
+	*	<h4>Known Browser and OS issues for Flash Audio</h4>
 	*	<b>All browsers</b><br />
 	*	<ul><li> There can be a delay in flash player starting playback of audio.  This has been most noticeable in Firefox.
-	*	Unfortunely this is an issue with the flash player and therefore cannot be addressed by SoundJS.</li></ul>
+	*	Unfortunely this is an issue with the flash player and the browser and therefore cannot be addressed by SoundJS.</li></ul>
 	*/
 	public function new():Void;
 	
@@ -217,9 +189,16 @@ extern class FlashPlugin
 	* Preload a sound instance. This plugin uses Flash to preload and play all sounds.
 	* @param src The path to the Sound
 	* @param instance Not used in this plugin.
-	* @param basePath A file path to prepend to the src.
 	*/
-	public function preload(src:String, instance:Dynamic, basePath:String):Dynamic;
+	public function preload(src:String, instance:Dynamic):Dynamic;
+	
+	/**
+	* Registers loaded source files to handle src being changed before loading.
+	*	This occurs when there is a basePath added (by PreloadJS or internal Preloading.
+	* @param loadSrc 
+	* @param src 
+	*/
+	private function _registerLoadedSrc(loadSrc:Dynamic, src:Dynamic):Dynamic;
 	
 	/**
 	* Remove a sound added using {{#crossLink "FlashPlugin/register"}}{{/crossLink}}. Note this does not cancel a
@@ -241,55 +220,15 @@ extern class FlashPlugin
 	public function setVolume(value:Float):Bool;
 	
 	/**
-	* The callback when Flash does not initialize. This usually means the SWF is missing or incorrectly pathed.
-	*/
-	private function handleTimeout():Dynamic;
-	
-	/**
 	* The Flash application that handles preloading and playback is ready. We wait for a callback from Flash to
 	*	ensure that everything is in place before playback begins.
 	*/
-	private function handleFlashReady():Dynamic;
+	private function _handleFlashReady():Dynamic;
 	
 	/**
 	* The SWF used for sound preloading and playback has been initialized.
 	* @param event Contains a reference to the swf.
 	*/
-	private function handleSWFReady(event:Dynamic):Dynamic;
-	
-	/**
-	* Used to couple a Flash loader instance with a <code>Loader</code> instance
-	* @param flashId Used to identify the Loader.
-	* @param instance The actual instance.
-	*/
-	public function registerPreloadInstance(flashId:String, instance:Dynamic):Dynamic;
-	
-	/**
-	* Used to couple a Flash sound instance with a {{#crossLink "SoundInstance"}}{{/crossLink}}.
-	* @param flashId Used to identify the SoundInstance.
-	* @param instance The actual instance.
-	*/
-	public function registerSoundInstance(flashId:String, instance:Dynamic):Dynamic;
-	
-	/**
-	* Used to decouple a <code>Loader</code> instance from Flash.
-	* @param flashId Used to identify the Loader.
-	*/
-	public function unregisterPreloadInstance(flashId:String):Dynamic;
-	
-	/**
-	* Used to decouple a {{#crossLink "SoundInstance"}}{{/crossLink}} from Flash.
-	*	instance.
-	* @param flashId Used to identify the SoundInstance.
-	* @param instance The actual instance.
-	*/
-	public function unregisterSoundInstance(flashId:String, instance:Dynamic):Dynamic;
-	
-	/**
-	* Used to output traces from Flash to the console, if {{#crossLink "FlashPlugin/showOutput"}}{{/crossLink}} is
-	*	<code>true</code>.
-	* @param data The information to be output.
-	*/
-	public function flashLog(data:String):Dynamic;
+	private function _handleSWFReady(event:Dynamic):Dynamic;
 	
 }

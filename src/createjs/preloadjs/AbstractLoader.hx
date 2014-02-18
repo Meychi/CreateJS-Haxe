@@ -1,19 +1,16 @@
 package createjs.preloadjs;
 
+import createjs.EventDispatcher;
+
 /**
 * The base loader, which defines all the generic callbacks and events. All loaders extend this class, including the
 *	{{#crossLink "LoadQueue"}}{{/crossLink}}.
 */
 @:native("createjs.AbstractLoader")
-extern class AbstractLoader
+extern class AbstractLoader extends EventDispatcher
 {
 	/**
-	* A path that will be prepended on to the item's source parameter before it is loaded.
-	*/
-	private var _basePath:String;
-	
-	/**
-	* Determine if the loader was canceled. Canceled loads will not fire complete events. Note that {{#crossLink "LoadQueue"}}{{/crossLink}} queues should be closed using {{#crossLink "AbstractLoader/close"}}{{/crossLink}} instead of canceled.
+	* Determine if the loader was canceled. Canceled loads will not fire complete events. Note that {{#crossLink "LoadQueue"}}{{/crossLink}} queues should be closed using {{#crossLink "AbstractLoader/close"}}{{/crossLink}} instead of setting this property.
 	*/
 	public var canceled:Bool;
 	
@@ -33,20 +30,23 @@ extern class AbstractLoader
 	private var _item:Dynamic;
 	
 	/**
-	* The RegExp pattern to use to parse file URIs. This supports simple file names, as well as full domain URIs with query strings. The resulting match is: protocol:$1 domain:$2 path:$3 file:$4 extension:$5 query:$6.
+	* The RegExp pattern to use to parse file URIs. This supports simple file names, as well as full domain URIs with query strings. The resulting match is: protocol:$1 domain:$2 relativePath:$3 path:$4 file:$5 extension:$6 query:$7.
 	*/
 	public static var FILE_PATTERN:EReg;
 	
 	/**
-	* A utility method that builds a file path using a source, a basePath, and a data object, and formats it into a new
-	*	path. All of the loaders in PreloadJS use this method to compile paths when loading.
+	* The RegExp pattern to use to parse path URIs. This supports protocols, relative files, and paths. The resulting match is: protocol:$1 relativePath:$2 path$3.
+	*/
+	public static var PATH_PATTERN:EReg;
+	
+	/**
+	* A utility method that builds a file path using a source and a data object, and formats it into a new path. All
+	*	of the loaders in PreloadJS use this method to compile paths when loading.
 	* @param src The source path to add values to.
-	* @param basePath A string to prepend to the file path. Sources beginning with http:// or similar will
-	*	not receive a base path.
 	* @param data Object used to append values to this request as a query string. Existing parameters on the
 	*	path will be preserved.
 	*/
-	public function buildPath(src:String, ?basePath:String, ?data:Dynamic):String;
+	public function buildPath(src:String, ?data:Dynamic):String;
 	
 	/**
 	* Begin loading the queued items. This method can be called when a {{#crossLink "LoadQueue"}}{{/crossLink}} is set
@@ -108,10 +108,20 @@ extern class AbstractLoader
 	private function init():Dynamic;
 	
 	/**
-	* Parse a file URI using the <code>AbstractLoader.FILE_PATTERN</code> RegExp pattern.
+	* Parse a file URI using the {{#crossLink "AbstractLoader/FILE_PATTERN:property"}}{{/crossLink}} RegExp pattern.
 	* @param path The file path to parse.
 	*/
 	private function _parseURI(path:String):Array<Dynamic>;
+	
+	/**
+	* Parse a file URI using the {{#crossLink "AbstractLoader/PATH_PATTERN"}}{{/crossLink}} RegExp pattern.
+	* @param path The file path to parse.
+	*/
+	private function _parsePath(path:String):Array<Dynamic>;
+	
+	private function _isCrossDomain(item:Dynamic):Bool;
+	
+	private function _isLocal(item:Dynamic):Bool;
 	
 	public function toString():String;
 	
