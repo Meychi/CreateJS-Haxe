@@ -501,7 +501,7 @@ extern class Sound
 	*	without an external preloader.  This is currently used by PreloadJS when loading sounds to disable internal preloading.
 	* @param basePath Set a path that will be prepended to src for loading.
 	*/
-	public static function registerSound(src:Dynamic, ?id:String, ?data:Dynamic, ?preload:Bool, basePath:String):Dynamic;
+	public static function registerSound(src:Dynamic, ?id:String, ?data:Dynamic, ?preload:Bool, ?basePath:String):Dynamic;
 	
 	/**
 	* Remove a manifest of audio files that have been registered with {{#crossLink "Sound/registerSound"}}{{/crossLink}} or

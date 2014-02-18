@@ -131,7 +131,7 @@ extern class SoundInstance extends EventDispatcher
 	/**
 	* Timeout that is created internally to handle sound playing to completion. Stored so we can remove it when stop, pause, or cleanup are called
 	*/
-	private var _soundCompleteTimeout:TimeoutVariable;
+	private var _soundCompleteTimeout:Dynamic;
 	
 	/**
 	* WebAudioPlugin only. Time audio started playback, in seconds. Used to handle set position, get position, and resuming from paused.
