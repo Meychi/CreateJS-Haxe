@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildhx>
-	<source path="../js/easeljs" language="javascript" parser="yuidoc" />
-	<output path="../src" namespace="createjs.easeljs" native="createjs" />
+	<source path="js/EaselJS-master/src/easeljs" language="javascript" parser="yuidoc" />
+	<output path="hx" namespace="createjs.easeljs" native="createjs" />
 </buildhx>

@@ -1,0 +1,1 @@
+Extract CreateJS repository archives here and run ../BuildAll.bat.

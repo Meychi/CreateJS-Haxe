@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildhx>
-	<source path="../js/soundjs" language="javascript" parser="yuidoc" />
-	<output path="../src" namespace="createjs.soundjs" native="createjs" />
+	<source path="js/SoundJS-master/src/soundjs" language="javascript" parser="yuidoc" />
+	<output path="hx" namespace="createjs.soundjs" native="createjs" />
 </buildhx>

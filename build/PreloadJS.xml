@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildhx>
-	<source path="../js/preloadjs" language="javascript" parser="yuidoc" />
-	<output path="../src" namespace="createjs.preloadjs" native="createjs" />
+	<source path="js/PreloadJS-master/src/preloadjs" language="javascript" parser="yuidoc" />
+	<output path="hx" namespace="createjs.preloadjs" native="createjs" />
 </buildhx>
