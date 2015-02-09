@@ -12,7 +12,7 @@ package createjs.tweenjs;
 *	
 *	     Tween.get(target).to({y:200}, 500, Ease.getPowIn(2.2));
 *	
-*	Please see the <a href="http://www.createjs.com/#!/TweenJS/demos/sparkTable">spark table demo</a> for an overview
+*	Please see the <a href="http://www.createjs.com/#!/Demos/TweenJS/Spark-Table">spark table demo</a> for an overview
 *	of the different ease types on <a href="http://tweenjs.com">TweenJS.com</a>.
 *	
 *	<i>Equations derived from work by Robert Penner.</i>
@@ -24,124 +24,125 @@ extern class Ease
 	* Configurable "back in out" ease.
 	* @param amount The strength of the ease.
 	*/
-	public static function getBackInOut(amount:Dynamic):Dynamic;
+	public static function getBackInOut(amount:Float):Dynamic;
 	
 	/**
 	* Configurable "back in" ease.
 	* @param amount The strength of the ease.
 	*/
-	public static function getBackIn(amount:Dynamic):Dynamic;
+	public static function getBackIn(amount:Float):Dynamic;
 	
 	/**
 	* Configurable "back out" ease.
 	* @param amount The strength of the ease.
 	*/
-	public static function getBackOut(amount:Dynamic):Dynamic;
+	public static function getBackOut(amount:Float):Dynamic;
 	
 	/**
 	* Configurable elastic ease.
 	* @param amplitude 
 	* @param period 
 	*/
-	public static function getElasticIn(amplitude:Dynamic, period:Dynamic):Dynamic;
+	public static function getElasticIn(amplitude:Float, period:Float):Dynamic;
 	
 	/**
 	* Configurable elastic ease.
 	* @param amplitude 
 	* @param period 
 	*/
-	public static function getElasticInOut(amplitude:Dynamic, period:Dynamic):Dynamic;
+	public static function getElasticInOut(amplitude:Float, period:Float):Dynamic;
 	
 	/**
 	* Configurable elastic ease.
 	* @param amplitude 
 	* @param period 
 	*/
-	public static function getElasticOut(amplitude:Dynamic, period:Dynamic):Dynamic;
+	public static function getElasticOut(amplitude:Float, period:Float):Dynamic;
 	
 	/**
 	* Configurable exponential ease.
 	* @param pow The exponent to use (ex. 3 would return a cubic ease).
 	*/
-	public static function getPowIn(pow:Dynamic):Dynamic;
+	public static function getPowIn(pow:Float):Dynamic;
 	
 	/**
 	* Configurable exponential ease.
 	* @param pow The exponent to use (ex. 3 would return a cubic ease).
 	*/
-	public static function getPowInOut(pow:Dynamic):Dynamic;
+	public static function getPowInOut(pow:Float):Dynamic;
 	
 	/**
 	* Configurable exponential ease.
 	* @param pow The exponent to use (ex. 3 would return a cubic ease).
 	*/
-	public static function getPowOut(pow:Dynamic):Dynamic;
+	public static function getPowOut(pow:Float):Dynamic;
 	
 	/**
 	* Identical to linear.
+	* @param t 
 	*/
-	public static function none():Dynamic;
+	public static function none(t:Float):Float;
 	
 	/**
 	* Mimics the simple -100 to 100 easing in Flash Pro.
 	* @param amount A value from -1 (ease in) to 1 (ease out) indicating the strength and direction of the ease.
 	*/
-	public static function get(amount:Dynamic):Dynamic;
+	public static function get(amount:Float):Dynamic;
 	
-	public static function backIn():Dynamic;
+	public static function backIn(t:Float):Float;
 	
-	public static function backInOut():Dynamic;
+	public static function backInOut(t:Float):Float;
 	
-	public static function backOut():Dynamic;
+	public static function backOut(t:Float):Float;
 	
-	public static function bounceIn():Dynamic;
+	public static function bounceIn(t:Float):Float;
 	
-	public static function bounceInOut():Dynamic;
+	public static function bounceInOut(t:Float):Float;
 	
-	public static function bounceOut():Dynamic;
+	public static function bounceOut(t:Float):Float;
 	
-	public static function circIn():Dynamic;
+	public static function circIn(t:Float):Float;
 	
-	public static function circInOut():Dynamic;
+	public static function circInOut(t:Float):Float;
 	
-	public static function circOut():Dynamic;
+	public static function circOut(t:Float):Float;
 	
-	public static function cubicIn():Dynamic;
+	public static function cubicIn(t:Float):Float;
 	
-	public static function cubicInOut():Dynamic;
+	public static function cubicInOut(t:Float):Float;
 	
-	public static function cubicOut():Dynamic;
+	public static function cubicOut(t:Float):Float;
 	
-	public static function elasticIn():Dynamic;
+	public static function elasticIn(t:Float):Float;
 	
-	public static function elasticInOut():Dynamic;
+	public static function elasticInOut(t:Float):Float;
 	
-	public static function elasticOut():Dynamic;
+	public static function elasticOut(t:Float):Float;
 	
-	public static function linear():Dynamic;
+	public static function linear(t:Float):Float;
 	
-	public static function quadIn():Dynamic;
+	public static function quadIn(t:Float):Float;
 	
-	public static function quadInOut():Dynamic;
+	public static function quadInOut(t:Float):Float;
 	
-	public static function quadOut():Dynamic;
+	public static function quadOut(t:Float):Float;
 	
-	public static function quartIn():Dynamic;
+	public static function quartIn(t:Float):Float;
 	
-	public static function quartInOut():Dynamic;
+	public static function quartInOut(t:Float):Float;
 	
-	public static function quartOut():Dynamic;
+	public static function quartOut(t:Float):Float;
 	
-	public static function quintIn():Dynamic;
+	public static function quintIn(t:Float):Float;
 	
-	public static function quintInOut():Dynamic;
+	public static function quintInOut(t:Float):Float;
 	
-	public static function quintOut():Dynamic;
+	public static function quintOut(t:Float):Float;
 	
-	public static function sineIn():Dynamic;
+	public static function sineIn(t:Float):Float;
 	
-	public static function sineInOut():Dynamic;
+	public static function sineInOut(t:Float):Float;
 	
-	public static function sineOut():Dynamic;
+	public static function sineOut(t:Float):Float;
 	
 }

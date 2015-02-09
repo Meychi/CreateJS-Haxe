@@ -6,51 +6,97 @@ package createjs.soundjs;
 *	
 *	<b>Registering and Preloading</b><br />
 *	Before you can play a sound, it <b>must</b> be registered. You can do this with {{#crossLink "Sound/registerSound"}}{{/crossLink}},
-*	or register multiple sounds using {{#crossLink "Sound/registerManifest"}}{{/crossLink}}. If you don't register a
+*	or register multiple sounds using {{#crossLink "Sound/registerSounds"}}{{/crossLink}}. If you don't register a
 *	sound prior to attempting to play it using {{#crossLink "Sound/play"}}{{/crossLink}} or create it using {{#crossLink "Sound/createInstance"}}{{/crossLink}},
 *	the sound source will be automatically registered but playback will fail as the source will not be ready. If you use
-*	<a href="http://preloadjs.com" target="_blank">PreloadJS</a>, this is handled for you when the sound is
+*	<a href="http://preloadjs.com" target="_blank">PreloadJS</a>, registration is handled for you when the sound is
 *	preloaded. It is recommended to preload sounds either internally using the register functions or externally using
 *	PreloadJS so they are ready when you want to use them.
 *	
 *	<b>Playback</b><br />
 *	To play a sound once it's been registered and preloaded, use the {{#crossLink "Sound/play"}}{{/crossLink}} method.
-*	This method returns a {{#crossLink "SoundInstance"}}{{/crossLink}} which can be paused, resumed, muted, etc.
-*	Please see the {{#crossLink "SoundInstance"}}{{/crossLink}} documentation for more on the instance control APIs.
+*	This method returns a {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} which can be paused, resumed, muted, etc.
+*	Please see the {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} documentation for more on the instance control APIs.
 *	
 *	<b>Plugins</b><br />
 *	By default, the {{#crossLink "WebAudioPlugin"}}{{/crossLink}} or the {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}}
 *	are used (when available), although developers can change plugin priority or add new plugins (such as the
-*	provided {{#crossLink "FlashPlugin"}}{{/crossLink}}). Please see the {{#crossLink "Sound"}}{{/crossLink}} API
+*	provided {{#crossLink "FlashAudioPlugin"}}{{/crossLink}}). Please see the {{#crossLink "Sound"}}{{/crossLink}} API
 *	methods for more on the playback and plugin APIs. To install plugins, or specify a different plugin order, see
 *	{{#crossLink "Sound/installPlugins"}}{{/crossLink}}.
 *	
 *	<h4>Example</h4>
-*	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.FlashPlugin]);
+*	
+*	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.FlashAudioPlugin]);
 *	     createjs.Sound.alternateExtensions = ["mp3"];
-*	     createjs.Sound.addEventListener("fileload", createjs.proxy(this.loadHandler, (this));
+*	     createjs.Sound.on("fileload", createjs.proxy(this.loadHandler, (this));
 *	     createjs.Sound.registerSound("path/to/mySound.ogg", "sound");
 *	     function loadHandler(event) {
 *	         // This is fired for each sound that is registered.
 *	         var instance = createjs.Sound.play("sound");  // play using id.  Could also use full source path or event.src.
-*	         instance.addEventListener("complete", createjs.proxy(this.handleComplete, this));
+*	         instance.on("complete", createjs.proxy(this.handleComplete, this));
 *	         instance.volume = 0.5;
 *	     }
 *	
 *	The maximum number of concurrently playing instances of the same sound can be specified in the "data" argument
 *	of {{#crossLink "Sound/registerSound"}}{{/crossLink}}.  Note that if not specified, the active plugin will apply
-*	a default limit.  Currently HTMLAudioPlugin sets a default limit of 2, while WebAudioPlugin and FlashPlugin set a
+*	a default limit.  Currently HTMLAudioPlugin sets a default limit of 2, while WebAudioPlugin and FlashAudioPlugin set a
 *	default limit of 100.
 *	
 *	     createjs.Sound.registerSound("sound.mp3", "soundId", 4);
 *	
 *	Sound can be used as a plugin with PreloadJS to help preload audio properly. Audio preloaded with PreloadJS is
 *	automatically registered with the Sound class. When audio is not preloaded, Sound will do an automatic internal
-*	load. As a result, it may not play immediately the first time play is called. Use the
+*	load. As a result, it may fail to play the first time play is called if the audio is not finished loading. Use the
 *	{{#crossLink "Sound/fileload"}}{{/crossLink}} event to determine when a sound has finished internally preloading.
 *	It is recommended that all audio is preloaded before it is played.
 *	
-*	     createjs.PreloadJS.installPlugin(createjs.Sound);
+*	     var queue = new createjs.LoadQueue();
+*			queue.installPlugin(createjs.Sound);
+*	
+*	<b>Audio Sprites</b><br />
+*	SoundJS has added support for Audio Sprites, available as of version 0.6.0.
+*	For those unfamiliar with audio sprites, they are much like CSS sprites or sprite sheets: multiple audio assets
+*	grouped into a single file.
+*	
+*	Benefits of Audio Sprites
+*	<ul><li>More robust support for older browsers and devices that only allow a single audio instance, such as iOS 5.</li>
+*	<li>They provide a work around for the Internet Explorer 9 audio tag limit, which until now restricted how many
+*	different sounds we could load at once.</li>
+*	<li>Faster loading by only requiring a single network request for several sounds, especially on mobile devices
+*	where the network round trip for each file can add significant latency.</li></ul>
+*	
+*	Drawbacks of Audio Sprites
+*	<ul><li>No guarantee of smooth looping when using HTML or Flash audio.  If you have a track that needs to loop
+*	smoothly and you are supporting non-web audio browsers, do not use audio sprites for that sound if you can avoid it.</li>
+*	<li>No guarantee that HTML audio will play back immediately, especially the first time. In some browsers (Chrome!),
+*	HTML audio will only load enough to play through – so we rely on the “canplaythrough” event to determine if the audio is loaded.
+*	Since audio sprites must jump ahead to play specific sounds, the audio may not yet have downloaded.</li>
+*	<li>Audio sprites share the same core source, so if you have a sprite with 5 sounds and are limited to 2
+*	concurrently playing instances, that means you can only play 2 of the sounds at the same time.</li></ul>
+*	
+*	<h4>Example</h4>
+*	
+*	     createjs.Sound.initializeDefaultPlugins();
+*			var assetsPath = "./assets/";
+*			var sounds = [{
+*				src:"MyAudioSprite.ogg", data: {
+*					audioSprite: [
+*						{id:"sound1", startTime:0, duration:500},
+*						{id:"sound2", startTime:1000, duration:400},
+*						{id:"sound3", startTime:1700, duration: 1000}
+*					]}
+*					}
+*			];
+*			createjs.Sound.alternateExtensions = ["mp3"];
+*			createjs.Sound.on("fileload", loadSound);
+*			createjs.Sound.registerSounds(sounds, assetsPath);
+*			// after load is complete
+*			createjs.Sound.play("sound2");
+*	
+*	You can also create audio sprites on the fly by setting the startTime and duration when creating an new AbstractSoundInstance.
+*	
+*			createjs.Sound.play("MyAudioSprite", {startTime: 1000, duration: 400});
 *	
 *	<b>Mobile Safe Approach</b><br />
 *	Mobile devices require sounds to be played inside of a user initiated event (touch/click) in varying degrees.
@@ -60,10 +106,11 @@ package createjs.soundjs;
 *	application.  See the MobileSafe demo for a working example.
 *	
 *	<h4>Example</h4>
+*	
 *	    document.getElementById("status").addEventListener("click", handleTouch, false);    // works on Android and iPad
 *	    function handleTouch(event) {
-*	      document.getElementById("status").removeEventListener("click", handleTouch, false);    // remove the listener
-*	      var thisApp = new myNameSpace.MyApp();    // launch the app
+*	        document.getElementById("status").removeEventListener("click", handleTouch, false);    // remove the listener
+*	        var thisApp = new myNameSpace.MyApp();    // launch the app
 *	    }
 *	
 *	<h4>Known Browser and OS issues</h4>
@@ -73,6 +120,7 @@ package createjs.soundjs;
 *	when or how you apply the volume change, as the tag seems to need to play to apply it.</li>
 *	<li>MP3 encoding will not always work for audio tags, particularly in Internet Explorer. We've found default
 *	encoding with 64kbps works.</li>
+*	<li>Occasionally very short samples will get cut off.</li>
 *	<li>There is a limit to how many audio tags you can load and play at once, which appears to be determined by
 *	hardware and browser settings.  See {{#crossLink "HTMLAudioPlugin.MAX_INSTANCES"}}{{/crossLink}} for a safe estimate.</li></ul>
 *	
@@ -101,9 +149,9 @@ package createjs.soundjs;
 extern class Sound
 {
 	/**
-	* A list of the default supported extensions that Sound will <i>try</i> to play. Plugins will check if the browser can play these types, so modifying this list before a plugin is initialized will allow the plugins to try to support additional media types.  NOTE this does not currently work for {{#crossLink "FlashPlugin"}}{{/crossLink}}.  More details on file formats can be found at <a href="http://en.wikipedia.org/wiki/Audio_file_format" target="_blank">http://en.wikipedia.org/wiki/Audio_file_format</a>.<br /> A very detailed list of file formats can be found at <a href="http://www.fileinfo.com/filetypes/audio" target="_blank">http://www.fileinfo.com/filetypes/audio</a>.
+	* A list of the default supported extensions that Sound will <i>try</i> to play. Plugins will check if the browser can play these types, so modifying this list before a plugin is initialized will allow the plugins to try to support additional media types.  NOTE this does not currently work for {{#crossLink "FlashAudioPlugin"}}{{/crossLink}}.  More details on file formats can be found at <a href="http://en.wikipedia.org/wiki/Audio_file_format" target="_blank">http://en.wikipedia.org/wiki/Audio_file_format</a>.<br /> A very detailed list of file formats can be found at <a href="http://www.fileinfo.com/filetypes/audio" target="_blank">http://www.fileinfo.com/filetypes/audio</a>.
 	*/
-	public var SUPPORTED_EXTENSIONS:Array<String>;
+	public static var SUPPORTED_EXTENSIONS:Array<String>;
 	
 	/**
 	* An array containing all currently playing instances. This allows Sound to control the volume, mute, and playback of all instances when using static APIs like {{#crossLink "Sound/stop"}}{{/crossLink}} and {{#crossLink "Sound/setVolume"}}{{/crossLink}}. When an instance has finished playback, it gets removed via the {{#crossLink "Sound/finishedPlaying"}}{{/crossLink}} method. If the user replays an instance, it gets added back in via the {{#crossLink "Sound/_beginPlaying"}}{{/crossLink}} method.
@@ -111,12 +159,12 @@ extern class Sound
 	public static var _instances:Array<Dynamic>;
 	
 	/**
-	* An array of extensions to attempt to use when loading sound, if the default is unsupported by the active plugin. These are applied in order, so if you try to Load Thunder.ogg in a browser that does not support ogg, and your extensions array is ["mp3", "m4a", "wav"] it will check mp3 support, then m4a, then wav. The audio files need to exist in the same location, as only the extension is altered.  Note that regardless of which file is loaded, you can call {{#crossLink "Sound/createInstance"}}{{/crossLink}} and {{#crossLink "Sound/play"}}{{/crossLink}} using the same id or full source path passed for loading. <h4>Example</h4> 	var manifest = [ 		{src:"myPath/mySound.ogg", id:"example"}, 	]; 	createjs.Sound.alternateExtensions = ["mp3"]; // now if ogg is not supported, SoundJS will try asset0.mp3 	createjs.Sound.addEventListener("fileload", handleLoad); // call handleLoad when each sound loads 	createjs.Sound.registerManifest(manifest, assetPath); 	// ... 	createjs.Sound.play("myPath/mySound.ogg"); // works regardless of what extension is supported.  Note calling with ID is a better approach
+	* An array of extensions to attempt to use when loading sound, if the default is unsupported by the active plugin. These are applied in order, so if you try to Load Thunder.ogg in a browser that does not support ogg, and your extensions array is ["mp3", "m4a", "wav"] it will check mp3 support, then m4a, then wav. The audio files need to exist in the same location, as only the extension is altered.  Note that regardless of which file is loaded, you can call {{#crossLink "Sound/createInstance"}}{{/crossLink}} and {{#crossLink "Sound/play"}}{{/crossLink}} using the same id or full source path passed for loading.  <h4>Example</h4>  	var sounds = [ 		{src:"myPath/mySound.ogg", id:"example"}, 	]; 	createjs.Sound.alternateExtensions = ["mp3"]; // now if ogg is not supported, SoundJS will try asset0.mp3 	createjs.Sound.on("fileload", handleLoad); // call handleLoad when each sound loads 	createjs.Sound.registerSounds(sounds, assetPath); 	// ... 	createjs.Sound.play("myPath/mySound.ogg"); // works regardless of what extension is supported.  Note calling with ID is a better approach
 	*/
 	public static var alternateExtensions:Array<Dynamic>;
 	
 	/**
-	* An object hash storing sound sources via there corresponding ID.
+	* An object hash storing objects with sound sources, startTime, and duration via there corresponding ID.
 	*/
 	public static var _idHash:Dynamic;
 	
@@ -124,11 +172,6 @@ extern class Sound
 	* An object hash that stores preloading sound sources via the parsed source that is passed to the plugin.  Contains the source, id, and data that was passed in by the user.  Parsed sources can contain multiple instances of source, id, and data.
 	*/
 	public static var _preloadHash:Dynamic;
-	
-	/**
-	* An object that stands in for audio that fails to play. This allows developers to continue to call methods on the failed instance without having to check if it is valid first. The instance is instantiated once, and shared to keep the memory footprint down.
-	*/
-	public static var _defaultSoundInstance:Dynamic;
 	
 	/**
 	* Defines the playState of an instance that completed playback.
@@ -168,7 +211,7 @@ extern class Sound
 	/**
 	* Some extensions use another type of extension support to play (one of them is a codex).  This allows you to map that support so plugins can accurately determine if an extension is supported.  Adding to this list can help plugins determine more accurately if an extension is supported.  A useful list of extensions for each format can be found at <a href="http://html5doctor.com/html5-audio-the-state-of-play/" target="_blank">http://html5doctor.com/html5-audio-the-state-of-play/</a>.
 	*/
-	public var EXTENSION_MAP:Dynamic;
+	public static var EXTENSION_MAP:Dynamic;
 	
 	/**
 	* The currently active plugin. If this is null, then no plugin could be initialized. If no plugin was specified, Sound attempts to apply the default plugins: {{#crossLink "WebAudioPlugin"}}{{/crossLink}}, followed by {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}}.
@@ -203,7 +246,7 @@ extern class Sound
 	/**
 	* The master volume value, which affects all sounds. Use {{#crossLink "Sound/getVolume"}}{{/crossLink}} and {{#crossLink "Sound/setVolume"}}{{/crossLink}} to modify the volume of all audio.
 	*/
-	private var _masterVolume:Float;
+	public static var _masterVolume:Float;
 	
 	/**
 	* The RegExp pattern used to parse file URIs. This supports simple file names, as well as full domain URIs with query strings. The resulting match is: protocol:$1 domain:$2 path:$3 file:$4 extension:$5 query:$6.
@@ -211,9 +254,18 @@ extern class Sound
 	public static var FILE_PATTERN:EReg;
 	
 	/**
-	* Used internally to assign unique IDs to each SoundInstance.
+	* Used internally to assign unique IDs to each AbstractSoundInstance.
 	*/
 	public static var _lastID:Float;
+	
+	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
 	
 	/**
 	* A sound has completed playback, been interrupted, failed, or been stopped. This method removes the instance from
@@ -221,11 +273,11 @@ extern class Sound
 	*	instances themselves.
 	* @param instance The instance that finished playback.
 	*/
-	private static function _playFinished(instance:SoundInstance):Dynamic;
+	private static function _playFinished(instance:AbstractSoundInstance):Dynamic;
 	
 	/**
 	* Begin playback. This is called immediately or after delay by {{#crossLink "Sound/playInstance"}}{{/crossLink}}.
-	* @param instance A {{#crossLink "SoundInstance"}}{{/crossLink}} to begin playback.
+	* @param instance A {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} to begin playback.
 	* @param interrupt How this sound interrupts other instances with the same source. Defaults to
 	*	{{#crossLink "Sound/INTERRUPT_NONE:property"}}{{/crossLink}}. Interrupts are defined as <code>INTERRUPT_TYPE</code>
 	*	constants on Sound.
@@ -235,38 +287,63 @@ extern class Sound
 	* @param volume The volume of the sound between 0 and 1. Defaults to the current value on the instance.
 	* @param pan The pan of the sound between -1 and 1. Defaults to current instance value.
 	*/
-	private static function _beginPlaying(instance:SoundInstance, ?interrupt:String, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Bool;
+	private static function _beginPlaying(instance:AbstractSoundInstance, ?interrupt:String, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Bool;
 	
 	/**
 	* Check if a source has been loaded by internal preloaders. This is necessary to ensure that sounds that are
 	*	not completed preloading will not kick off a new internal preload if they are played.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    var mySound = "assetPath/asset0.ogg";
 	*	    if(createjs.Sound.loadComplete(mySound) {
 	*	        createjs.Sound.play(mySound);
 	*	    }
 	* @param src The src or id that is being loaded.
 	*/
-	public function loadComplete(src:String):Bool;
+	public static function loadComplete(src:String):Bool;
 	
 	/**
-	* Creates a {{#crossLink "SoundInstance"}}{{/crossLink}} using the passed in src. If the src does not have a
-	*	supported extension or if there is no available plugin, a default SoundInstance will be returned that can be
+	* Creates a {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} using the passed in src. If the src does not have a
+	*	supported extension or if there is no available plugin, a default AbstractSoundInstance will be returned that can be
 	*	called safely but does nothing.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var myInstance = null;
-	*	     createjs.Sound.addEventListener("fileload", handleLoad);
+	*	     createjs.Sound.on("fileload", handleLoad);
 	*	     createjs.Sound.registerSound("myAudioPath/mySound.mp3", "myID", 3);
 	*	     function handleLoad(event) {
 	*	     	myInstance = createjs.Sound.createInstance("myID");
 	*	     	// alternately we could call the following
 	*	     	myInstance = createjs.Sound.createInstance("myAudioPath/mySound.mp3");
 	*	     }
+	*	
+	*	NOTE to create an audio sprite that has not already been registered, both startTime and duration need to be set.
+	*	This is only when creating a new audio sprite, not when playing using the id of an already registered audio sprite.
 	* @param src The src or ID of the audio.
+	* @param startTime To create an audio sprite (with duration), the initial offset to start playback and loop from, in milliseconds.
+	* @param duration To create an audio sprite (with startTime), the amount of time to play the clip for, in milliseconds.
 	*/
-	public function createInstance(src:String):SoundInstance;
+	public static function createInstance(src:String, ?startTime:Float, ?duration:Float):AbstractSoundInstance;
+	
+	/**
+	* Deprecated.  Please use {{#crossLink "Sound/registerSounds"}}{{/crossLink} instead.
+	* @param sounds An array of objects to load. Objects are expected to be in the format needed for
+	*	{{#crossLink "Sound/registerSound"}}{{/crossLink}}: <code>{src:srcURI, id:ID, data:Data}</code>
+	*	with "id" and "data" being optional.
+	* @param basePath Set a path that will be prepended to each src when loading.  When creating, playing, or removing
+	*	audio that was loaded with a basePath by src, the basePath must be included.
+	*/
+	public static function registerManifest(sounds:Array<Dynamic>, basePath:String):Dynamic;
+	
+	/**
+	* Deprecated.  Please use {{#crossLink "Sound/removeSounds"}}{{/crossLink}} instead.
+	* @param manifest An array of objects to remove. Objects are expected to be in the format needed for
+	*	{{#crossLink "Sound/removeSound"}}{{/crossLink}}: <code>{srcOrID:srcURIorID}</code>
+	* @param basePath Set a path that will be prepended to each src when removing.
+	*/
+	public static function removeManifest(manifest:Array<Dynamic>, basePath:String):Dynamic;
 	
 	/**
 	* Determines if Sound has been initialized, and a plugin has been activated.
@@ -275,8 +352,8 @@ extern class Sound
 	*	This example sets up a Flash fallback, but only if there is no plugin specified yet.
 	*	
 	*		if (!createjs.Sound.isReady()) {
-	*			createjs.FlashPlugin.swfPath = "../src/SoundJS/";
-	*			createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashPlugin]);
+	*			createjs.FlashAudioPlugin.swfPath = "../src/soundjs/flashaudio/";
+	*			createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashAudioPlugin]);
 	*		}
 	*/
 	public static function isReady():Bool;
@@ -286,6 +363,7 @@ extern class Sound
 	*	full list of capabilities.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var maxAudioInstances = createjs.Sound.getCapability("tracks");
 	* @param key The capability to retrieve
 	*/
@@ -315,9 +393,10 @@ extern class Sound
 	
 	/**
 	* Get the master volume of Sound. The master volume is multiplied against each sound's individual volume.
-	*	To get individual sound volume, use SoundInstance {{#crossLink "SoundInstance/volume:property"}}{{/crossLink}} instead.
+	*	To get individual sound volume, use AbstractSoundInstance {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} instead.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    var masterVolume = createjs.Sound.getVolume();
 	*/
 	public static function getVolume():Float;
@@ -343,58 +422,64 @@ extern class Sound
 	*	default plugins are {{#crossLink "WebAudioPlugin"}}{{/crossLink}} followed by {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}}.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*		if (!createjs.initializeDefaultPlugins()) { return; }
 	*/
 	public static function initializeDefaultPlugins():Bool;
 	
 	/**
+	* Internal method for loading sounds.  This should not be called directly.
+	* @param src The object to load, containing src property and optionally containing id and data.
+	*/
+	private static function _registerSound(src:Dynamic):Dynamic;
+	
+	/**
 	* Mute/Unmute all audio. Note that muted audio still plays at 0 volume. This global mute value is maintained
 	*	separately and when set will override, but not change the mute property of individual instances. To mute an individual
-	*	instance, use SoundInstance {{#crossLink "SoundInstance/setMute"}}{{/crossLink}} instead.
+	*	instance, use AbstractSoundInstance {{#crossLink "AbstractSoundInstance/setMute"}}{{/crossLink}} instead.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    createjs.Sound.setMute(true);
 	* @param value Whether the audio should be muted or not.
 	*/
 	public static function setMute(value:Bool):Bool;
 	
 	/**
-	* Parse the path of a sound, usually from a manifest item. Manifest items support single file paths, as well as
-	*	composite paths using {{#crossLink "Sound/DELIMITER:property"}}{{/crossLink}}, which defaults to "|". The first path supported by the
-	*	current browser/plugin will be used.
-	*	NOTE the "|" approach is deprecated and will be removed in the next version
+	* Parse the path of a sound. alternate extensions will be attempted in order if the
+	*	current extension is not supported
 	* @param value The path to an audio source.
-	* @param type The type of path. This will typically be "sound" or null.
-	* @param id The user-specified sound ID. This may be null, in which case the src will be used instead.
-	* @param data Arbitrary data appended to the sound, usually denoting the
-	*	number of channels for the sound. This method doesn't currently do anything with the data property.
 	*/
-	private function _parsePath(value:String, ?type:String, ?id:String, ?data:Dynamic):Dynamic;
+	private static function _parsePath(value:String):Dynamic;
 	
 	/**
-	* Play a sound and get a {{#crossLink "SoundInstance"}}{{/crossLink}} to control. If the sound fails to play, a
-	*	SoundInstance will still be returned, and have a playState of {{#crossLink "Sound/PLAY_FAILED:property"}}{{/crossLink}}.
-	*	Note that even on sounds with failed playback, you may still be able to call SoundInstance {{#crossLink "SoundInstance/play"}}{{/crossLink}},
+	* Play a sound and get a {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} to control. If the sound fails to play, a
+	*	AbstractSoundInstance will still be returned, and have a playState of {{#crossLink "Sound/PLAY_FAILED:property"}}{{/crossLink}}.
+	*	Note that even on sounds with failed playback, you may still be able to call AbstractSoundInstance {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}},
 	*	since the failure could be due to lack of available channels. If the src does not have a supported extension or
-	*	if there is no available plugin, a default SoundInstance will be returned which will not play any audio, but will not generate errors.
+	*	if there is no available plugin, a default AbstractSoundInstance will be returned which will not play any audio, but will not generate errors.
 	*	
 	*	<h4>Example</h4>
-	*	     createjs.Sound.addEventListener("fileload", handleLoad);
+	*	
+	*	     createjs.Sound.on("fileload", handleLoad);
 	*	     createjs.Sound.registerSound("myAudioPath/mySound.mp3", "myID", 3);
 	*	     function handleLoad(event) {
 	*	     	createjs.Sound.play("myID");
-	*	     	// we can pass in options we want to set inside of an object, and store off SoundInstance for controlling
+	*	     	// we can pass in options we want to set inside of an object, and store off AbstractSoundInstance for controlling
 	*	     	var myInstance = createjs.Sound.play("myID", {interrupt: createjs.Sound.INTERRUPT_ANY, loop:-1});
 	*	     	// alternately, we can pass full source path and specify each argument individually
 	*	     	var myInstance = createjs.Sound.play("myAudioPath/mySound.mp3", createjs.Sound.INTERRUPT_ANY, 0, 0, -1, 1, 0);
 	*	     }
+	*	
+	*	NOTE to create an audio sprite that has not already been registered, both startTime and duration need to be set.
+	*	This is only when creating a new audio sprite, not when playing using the id of an already registered audio sprite.
 	* @param src The src or ID of the audio.
 	* @param interrupt How to interrupt any currently playing instances of audio with the same source,
 	*	if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
 	*	constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior:property"}}{{/crossLink}}.
 	*	<br /><strong>OR</strong><br />
 	*	This parameter can be an object that contains any or all optional properties by name, including: interrupt,
-	*	delay, offset, loop, volume, and pan (see the above code sample).
+	*	delay, offset, loop, volume, pan, startTime, and duration (see the above code sample).
 	* @param delay The amount of time to delay the start of audio playback, in milliseconds.
 	* @param offset The offset from the start of the audio to begin playback, in milliseconds.
 	* @param loop How many times the audio loops when it reaches the end of playback. The default is 0 (no
@@ -402,13 +487,15 @@ extern class Sound
 	* @param volume The volume of the sound, between 0 and 1. Note that the master volume is applied
 	*	against the individual volume.
 	* @param pan The left-right pan of the sound (if supported), between -1 (left) and 1 (right).
+	* @param startTime To create an audio sprite (with duration), the initial offset to start playback and loop from, in milliseconds.
+	* @param duration To create an audio sprite (with startTime), the amount of time to play the clip for, in milliseconds.
 	*/
-	public static function play(src:String, ?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):SoundInstance;
+	public static function play(src:String, ?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float, ?startTime:Float, ?duration:Float):AbstractSoundInstance;
 	
 	/**
 	* Play an instance. This is called by the static API, as well as from plugins. This allows the core class to
 	*	control delays.
-	* @param instance The {{#crossLink "SoundInstance"}}{{/crossLink}} to start playing.
+	* @param instance The {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} to start playing.
 	* @param interrupt How to interrupt any currently playing instances of audio with the same source,
 	*	if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
 	*	constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior"}}{{/crossLink}}.
@@ -422,66 +509,48 @@ extern class Sound
 	* @param volume The volume of the sound between 0 and 1. Defaults to current instance value.
 	* @param pan The pan of the sound between -1 and 1. Defaults to current instance value.
 	*/
-	private static function _playInstance(instance:SoundInstance, ?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Bool;
+	private static function _playInstance(instance:AbstractSoundInstance, ?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):Bool;
 	
 	/**
 	* Process manifest items from <a href="http://preloadjs.com" target="_blank">PreloadJS</a>. This method is intended
 	*	for usage by a plugin, and not for direct interaction.
-	* @param src The src or object to load. This is usually a string path, but can also be an
-	*	HTMLAudioElement or similar audio playback object.
-	* @param type The type of object. Will likely be "sound" or null.
-	* @param id An optional user-specified id that is used to play sounds.
-	* @param data Data associated with the item. Sound uses the data parameter as the
-	*	number of channels for an audio instance, however a "channels" property can be appended to the data object if
-	*	this property is used for other information. The audio channels will default to 1 if no value is found.
-	* @param path A combined basepath and subPath from PreloadJS that has already been prepended to src.
+	* @param src The object to load.
 	*/
-	private static function initLoad(src:Dynamic, ?type:String, ?id:String, ?data:Dynamic, ?path:String):Dynamic;
+	private static function initLoad(src:Dynamic):Dynamic;
 	
 	/**
 	* Register a list of Sound plugins, in order of precedence. To register a single plugin, pass a single element in the array.
 	*	
 	*	<h4>Example</h4>
-	*	     createjs.FlashPlugin.swfPath = "../src/SoundJS/";
-	*	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashPlugin]);
+	*	
+	*	     createjs.FlashAudioPlugin.swfPath = "../src/soundjs/flashaudio/";
+	*	     createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashAudioPlugin]);
 	* @param plugins An array of plugins classes to install.
 	*/
 	public static function registerPlugins(plugins:Array<Dynamic>):Bool;
 	
 	/**
-	* Register a manifest of audio files for loading and future playback in Sound. It is recommended to register all
+	* Register an array of audio files for loading and future playback in Sound. It is recommended to register all
 	*	sounds that need to be played back in order to properly prepare and preload them. Sound does internal preloading
 	*	when required.
 	*	
 	*	<h4>Example</h4>
-	*	     var manifest = [
+	*	
+	*	     var sounds = [
 	*	         {src:"asset0.ogg", id:"example"},
 	*	         {src:"asset1.ogg", id:"1", data:6},
 	*	         {src:"asset2.mp3", id:"works"}
 	*	     ];
 	*	     createjs.Sound.alternateExtensions = ["mp3"];	// if the passed extension is not supported, try this extension
-	*	     createjs.Sound.addEventListener("fileload", handleLoad); // call handleLoad when each sound loads
-	*	     createjs.Sound.registerManifest(manifest, assetPath);
-	* @param manifest An array of objects to load. Objects are expected to be in the format needed for
+	*	     createjs.Sound.on("fileload", handleLoad); // call handleLoad when each sound loads
+	*	     createjs.Sound.registerSounds(sounds, assetPath);
+	* @param sounds An array of objects to load. Objects are expected to be in the format needed for
 	*	{{#crossLink "Sound/registerSound"}}{{/crossLink}}: <code>{src:srcURI, id:ID, data:Data}</code>
-	*	with "id" and "data" being optional.
+	*	with "id" and "data" being optional.  You can also set an optional path property that will be prepended to the src of each object.
 	* @param basePath Set a path that will be prepended to each src when loading.  When creating, playing, or removing
 	*	audio that was loaded with a basePath by src, the basePath must be included.
 	*/
-	public static function registerManifest(manifest:Array<Dynamic>, basePath:String):Dynamic;
-	
-	/**
-	* Register a Sound plugin. Plugins handle the actual playback of audio. The default plugins are
-	*	({{#crossLink "WebAudioPlugin"}}{{/crossLink}} followed by {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}}),
-	*	and are installed if no other plugins are present when the user attempts to start playback or register sound.
-	*	<h4>Example</h4>
-	*	     createjs.FlashPlugin.swfPath = "../src/SoundJS/";
-	*	     createjs.Sound._registerPlugin(createjs.FlashPlugin);
-	*	
-	*	To register multiple plugins, use {{#crossLink "Sound/registerPlugins"}}{{/crossLink}}.
-	* @param plugin The plugin class to install.
-	*/
-	private static function _registerPlugin(plugin:Dynamic):Bool;
+	public static function registerSounds(sounds:Array<Dynamic>, basePath:String):Dynamic;
 	
 	/**
 	* Register an audio file for loading and future playback in Sound. This is automatically called when using
@@ -489,46 +558,32 @@ extern class Sound
 	*	need to be played back in order to properly prepare and preload them. Sound does internal preloading when required.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     createjs.Sound.alternateExtensions = ["mp3"];
-	*	     createjs.Sound.addEventListener("fileload", handleLoad); // add an event listener for when load is completed
+	*	     createjs.Sound.on("fileload", handleLoad); // add an event listener for when load is completed
 	*	     createjs.Sound.registerSound("myAudioPath/mySound.ogg", "myID", 3);
 	* @param src The source or an Object with a "src" property
 	* @param id An id specified by the user to play the sound later.
 	* @param data Data associated with the item. Sound uses the data parameter as the number of
 	*	channels for an audio instance, however a "channels" property can be appended to the data object if it is used
 	*	for other information. The audio channels will set a default based on plugin if no value is found.
-	* @param preload If the sound should be internally preloaded so that it can be played back
-	*	without an external preloader.  This is currently used by PreloadJS when loading sounds to disable internal preloading.
+	*	Sound also uses the data property to hold an audioSprite array of objects in the following format {id, startTime, duration}.<br/>
+	*	  id used to play the sound later, in the same manner as a sound src with an id.<br/>
+	*	  startTime is the initial offset to start playback and loop from, in milliseconds.<br/>
+	*	  duration is the amount of time to play the clip for, in milliseconds.<br/>
+	*	This allows Sound to support audio sprites that are played back by id.
 	* @param basePath Set a path that will be prepended to src for loading.
 	*/
-	public static function registerSound(src:Dynamic, ?id:String, ?data:Dynamic, ?preload:Bool, ?basePath:String):Dynamic;
-	
-	/**
-	* Remove a manifest of audio files that have been registered with {{#crossLink "Sound/registerSound"}}{{/crossLink}} or
-	*	{{#crossLink "Sound/registerManifest"}}{{/crossLink}}.
-	*	<br />Note this will stop playback on active instances playing this audio before deleting them.
-	*	<br />Note if you passed in a basePath, you need to pass it or prepend it to the src here.
-	*	
-	*	<h4>Example</h4>
-	*	     var manifest = [
-	*	         {src:"asset0.ogg", id:"example"},
-	*	         {src:"asset1.ogg", id:"1", data:6},
-	*	         {src:"asset2.mp3", id:"works"}
-	*	     ];
-	*	     createjs.Sound.removeManifest(manifest, assetPath);
-	* @param manifest An array of objects to remove. Objects are expected to be in the format needed for
-	*	{{#crossLink "Sound/removeSound"}}{{/crossLink}}: <code>{srcOrID:srcURIorID}</code>
-	* @param basePath Set a path that will be prepended to each src when removing.
-	*/
-	public static function removeManifest(manifest:Array<Dynamic>, basePath:String):Dynamic;
+	public static function registerSound(src:Dynamic, ?id:String, ?data:Dynamic, ?basePath:String):Dynamic;
 	
 	/**
 	* Remove a sound that has been registered with {{#crossLink "Sound/registerSound"}}{{/crossLink}} or
-	*	{{#crossLink "Sound/registerManifest"}}{{/crossLink}}.
+	*	{{#crossLink "Sound/registerSounds"}}{{/crossLink}}.
 	*	<br />Note this will stop playback on active instances playing this sound before deleting them.
 	*	<br />Note if you passed in a basePath, you need to pass it or prepend it to the src here.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     createjs.Sound.removeSound("myAudioBasePath/mySound.ogg");
 	*	     createjs.Sound.removeSound("myID");
 	* @param src The src or ID of the audio, or an Object with a "src" property
@@ -538,19 +593,42 @@ extern class Sound
 	
 	/**
 	* Remove all sounds that have been registered with {{#crossLink "Sound/registerSound"}}{{/crossLink}} or
-	*	{{#crossLink "Sound/registerManifest"}}{{/crossLink}}.
+	*	{{#crossLink "Sound/registerSounds"}}{{/crossLink}}.
 	*	<br />Note this will stop playback on all active sound instances before deleting them.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    createjs.Sound.removeAllSounds();
 	*/
 	public static function removeAllSounds():Dynamic;
 	
 	/**
-	* Returns the global mute value. To get the mute value of an individual instance, use SoundInstance
-	*	{{#crossLink "SoundInstance/getMute"}}{{/crossLink}} instead.
+	* Remove an array of audio files that have been registered with {{#crossLink "Sound/registerSound"}}{{/crossLink}} or
+	*	{{#crossLink "Sound/registerSounds"}}{{/crossLink}}.
+	*	<br />Note this will stop playback on active instances playing this audio before deleting them.
+	*	<br />Note if you passed in a basePath, you need to pass it or prepend it to the src here.
 	*	
 	*	<h4>Example</h4>
+	*	
+	*	     var sounds = [
+	*	         {src:"asset0.ogg", id:"example"},
+	*	         {src:"asset1.ogg", id:"1", data:6},
+	*	         {src:"asset2.mp3", id:"works"}
+	*	     ];
+	*	     createjs.Sound.removeSounds(sounds, assetPath);
+	* @param sounds An array of objects to remove. Objects are expected to be in the format needed for
+	*	{{#crossLink "Sound/removeSound"}}{{/crossLink}}: <code>{srcOrID:srcURIorID}</code>.
+	*	You can also set an optional path property that will be prepended to the src of each object.
+	* @param basePath Set a path that will be prepended to each src when removing.
+	*/
+	public static function removeSounds(sounds:Array<Dynamic>, basePath:String):Dynamic;
+	
+	/**
+	* Returns the global mute value. To get the mute value of an individual instance, use AbstractSoundInstance
+	*	{{#crossLink "AbstractSoundInstance/getMute"}}{{/crossLink}} instead.
+	*	
+	*	<h4>Example</h4>
+	*	
 	*	    var muted = createjs.Sound.getMute();
 	*/
 	public static function getMute():Bool;
@@ -558,9 +636,10 @@ extern class Sound
 	/**
 	* Set the master volume of Sound. The master volume is multiplied against each sound's individual volume.  For
 	*	example, if master volume is 0.5 and a sound's volume is 0.5, the resulting volume is 0.25. To set individual
-	*	sound volume, use SoundInstance {{#crossLink "SoundInstance/setVolume"}}{{/crossLink}} instead.
+	*	sound volume, use AbstractSoundInstance {{#crossLink "AbstractSoundInstance/setVolume"}}{{/crossLink}} instead.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    createjs.Sound.setVolume(0.5);
 	* @param value The master volume value. The acceptable range is 0-1.
 	*/
@@ -568,22 +647,65 @@ extern class Sound
 	
 	/**
 	* Stop all audio (global stop). Stopped audio is reset, and not paused. To play audio that has been stopped,
-	*	call SoundInstance {{#crossLink "SoundInstance/play"}}{{/crossLink}}.
+	*	call AbstractSoundInstance {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}}.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	    createjs.Sound.stop();
 	*/
 	public static function stop():Dynamic;
 	
 	/**
-	* Used by external plugins to dispatch file load events.
-	* @param src A sound file has completed loading, and should be dispatched.
+	* Used by {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} to register a Sound plugin.
+	* @param plugin The plugin class to install.
 	*/
-	private static function _sendFileLoadEvent(src:String):Dynamic;
+	private static function _registerPlugin(plugin:Dynamic):Bool;
+	
+	/**
+	* Used to dispatch fileload events from internal loading.
+	* @param event A loader event.
+	*/
+	private static function _handleLoadComplete(event:Dynamic):Dynamic;
 	
 	// EventDispatcher injects...
 	
-	private var _listeners:Dynamic;
+	/**
+	* A shortcut method for using addEventListener that makes it easier to specify an execution scope, have a listener
+	*	only run once, associate arbitrary data with the listener, and remove the listener.
+	*	
+	*	This method works by creating an anonymous wrapper function and subscribing it with addEventListener.
+	*	The created anonymous function is returned for use with .removeEventListener (or .off).
+	*	
+	*	<h4>Example</h4>
+	*	
+	*			var listener = myBtn.on("click", handleClick, null, false, {count:3});
+	*			function handleClick(evt, data) {
+	*				data.count -= 1;
+	*				console.log(this == myBtn); // true - scope defaults to the dispatcher
+	*				if (data.count == 0) {
+	*					alert("clicked 3 times!");
+	*					myBtn.off("click", listener);
+	*					// alternately: evt.remove();
+	*				}
+	*			}
+	* @param type The string type of the event.
+	* @param listener An object with a handleEvent method, or a function that will be called when
+	*	the event is dispatched.
+	* @param scope The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
+	* @param once If true, the listener will remove itself after the first time it is triggered.
+	* @param data Arbitrary data that will be included as the second parameter when the listener is called.
+	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	*/
+	public static function on(type:String, listener:Dynamic, ?scope:Dynamic, ?once:Bool, ?data:Dynamic, ?useCapture:Bool):Dynamic;
+	
+	/**
+	* A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
+	*	.on method.
+	* @param type The string type of the event.
+	* @param listener The listener function or object.
+	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	*/
+	public static function off(type:String, listener:Dynamic, ?useCapture:Bool):Dynamic;
 	
 	/**
 	* Adds the specified event listener. Note that adding multiple listeners to the same function will result in
@@ -615,14 +737,26 @@ extern class Sound
 	*	     this.dispatchEvent(event);
 	* @param eventObj An object with a "type" property, or a string type.
 	*	While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
-	*	dispatchEvent will construct an Event instance with the specified type.
-	* @param target The object to use as the target property of the event object. This will default to the
-	*	dispatching object. <b>This parameter is deprecated and will be removed.</b>
+	*	dispatchEvent will construct an Event instance if necessary with the specified type. This latter approach can
+	*	be used to avoid event object instantiation for non-bubbling events that may not have any listeners.
+	* @param bubbles Specifies the `bubbles` value when a string was passed to eventObj.
+	* @param cancelable Specifies the `cancelable` value when a string was passed to eventObj.
 	*/
-	public static function dispatchEvent(eventObj:Dynamic, ?target:Dynamic):Bool;
+	public static function dispatchEvent(eventObj:Dynamic, ?bubbles:Bool, ?cancelable:Bool):Bool;
 	
 	/**
-	* Indicates whether there is at least one listener for the specified event type and `useCapture` value.
+	* Indicates whether there is at least one listener for the specified event type on this object or any of its
+	*	ancestors (parent, parent's parent, etc). A return value of true indicates that if a bubbling event of the
+	*	specified type is dispatched from this object, it will trigger at least one listener.
+	*	
+	*	This is similar to {{#crossLink "EventDispatcher/hasEventListener"}}{{/crossLink}}, but it searches the entire
+	*	event flow for a listener, not just this object.
+	* @param type The string type of the event.
+	*/
+	public static function willTrigger(type:String):Bool;
+	
+	/**
+	* Indicates whether there is at least one listener for the specified event type.
 	* @param type The string type of the event.
 	*/
 	public static function hasEventListener(type:String):Bool;
@@ -633,7 +767,7 @@ extern class Sound
 	*	<h4>Example</h4>
 	*	
 	*	     // Remove all listeners
-	*	     displayObject.removeAllEvenListeners();
+	*	     displayObject.removeAllEventListeners();
 	*	
 	*	     // Remove all click listeners
 	*	     displayObject.removeAllEventListeners("click");

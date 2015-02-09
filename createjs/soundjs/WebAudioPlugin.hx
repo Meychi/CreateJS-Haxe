@@ -26,22 +26,17 @@ import js.html.audio.GainNode;
 *	</ul>
 */
 @:native("createjs.WebAudioPlugin")
-extern class WebAudioPlugin
+extern class WebAudioPlugin extends AbstractPlugin
 {
 	/**
-	* A DynamicsCompressorNode, which is used to improve sound quality and prevent audio distortion. It is connected to <code>context.destination</code>.
+	* A DynamicsCompressorNode, which is used to improve sound quality and prevent audio distortion. It is connected to <code>context.destination</code>.  Can be accessed by advanced users through createjs.Sound.activePlugin.dynamicsCompressorNode.
 	*/
 	public var dynamicsCompressorNode:AudioNode;
 	
 	/**
-	* A GainNode for controlling master _volume. It is connected to {{#crossLink "WebAudioPlugin/dynamicsCompressorNode:property"}}{{/crossLink}}.
+	* A GainNode for controlling master volume. It is connected to {{#crossLink "WebAudioPlugin/dynamicsCompressorNode:property"}}{{/crossLink}}.  Can be accessed by advanced users through createjs.Sound.activePlugin.gainNode.
 	*/
 	public var gainNode:GainNode;
-	
-	/**
-	* An object hash used internally to store ArrayBuffers, indexed by the source URI used  to load it. This prevents having to load and decode audio files more than once. If a load has been started on a file, <code>arrayBuffers[src]</code> will be set to true. Once load is complete, it is set the the loaded ArrayBuffer instance.
-	*/
-	private var _arrayBuffers:Dynamic;
 	
 	/**
 	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/_generateCapabilities:method"}}{{/crossLink}} method and is used internally.
@@ -56,42 +51,22 @@ extern class WebAudioPlugin
 	/**
 	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.
 	*/
-	public var context:AudioContext;
+	//public var context:AudioContext;
 	
 	/**
-	* Value to set panning model to equal power for SoundInstance.  Can be "equalpower" or 0 depending on browser implementation.
+	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.  Advanced users can set this to an existing context, but <b>must</b> do so before they call {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} or {{#crossLink "Sound/initializeDefaultPlugins"}}{{/crossLink}}.
 	*/
-	private var _panningModel:Dynamic;
+	public static var context:AudioContext;
 	
 	/**
-	* Add loaded results to the preload object hash.
-	* @param src The sound URI to unload.
+	* Value to set panning model to equal power for WebAudioSoundInstance.  Can be "equalpower" or 0 depending on browser implementation.
 	*/
-	public function addPreloadResults(src:String):Bool;
+	//private var _panningModel:Dynamic;
 	
 	/**
-	* An initialization function run by the constructor
+	* Value to set panning model to equal power for WebAudioSoundInstance.  Can be "equalpower" or 0 depending on browser implementation.
 	*/
-	private function _init():Dynamic;
-	
-	/**
-	* Checks if preloading has finished for a specific source.
-	* @param src The sound URI to load.
-	*/
-	public function isPreloadComplete(src:String):Bool;
-	
-	/**
-	* Checks if preloading has started for a specific source. If the source is found, we can assume it is loading,
-	*	or has already finished loading.
-	* @param src The sound URI to check.
-	*/
-	public function isPreloadStarted(src:String):Bool;
-	
-	/**
-	* Create a sound instance. If the sound has not been preloaded, it is internally preloaded here.
-	* @param src The sound source to use.
-	*/
-	public function create(src:String):SoundInstance;
+	public static var _panningModel:Dynamic;
 	
 	/**
 	* Determine if the plugin can be used in the current browser/OS.
@@ -108,30 +83,6 @@ extern class WebAudioPlugin
 	*	method for an overview of plugin capabilities.
 	*/
 	private static function _generateCapabilities():Dynamic;
-	
-	/**
-	* Get the master volume of the plugin, which affects all SoundInstances.
-	*/
-	public function getVolume():Dynamic;
-	
-	/**
-	* Handles internal preload completion.
-	*/
-	private function _handlePreloadComplete():Dynamic;
-	
-	/**
-	* Internally preload a sound. Loading uses XHR2 to load an array buffer for use with WebAudio.
-	* @param src The sound URI to load.
-	* @param instance Not used in this plugin.
-	*/
-	public function preload(src:String, instance:Dynamic):Dynamic;
-	
-	/**
-	* Mute all sounds via the plugin.
-	* @param value If all sound should be muted or not. Note that plugin-level muting just looks up
-	*	the mute value of Sound {{#crossLink "Sound/getMute"}}{{/crossLink}}, so this property is not used here.
-	*/
-	public function setMute(value:Bool):Bool;
 	
 	/**
 	* Play sounds using Web Audio in the browser. The WebAudioPlugin is currently the default plugin, and will be used
@@ -168,40 +119,12 @@ extern class WebAudioPlugin
 	*	        createjs.WebAudioPlugin.playEmptySound();
 	*	    }
 	*/
-	public function playEmptySound():Dynamic;
-	
-	/**
-	* Pre-register a sound for preloading and setup. This is called by {{#crossLink "Sound"}}{{/crossLink}}.
-	*	Note that WebAudio provides a <code>Loader</code> instance, which <a href="http://preloadjs.com" target="_blank">PreloadJS</a>
-	*	can use to assist with preloading.
-	* @param src The source of the audio
-	* @param instances The number of concurrently playing instances to allow for the channel at any time.
-	*	Note that the WebAudioPlugin does not manage this property.
-	*/
-	public function register(src:String, instances:Float):Dynamic;
-	
-	/**
-	* Remove a sound added using {{#crossLink "WebAudioPlugin/register"}}{{/crossLink}}. Note this does not cancel a preload.
-	* @param src The sound URI to unload.
-	*/
-	public function removeSound(src:String):Dynamic;
-	
-	/**
-	* Remove all sounds added using {{#crossLink "WebAudioPlugin/register"}}{{/crossLink}}. Note this does not cancel a preload.
-	* @param src The sound URI to unload.
-	*/
-	public function removeAllSounds(src:String):Dynamic;
+	public static function playEmptySound():Dynamic;
 	
 	/**
 	* Set the gain value for master audio. Should not be called externally.
 	*/
-	private function _updateVolume():Dynamic;
-	
-	/**
-	* Set the master volume of the plugin, which affects all SoundInstances.
-	* @param value The volume to set, between 0 and 1.
-	*/
-	public function setVolume(value:Float):Bool;
+	//private function _updateVolume():Dynamic;
 	
 	/**
 	* Set up compatibility if only deprecated web audio calls are supported.
@@ -209,6 +132,11 @@ extern class WebAudioPlugin
 	*	Needed so we can support new browsers that don't support deprecated calls (Firefox) as well as old browsers that
 	*	don't support new calls.
 	*/
-	private function _compatibilitySetUp():Dynamic;
+	private static function _compatibilitySetUp():Dynamic;
+	
+	/**
+	* Set up needed properties on supported classes WebAudioSoundInstance and WebAudioLoader.
+	*/
+	private static function _addPropsToClasses():Dynamic;
 	
 }

@@ -7,6 +7,7 @@ import js.html.CanvasRenderingContext2D;
 *	HTML element, or a string.
 *	
 *	<h4>Example</h4>
+*	
 *	     var bitmap = new createjs.Bitmap("imagePath.jpg");
 *	
 *	<strong>Notes:</strong>
@@ -26,26 +27,21 @@ import js.html.CanvasRenderingContext2D;
 extern class Bitmap extends DisplayObject
 {
 	/**
-	* Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+	* Specifies an area of the source image to draw. If omitted, the whole image will be drawn. Note that video sources must have a width / height set to work correctly with `sourceRect`.
 	*/
 	public var sourceRect:Rectangle;
 	
 	/**
-	* The image to render. This can be an Image, a Canvas, or a Video.
+	* The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially mobile browsers) support drawing video to a canvas.
 	*/
 	public var image:Dynamic;
-	
-	private var DisplayObject_draw:Dynamic;
-	
-	private var DisplayObject_getBounds:Dynamic;
-	
-	private var DisplayObject_initialize:Dynamic;
 	
 	/**
 	* A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
 	*	HTML element, or a string.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var bitmap = new createjs.Bitmap("imagePath.jpg");
 	*	
 	*	<strong>Notes:</strong>
@@ -97,6 +93,12 @@ extern class Bitmap extends DisplayObject
 	//public function updateCache():Dynamic;
 	
 	/**
+	* Constructor alias for backwards compatibility. This method will be removed in future versions.
+	*	Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	*/
+	public function initialize():Dynamic;
+	
+	/**
 	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	
@@ -107,14 +109,6 @@ extern class Bitmap extends DisplayObject
 	*	into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
-	
-	/**
-	* Initialization method.
-	* @param imageOrUri The source object or URI to an image to
-	*	display. This can be either an Image, Canvas, or Video object, or a string URI to an image file to load and use.
-	*	If it is a URI, a new Image object will be constructed and assigned to the `.image` property.
-	*/
-	//private function initialize(imageOrUri:Dynamic):Dynamic;
 	
 	/**
 	* Returns a clone of the Bitmap instance.

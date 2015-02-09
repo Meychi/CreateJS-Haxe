@@ -5,6 +5,7 @@ package createjs.easeljs;
 *	via its <code>shadow</code> property.
 *	
 *	<h4>Example</h4>
+*	
 *	     myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
 */
 @:native("createjs.Shadow")
@@ -16,13 +17,13 @@ extern class Shadow
 	public static var identity:Shadow;
 	
 	/**
-	* Initialization method.
-	* @param color The color of the shadow.
-	* @param offsetX The x offset of the shadow.
-	* @param offsetY The y offset of the shadow.
-	* @param blur The size of the blurring effect.
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
 	*/
-	private function initialize(color:String, offsetX:Float, offsetY:Float, blur:Float):Dynamic;
+	private function initialize():Dynamic;
 	
 	/**
 	* Returns a clone of this Shadow instance.
@@ -39,6 +40,7 @@ extern class Shadow
 	*	via its <code>shadow</code> property.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
 	* @param color The color of the shadow.
 	* @param offsetX The x offset of the shadow in pixels.

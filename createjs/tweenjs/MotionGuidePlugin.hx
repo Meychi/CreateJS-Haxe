@@ -34,6 +34,8 @@ extern class MotionGuidePlugin
 {
 	public static var priority:Dynamic;
 	
+	public static var temporary variable storage:Dynamic;
+	
 	/**
 	* A TweenJS plugin for working with motion guides.
 	*	
@@ -63,7 +65,7 @@ extern class MotionGuidePlugin
 	*	information on these objects in the background and sharing them can cause unexpected behaviour. Values
 	*	outside 0-1 range of tweens will be a "best guess" from the appropriate part of the defined curve.
 	*/
-	public function new(path:Array<Float>, ?start:Float, ?end:Float, ?orient:String):Void;
+	public function new():Void;
 	
 	/**
 	* Installs this plugin for use with TweenJS. Call this once after TweenJS is loaded to enable this plugin.

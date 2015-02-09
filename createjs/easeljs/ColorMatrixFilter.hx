@@ -24,6 +24,11 @@ package createjs.easeljs;
 extern class ColorMatrixFilter extends Filter
 {
 	/**
+	* A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
+	*/
+	public var matrix:Dynamic;
+	
+	/**
 	* Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
 	*	{{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
 	*	consider the {{#crossLink "ColorFilter"}}{{/crossLink}}.
@@ -45,13 +50,6 @@ extern class ColorMatrixFilter extends Filter
 	* @param matrix A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
 	*	class.
 	*/
-	public function new(matrix:Array<Dynamic>):Void;
-	
-	/**
-	* Returns a clone of this ColorMatrixFilter instance.
-	*/
-	//public function clone():ColorMatrixFilter;
-	
-	//private function initialize(matrix:Array<Dynamic>):Dynamic;
+	public function new(matrix:Dynamic):Void;
 	
 }

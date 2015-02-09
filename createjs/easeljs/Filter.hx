@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import js.html.ImageData;
 
 /**
 * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
@@ -8,6 +9,7 @@ import js.html.CanvasRenderingContext2D;
 *	{{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
 *	
 *	<h4>Example</h4>
+*	
 *	     myInstance.filters = [
 *	         new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
 *	         new createjs.BlurFilter(5, 5, 10)
@@ -32,6 +34,15 @@ import js.html.CanvasRenderingContext2D;
 extern class Filter
 {
 	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
+	
+	/**
 	* Applies the filter to the specified context.
 	* @param ctx The 2D context to use as the source.
 	* @param x The x position to use for the source rect.
@@ -50,6 +61,7 @@ extern class Filter
 	*	{{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     myInstance.filters = [
 	*	         new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
 	*	         new createjs.BlurFilter(5, 5, 10)
@@ -73,9 +85,10 @@ extern class Filter
 	public function new():Void;
 	
 	/**
-	* Initialization method.
+	* Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
+	* @param rect If specified, the provided Rectangle instance will be expanded by the padding amounts and returned.
 	*/
-	private function initialize():Dynamic;
+	public function getBounds(?rect:Rectangle):Rectangle;
 	
 	/**
 	* Returns a clone of this Filter instance.
@@ -83,15 +96,10 @@ extern class Filter
 	public function clone():Filter;
 	
 	/**
-	* Returns a rectangle with values indicating the margins required to draw the filter or null.
-	*	For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	*	(but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
-	*/
-	public function getBounds():Rectangle;
-	
-	/**
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
+	
+	public function _applyFilter(imageData:ImageData):Bool;
 	
 }

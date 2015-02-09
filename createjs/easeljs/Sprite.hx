@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Text;
 
 /**
 * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
@@ -12,6 +11,7 @@ import js.html.Text;
 *	See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
 *	
 *	<h4>Example</h4>
+*	
 *	     var instance = new createjs.Sprite(spriteSheet);
 *	     instance.gotoAndStop("frameName");
 *	
@@ -27,6 +27,16 @@ extern class Sprite extends DisplayObject
 	public var framerate:Float;
 	
 	/**
+	* Current animation object.
+	*/
+	private var _animation:Dynamic;
+	
+	/**
+	* Current frame index.
+	*/
+	private var _currentFrame:Float;
+	
+	/**
 	* Dispatches the "animationend" event. Returns true if a handler changed the animation (ex. calling {{#crossLink "Sprite/stop"}}{{/crossLink}}, {{#crossLink "Sprite/gotoAndPlay"}}{{/crossLink}}, etc.)
 	*/
 	private var _dispatchAnimationEnd:Dynamic;
@@ -37,14 +47,14 @@ extern class Sprite extends DisplayObject
 	public var paused:Bool;
 	
 	/**
-	* REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Sprite/animationend:event"}}{{/crossLink}} event.
-	*/
-	public var onAnimationEnd:Dynamic;
-	
-	/**
 	* Returns the name of the currently playing animation.
 	*/
 	public var currentAnimation:String;
+	
+	/**
+	* Skips the next auto advance. Used by gotoAndPlay to avoid immediately jumping to the next frame
+	*/
+	private var _skipAdvance:Bool;
 	
 	/**
 	* Specifies the current frame index within the currently playing animation. When playing normally, this will increase from 0 to n-1, where n is the number of frames in the current animation.  This could be a non-integer value if using time-based playback (see {{#crossLink "Sprite/framerate"}}{{/crossLink}}, or if the animation's speed is not an integer.
@@ -61,27 +71,12 @@ extern class Sprite extends DisplayObject
 	*/
 	public var spriteSheet:SpriteSheet;
 	
-	private var _advanceCount:Float;
-	
-	private var _animation:Dynamic;
-	
-	private var DisplayObject__tick:Dynamic;
-	
-	private var DisplayObject_cloneProps:Dynamic;
-	
-	private var DisplayObject_draw:Dynamic;
-	
-	private var DisplayObject_getBounds:Dynamic;
-	
-	private var DisplayObject_initialize:Dynamic;
-	
-	public var offset:Float;
-	
 	/**
 	* Advances the <code>currentFrame</code> if paused is not true. This is called automatically when the {{#crossLink "Stage"}}{{/crossLink}}
 	*	ticks.
+	* @param evtObj An event object that will be dispatched to all tick listeners. This object is reused between dispatchers to reduce construction & GC costs.
 	*/
-	//private function _tick():Dynamic;
+	//private function _tick(evtObj:Dynamic):Dynamic;
 	
 	/**
 	* Advances the playhead. This occurs automatically each tick by default.
@@ -91,22 +86,28 @@ extern class Sprite extends DisplayObject
 	public function advance(?time:Float):Dynamic;
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	*	You should not cache Bitmap instances as it can degrade performance.
+	* Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	*	You should not cache Sprite instances as it can degrade performance.
 	*/
 	//public function cache():Dynamic;
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	*	You should not cache Bitmap instances as it can degrade performance.
+	* Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	*	You should not cache Sprite instances as it can degrade performance.
 	*/
 	//public function uncache():Dynamic;
 	
 	/**
-	* Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	*	You should not cache Bitmap instances as it can degrade performance.
+	* Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	*	You should not cache Sprite instances as it can degrade performance.
 	*/
 	//public function updateCache():Dynamic;
+	
+	/**
+	* Constructor alias for backwards compatibility. This method will be removed in future versions.
+	*	Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	*/
+	public function initialize():Dynamic;
 	
 	/**
 	* Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
@@ -117,6 +118,7 @@ extern class Sprite extends DisplayObject
 	*	See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var instance = new createjs.Sprite(spriteSheet);
 	*	     instance.gotoAndStop("frameName");
 	*	
@@ -126,7 +128,7 @@ extern class Sprite extends DisplayObject
 	*	dimensions, and frame data. See {{#crossLink "SpriteSheet"}}{{/crossLink}} for more information.
 	* @param frameOrAnimation The frame number or animation to play initially.
 	*/
-	public function new(spriteSheet:SpriteSheet, frameOrAnimation:Dynamic):Void;
+	public function new(spriteSheet:SpriteSheet, ?frameOrAnimation:Dynamic):Void;
 	
 	/**
 	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
@@ -138,11 +140,6 @@ extern class Sprite extends DisplayObject
 	*	into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
-	
-	/**
-	* Initialization method.
-	*/
-	//private function initialize():Dynamic;
 	
 	/**
 	* Moves the playhead to the specified frame number or animation.
@@ -211,6 +208,6 @@ extern class Sprite extends DisplayObject
 	*/
 	public function stop():Dynamic;
 	
-	//private function cloneProps(o:Text):Dynamic;
+	//private function _cloneProps(o:Sprite):Sprite;
 	
 }

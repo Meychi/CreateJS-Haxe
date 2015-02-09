@@ -68,6 +68,15 @@ extern class Event
 	public var type:String;
 	
 	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
+	
+	/**
 	* Causes the active listener to be removed via removeEventListener();
 	*	
 	*			myBtn.addEventListener("click", function(evt) {
@@ -90,12 +99,10 @@ extern class Event
 	public function new(type:String, bubbles:Bool, cancelable:Bool):Void;
 	
 	/**
-	* Initialization method.
-	* @param type The event type.
-	* @param bubbles Indicates whether the event will bubble through the display list.
-	* @param cancelable Indicates whether the default behaviour of this event can be cancelled.
+	* Provides a chainable shortcut method for setting a number of properties on the instance.
+	* @param props A generic object containing properties to copy to the instance.
 	*/
-	private function initialize(type:String, bubbles:Bool, cancelable:Bool):Dynamic;
+	public function set(props:Dynamic):Event;
 	
 	/**
 	* Returns a clone of the Event instance.
@@ -108,8 +115,9 @@ extern class Event
 	public function toString():String;
 	
 	/**
-	* Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true.
-	*	Mirrors the DOM event standard.
+	* Sets {{#crossLink "Event/defaultPrevented"}}{{/crossLink}} to true if the event is cancelable.
+	*	Mirrors the DOM level 2 event standard. In general, cancelable events that have `preventDefault()` called will
+	*	cancel the default behaviour associated with the event.
 	*/
 	public function preventDefault():Dynamic;
 	

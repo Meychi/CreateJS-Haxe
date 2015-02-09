@@ -1,18 +1,18 @@
 package createjs.easeljs;
 
 /**
-* Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
-*	or can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance to facilitate
-*	chained calls.
+* Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}.
+*	Most methods return the instance to facilitate chained calls.
 *	
 *	<h4>Example</h4>
+*	
 *	     myColorMatrix.adjustHue(20).adjustBrightness(50);
 *	
 *	See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}
 *	for an example of how to use ColorMatrix to change a DisplayObject's color.
 */
 @:native("createjs.ColorMatrix")
-extern class ColorMatrix extends Array
+extern class ColorMatrix
 {
 	/**
 	* Array of delta values for contrast calculations.
@@ -28,6 +28,15 @@ extern class ColorMatrix extends Array
 	* The constant length of a color matrix.
 	*/
 	public static var LENGTH:Float;
+	
+	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
 	
 	/**
 	* Adjusts the brightness of pixel color by adding the specified value to the red, green and blue channels.
@@ -66,16 +75,7 @@ extern class ColorMatrix extends Array
 	* Copy the specified matrix's values to this matrix.
 	* @param matrix An array or ColorMatrix instance.
 	*/
-	public function copyMatrix(matrix:Array<Dynamic>):ColorMatrix;
-	
-	/**
-	* Initialization method.
-	* @param brightness 
-	* @param contrast 
-	* @param saturation 
-	* @param hue 
-	*/
-	private function initialize(brightness:Float, contrast:Float, saturation:Float, hue:Float):Dynamic;
+	public function copy(matrix:Array<Dynamic>):ColorMatrix;
 	
 	/**
 	* Make sure values are within the specified range, hue has a limit of 180, brightness is 255, others are 100.
@@ -91,11 +91,11 @@ extern class ColorMatrix extends Array
 	private function _fixMatrix(matrix:Array<Dynamic>):Dynamic;
 	
 	/**
-	* Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
-	*	or can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance to facilitate
-	*	chained calls.
+	* Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}.
+	*	Most methods return the instance to facilitate chained calls.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     myColorMatrix.adjustHue(20).adjustBrightness(50);
 	*	
 	*	See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}
@@ -106,6 +106,15 @@ extern class ColorMatrix extends Array
 	* @param hue 
 	*/
 	public function new(brightness:Float, contrast:Float, saturation:Float, hue:Float):Void;
+	
+	/**
+	* Resets the instance with the specified values.
+	* @param brightness 
+	* @param contrast 
+	* @param saturation 
+	* @param hue 
+	*/
+	public function setColor(brightness:Float, contrast:Float, saturation:Float, hue:Float):ColorMatrix;
 	
 	/**
 	* Resets the matrix to identity values.
@@ -125,7 +134,7 @@ extern class ColorMatrix extends Array
 	/**
 	* Returns a string representation of this object.
 	*/
-	public override function toString():String;
+	public function toString():String;
 	
 	/**
 	* Shortcut method to adjust brightness, contrast, saturation and hue.

@@ -50,6 +50,11 @@ extern class MovieClip extends Container
 	public var frameBounds:Array<Dynamic>;
 	
 	/**
+	* By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip will cause it to advance based on elapsed time between ticks as appropriate to maintain the target framerate.  For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will vary slightly between frames.  This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+	*/
+	public var framerate:Float;
+	
+	/**
 	* Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED). See each constant for a description of the behaviour.
 	*/
 	public var mode:String;
@@ -78,6 +83,16 @@ extern class MovieClip extends Container
 	* List of display objects that are actively being managed by the MovieClip.
 	*/
 	private var _managed:Dynamic;
+	
+	/**
+	* Returns an array of objects with label and position (aka frame) properties, sorted by position. Shortcut to TweenJS: Timeline.getLabels();
+	*/
+	public var labels:Array<Dynamic>;
+	
+	/**
+	* Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel() for more information.
+	*/
+	public var currentLabel:String;
 	
 	/**
 	* Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
@@ -110,7 +125,12 @@ extern class MovieClip extends Container
 	public static var SINGLE_FRAME:String;
 	
 	/**
-	* The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween instances to the timeline.  <h4>Example</h4>      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);      var mc = new createjs.MovieClip();      mc.timeline.addTween(tween);  Elements can be added and removed from the timeline by toggling an "_off" property using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for frame 1. You can use the "visible" property to achieve the same effect.       var tween = createjs.Tween.get(target).to({_off:false})          .wait(1).to({_off:true})          .wait(1).to({_off:false});
+	* The time remaining from the previous tick, only applicable when .framerate is set.
+	*/
+	private var _t:Float;
+	
+	/**
+	* The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween instances to the timeline.  <h4>Example</h4>       var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);      var mc = new createjs.MovieClip();      mc.timeline.addTween(tween);  Elements can be added and removed from the timeline by toggling an "_off" property using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for frame 1. You can use the "visible" property to achieve the same effect.       var tween = createjs.Tween.get(target).to({_off:false})          .wait(1).to({_off:true})          .wait(1).to({_off:false});
 	*/
 	public var timeline:Timeline;
 	
@@ -125,16 +145,18 @@ extern class MovieClip extends Container
 	
 	private var _synchOffset:Float;
 	
-	private var Container__tick:Dynamic;
-	
-	private var Container_draw:Dynamic;
-	
 	/**
 	* Adds a child to the timeline, and sets it up as a managed child.
 	* @param child The child MovieClip to manage
 	* @param offset 
 	*/
 	private function _addManagedChild(child:MovieClip, offset:Float):Dynamic;
+	
+	/**
+	* Advances the playhead. This occurs automatically each tick by default.
+	* @param time The amount of time in ms to advance by. Only applicable if framerate is set.
+	*/
+	public function advance(?time:Float):Dynamic;
 	
 	/**
 	* Advances this movie clip to the specified position or label and sets paused to false.
@@ -149,6 +171,12 @@ extern class MovieClip extends Container
 	public function gotoAndStop(positionOrLabel:Dynamic):Dynamic;
 	
 	/**
+	* Constructor alias for backwards compatibility. This method will be removed in future versions.
+	*	Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	*/
+	//public function initialize():Dynamic;
+	
+	/**
 	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
@@ -160,36 +188,14 @@ extern class MovieClip extends Container
 	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Dynamic;
 	
 	/**
-	* Initialization method called by the constructor.
-	* @param mode Initial value for the mode property. One of MovieClip.INDEPENDENT,
-	*	MovieClip.SINGLE_FRAME, or MovieClip.SYNCHED. The default is MovieClip.INDEPENDENT.
-	* @param startPosition Initial value for the startPosition property.
-	* @param loop Initial value for the loop property. The default is true.
-	* @param labels A hash of labels to pass to the timeline instance associated with this MovieClip.
-	*	Labels only need to be passed if they need to be used.
-	*/
-	//private function initialize(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic):Dynamic;
-	
-	/**
 	* MovieClip instances cannot be cloned.
 	*/
 	//public function clone():Dynamic;
 	
 	/**
-	* Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
-	*/
-	public function getLabels():Array<Object>;
-	
-	/**
 	* Returns a string representation of this object.
 	*/
 	//public function toString():String;
-	
-	/**
-	* Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	*	for more information.
-	*/
-	public function getCurrentLabel():String;
 	
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -255,9 +261,19 @@ extern class MovieClip extends Container
 	*/
 	public function new(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic):Void;
 	
+	/**
+	* Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
+	*/
+	public function getCurrentLabel():String;
+	
+	/**
+	* Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.
+	*/
+	public function getLabels():Array<Dynamic>;
+	
 	//private function _getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
 	
-	//private function _tick(params:Array<Dynamic>):Dynamic;
+	//private function _tick(evtObj:Dynamic):Dynamic;
 	
 	private function _goto(positionOrLabel:Dynamic):Dynamic;
 	
@@ -266,7 +282,5 @@ extern class MovieClip extends Container
 	private function _setState(state:Array<Dynamic>, offset:Float):Dynamic;
 	
 	private function _updateTimeline():Dynamic;
-	
-	private function Container__getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
 	
 }

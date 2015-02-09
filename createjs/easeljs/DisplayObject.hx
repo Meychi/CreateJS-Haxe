@@ -59,6 +59,11 @@ extern class DisplayObject extends EventDispatcher
 	public var tickEnabled:Bool;
 	
 	/**
+	* If set, defines the transformation for this display object, overriding all other transformation properties (x, y, rotation, scale, skew).
+	*/
+	public var transformMatrix:Matrix2D;
+	
+	/**
 	* Indicates whether the display object should be drawn to a whole pixel when {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
 	*/
 	public var snapToPixel:Bool;
@@ -82,6 +87,11 @@ extern class DisplayObject extends EventDispatcher
 	* Returns an ID number that uniquely identifies the current cache for this display object. This can be used to determine if the cache has changed since a previous check.
 	*/
 	public var cacheID:Float;
+	
+	/**
+	* Returns the Stage instance that this display object will be rendered on, or null if it has not been added to one.
+	*/
+	public var stage:Stage;
 	
 	/**
 	* Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}} with cross domain content.
@@ -155,7 +165,11 @@ extern class DisplayObject extends EventDispatcher
 	
 	private var _cacheScale:Float;
 	
-	private var _matrix:Matrix2D;
+	private var _filterOffsetX:Float;
+	
+	private var _filterOffsetY:Float;
+	
+	private var _props:DisplayObject;
 	
 	private var _rectangle:Rectangle;
 	
@@ -247,14 +261,22 @@ extern class DisplayObject extends EventDispatcher
 	public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
 	
 	/**
-	* Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
+	* Generates a DisplayProps object representing the combined display properties of the  object and all of its
+	*	parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}).
+	* @param props A {{#crossLink "DisplayProps"}}{{/crossLink}} object to populate with the calculated values.
+	*	If null, a new DisplayProps object is returned.
+	*/
+	public function getConcatenatedDisplayProps(?props:DisplayProps):DisplayProps;
+	
+	/**
+	* Generates a Matrix2D object representing the combined transform of the display object and all of its
 	*	parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}). This can
 	*	be used to transform positions between coordinate spaces, such as with {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
 	*	and {{#crossLink "DisplayObject/globalToLocal"}}{{/crossLink}}.
-	* @param mtx A {{#crossLink "Matrix2D"}}{{/crossLink}} object to populate with the calculated values.
+	* @param matrix A {{#crossLink "Matrix2D"}}{{/crossLink}} object to populate with the calculated values.
 	*	If null, a new Matrix2D object is returned.
 	*/
-	public function getConcatenatedMatrix(?mtx:Matrix2D):Matrix2D;
+	public function getConcatenatedMatrix(?matrix:Matrix2D):Matrix2D;
 	
 	/**
 	* Indicates whether the display object has any mouse event listeners or a cursor.
@@ -262,18 +284,12 @@ extern class DisplayObject extends EventDispatcher
 	private function _isMouseOpaque():Bool;
 	
 	/**
-	* Initialization method.
-	*/
-	private function initialize():Dynamic;
-	
-	/**
-	* Provides a chainable shortcut method for setting a number of properties on a DisplayObject instance.
+	* Provides a chainable shortcut method for setting a number of properties on the instance.
 	*	
 	*	<h4>Example</h4>
 	*	
 	*	     var myGraphics = new createjs.Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
-	*	     var shape = stage.addChild(new Shape())
-	*	         .set({graphics:myGraphics, x:100, y:100, alpha:0.5});
+	*	     var shape = stage.addChild(new Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
 	* @param props A generic object containing properties to copy to the DisplayObject instance.
 	*/
 	public function set(props:Dynamic):DisplayObject;
@@ -299,7 +315,8 @@ extern class DisplayObject extends EventDispatcher
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
-	*	reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
+	*	reverted to their defaults (for example .parent). Caches are not maintained across clones, and some elements
+	*	are copied by reference (masks, individual filter instances, hit area)
 	*/
 	public function clone():DisplayObject;
 	
@@ -310,11 +327,11 @@ extern class DisplayObject extends EventDispatcher
 	public function getCacheDataURL():String;
 	
 	/**
-	* Returns a matrix based on this object's transform.
+	* Returns a matrix based on this object's current transform.
 	* @param matrix Optional. A Matrix2D object to populate with the calculated values. If null, a new
 	*	Matrix object is returned.
 	*/
-	public function getMatrix(?matrix:Matrix2D):Matrix2D;
+	public function getMatrix(matrix:Matrix2D):Matrix2D;
 	
 	/**
 	* Returns a rectangle representing this object's bounds in its local coordinate system (ie. with no transformation).
@@ -391,11 +408,6 @@ extern class DisplayObject extends EventDispatcher
 	public override function toString():String;
 	
 	/**
-	* Returns the stage that this display object will be rendered on, or null if it has not been added to one.
-	*/
-	public function getStage():Stage;
-	
-	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	*	This does not account for whether it would be visible within the boundaries of the stage.
 	*	
@@ -423,9 +435,8 @@ extern class DisplayObject extends EventDispatcher
 	public function setTransform(?x:Float, ?y:Float, ?scaleX:Float, ?scaleY:Float, ?rotation:Float, ?skewX:Float, ?skewY:Float, ?regX:Float, ?regY:Float):DisplayObject;
 	
 	/**
-	* Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
-	*	the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
-	*	transform properties including regX/Y.
+	* Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
+	*	the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
 	*	
 	*	<h4>Example</h4>
 	*	
@@ -455,8 +466,9 @@ extern class DisplayObject extends EventDispatcher
 	*	     // Results in x=400, y=300
 	* @param x The x position in the source display object to transform.
 	* @param y The y position in the source display object to transform.
+	* @param pt An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
 	*/
-	public function localToGlobal(x:Float, y:Float):Point;
+	public function localToGlobal(x:Float, y:Float, ?pt:Dynamic):Point;
 	
 	/**
 	* Transforms the specified x and y position from the coordinate space of this display object to the coordinate
@@ -469,8 +481,9 @@ extern class DisplayObject extends EventDispatcher
 	* @param x The x position in the source display object to transform.
 	* @param y The y position on the source display object to transform.
 	* @param target The target display object to which the coordinates will be transformed.
+	* @param pt An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
 	*/
-	public function localToLocal(x:Float, y:Float, target:DisplayObject):Point;
+	public function localToLocal(x:Float, y:Float, target:DisplayObject, ?pt:Dynamic):Point;
 	
 	/**
 	* Transforms the specified x and y position from the global (stage) coordinate space to the
@@ -487,23 +500,29 @@ extern class DisplayObject extends EventDispatcher
 	*	     // Results in x=-200, y=-100
 	* @param x The x position on the stage to transform.
 	* @param y The y position on the stage to transform.
+	* @param pt An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
 	*/
-	public function globalToLocal(x:Float, y:Float):Point;
+	public function globalToLocal(x:Float, y:Float, ?pt:Dynamic):Point;
 	
-	private function _applyFilterBounds(x:Float, y:Float, width:Float, height:Float):Rectangle;
+	/**
+	* Use the {{#crossLink "DisplayObject/stage:property"}}{{/crossLink}} property instead.
+	*/
+	public function getStage():Stage;
 	
 	private function _applyFilters():Dynamic;
 	
 	private function _applyShadow(ctx:CanvasRenderingContext2D, shadow:Shadow):Dynamic;
 	
+	private function _cloneProps(o:DisplayObject):DisplayObject;
+	
 	private function _getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
+	
+	private function _getFilterBounds():Rectangle;
 	
 	private function _testHit(ctx:CanvasRenderingContext2D):Bool;
 	
-	private function _tick(params:Array<Dynamic>):Dynamic;
+	private function _tick(evtObj:Dynamic):Dynamic;
 	
 	private function _transformBounds(bounds:Rectangle, matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
-	
-	private function cloneProps(o:DisplayObject):Dynamic;
 	
 }

@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Image;
 
 /**
 * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
@@ -45,7 +44,7 @@ extern class SpriteSheetUtils
 	* @param alphaImage The image (or canvas) containing the alpha channel to use.
 	* @param canvas Optional. If specified, this canvas will be used and returned. If not, a new canvas will be created.
 	*/
-	public static function mergeAlpha(rbgImage:Image, alphaImage:Image, canvas:Canvas):Canvas;
+	public static function mergeAlpha(rbgImage:HTMLImageElement, alphaImage:HTMLImageElement, canvas:HTMLCanvasElement):HTMLCanvasElement;
 	
 	/**
 	* Returns a single frame of the specified sprite sheet as a new PNG image. An example of when this may be useful is
@@ -61,6 +60,6 @@ extern class SpriteSheetUtils
 	* @param frameOrAnimation The frame number or animation name to extract. If an animation
 	*	name is specified, only the first frame of the animation will be extracted.
 	*/
-	public static function extractFrame(spriteSheet:Image, frameOrAnimation:Dynamic):Image;
+	public static function extractFrame(spriteSheet:SpriteSheet, frameOrAnimation:Dynamic):HTMLImageElement;
 	
 }

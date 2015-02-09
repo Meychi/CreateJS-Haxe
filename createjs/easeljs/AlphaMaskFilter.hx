@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Image;
 
 /**
 * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -33,7 +32,7 @@ extern class AlphaMaskFilter extends Filter
 	/**
 	* The image (or canvas) to use as the mask.
 	*/
-	public var mask:Image;
+	public var mask:Dynamic;
 	
 	/**
 	* Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
@@ -60,7 +59,7 @@ extern class AlphaMaskFilter extends Filter
 	*	See {{#crossLink "Filter"}}{{/crossLink}} for more information on applying filters.
 	* @param mask 
 	*/
-	public function new(mask:Image):Void;
+	public function new(mask:Dynamic):Void;
 	
 	/**
 	* Applies the filter to the specified context.
@@ -72,15 +71,10 @@ extern class AlphaMaskFilter extends Filter
 	* @param y The y position to use for the source rect.
 	* @param width The width to use for the source rect.
 	* @param height The height to use for the source rect.
-	* @param targetCtx The 2D context to draw the result to. Defaults to the context passed to ctx.
-	* @param targetX The x position to draw the result to. Defaults to the value passed to x.
-	* @param targetY The y position to draw the result to. Defaults to the value passed to y.
+	* @param targetCtx NOT SUPPORTED IN THIS FILTER. The 2D context to draw the result to. Defaults to the context passed to ctx.
+	* @param targetX NOT SUPPORTED IN THIS FILTER. The x position to draw the result to. Defaults to the value passed to x.
+	* @param targetY NOT SUPPORTED IN THIS FILTER. The y position to draw the result to. Defaults to the value passed to y.
 	*/
 	//public function applyFilter(ctx:CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float):Bool;
-	
-	/**
-	* Returns a clone of this object.
-	*/
-	//public function clone():AlphaMaskFilter;
 	
 }

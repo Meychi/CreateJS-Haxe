@@ -41,12 +41,6 @@ extern class DOMElement extends DisplayObject
 	
 	private var _oldMtx:Matrix2D;
 	
-	private var _visible:Bool;
-	
-	private var DisplayObject__tick:Dynamic;
-	
-	private var DisplayObject_initialize:Dynamic;
-	
 	/**
 	* <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>
 	*	
@@ -92,12 +86,6 @@ extern class DOMElement extends DisplayObject
 	*	into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ignoreCache:Bool):Bool;
-	
-	/**
-	* Initialization method.
-	* @param htmlElement A reference or id for the DOM element to manage.
-	*/
-	//private function initialize(htmlElement:Element):Dynamic;
 	
 	/**
 	* Not applicable to DOMElement.
@@ -146,7 +134,7 @@ extern class DOMElement extends DisplayObject
 	*/
 	//public function isVisible():Bool;
 	
-	//private function _tick(params:Array<Dynamic>):Dynamic;
+	//private function _tick(evtObj:Dynamic):Dynamic;
 	
 	private function _handleDrawEnd(evt:Event):Dynamic;
 	

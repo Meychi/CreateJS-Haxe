@@ -1,7 +1,5 @@
 package createjs.tweenjs;
 
-import createjs.EventDispatcher;
-
 /**
 * A Tween instance tweens properties for a single target. Instance methods can be chained for easy construction and sequencing:
 *	
@@ -40,7 +38,7 @@ extern class Tween extends EventDispatcher
 	public var pluginData:Dynamic;
 	
 	/**
-	* Causes this tween to continue playing when a global pause is active. For example, if TweenJS is using Ticker, then setting this to true (the default) will cause this tween to be paused when <code>Ticker.setPaused(true)</code> is called. See Tween.tick() for more info. Can be set via the props param.
+	* Causes this tween to continue playing when a global pause is active. For example, if TweenJS is using {{#crossLink "Ticker"}}{{/crossLink}}, then setting this to true (the default) will cause this tween to be paused when <code>Ticker.setPaused(true)</code> is called. See the Tween {{#crossLink "Tween/tick"}}{{/crossLink}} method for more info. Can be set via the props parameter.
 	*/
 	public var ignoreGlobalPause:Bool;
 	
@@ -120,7 +118,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _useTicks:Bool;
 	
-	public static var _tweens:Array<Tween>;
+	//public static var _listeners:Array<Tween>;
 	
 	public static var _plugins:Dynamic;
 	
@@ -157,7 +155,7 @@ extern class Tween extends EventDispatcher
 	*	All properties default to false. Supported props are:<UL>
 	*	   <LI> loop: sets the loop property on this tween.</LI>
 	*	   <LI> useTicks: uses ticks for all durations instead of milliseconds.</LI>
-	*	   <LI> ignoreGlobalPause: sets the ignoreGlobalPause property on this tween.</LI>
+	*	   <LI> ignoreGlobalPause: sets the {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}} property on this tween.</LI>
 	*	   <LI> override: if true, `Tween.removeTweens(target)` will be called to remove any other tweens with the same target.
 	*	   <LI> paused: indicates whether to start the tween paused.</LI>
 	*	   <LI> position: indicates the initial position for this tween.</LI>
@@ -169,14 +167,12 @@ extern class Tween extends EventDispatcher
 	public function new(target:Dynamic, ?props:Dynamic, ?pluginData:Dynamic):Void;
 	
 	/**
-	* Advances all tweens. This typically uses the Ticker class (available in the EaselJS library), but you can call it
+	* Advances all tweens. This typically uses the {{#crossLink "Ticker"}}{{/crossLink}} class, but you can call it
 	*	manually if you prefer to use your own "heartbeat" implementation.
-	*	
-	*	Note: Currently, EaselJS must be included <em>before</em> TweenJS to ensure Ticker exists during initialization.
 	* @param delta The change in time in milliseconds since the last tick. Required unless all tweens have
 	*	<code>useTicks</code> set to true.
-	* @param paused Indicates whether a global pause is in effect. Tweens with <code>ignoreGlobalPause</code>
-	*	will ignore this, but all others will pause if this is true.
+	* @param paused Indicates whether a global pause is in effect. Tweens with {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}}
+	*	will ignore this, but all others will pause if this is `true`.
 	*/
 	public static function tick(delta:Float, paused:Bool):Dynamic;
 	
@@ -192,7 +188,8 @@ extern class Tween extends EventDispatcher
 	
 	/**
 	* Advances this tween by the specified amount of time in milliseconds (or ticks if <code>useTicks</code> is true).
-	*	This is normally called automatically by the Tween engine (via <code>Tween.tick</code>), but is exposed for advanced uses.
+	*	This is normally called automatically by the Tween engine (via <code>Tween.tick</code>), but is exposed for
+	*	advanced uses.
 	* @param delta The time to advance in milliseconds (or ticks if <code>useTicks</code> is true).
 	*/
 	//public function tick(delta:Float):Dynamic;
@@ -200,7 +197,8 @@ extern class Tween extends EventDispatcher
 	/**
 	* Handle events that result from Tween being used as an event handler. This is included to allow Tween to handle
 	*	tick events from <code>createjs.Ticker</code>. No other events are handled in Tween.
-	* @param event An event object passed in by the EventDispatcher. Will usually be of type "tick".
+	* @param event An event object passed in by the {{#crossLink "EventDispatcher"}}{{/crossLink}}. Will
+	*	usually be of type "tick".
 	*/
 	private static function handleEvent(event:Dynamic):Dynamic;
 	
@@ -212,8 +210,8 @@ extern class Tween extends EventDispatcher
 	public static function hasActiveTweens(?target:Dynamic):Bool;
 	
 	/**
-	* Installs a plugin, which can modify how certain properties are handled when tweened. See the CSSPlugin for an
-	*	example of how to write TweenJS plugins.
+	* Installs a plugin, which can modify how certain properties are handled when tweened. See the {{#crossLink "CSSPlugin"}}{{/crossLink}}
+	*	for an example of how to write TweenJS plugins.
 	* @param plugin The plugin class to install
 	* @param properties An array of properties that the plugin will handle.
 	*/
@@ -257,24 +255,24 @@ extern class Tween extends EventDispatcher
 	public function call(_callback:Dynamic, ?params:Array<Dynamic>, ?scope:Dynamic):Tween;
 	
 	/**
-	* Queues an action to set the specified props on the specified target. If target is null, it will use this tween's
-	*	target.
-	* @param props The properties to set (ex. <code>{visible:false}</code>).
-	* @param target Optional. The target to set the properties on. If omitted, they will be set on the tween's target.
-	*/
-	public function set(props:Dynamic, ?target:Dynamic):Tween;
-	
-	/**
-	* Queues an action to to pause the specified tween.
+	* Queues an action to pause the specified tween.
 	* @param tween The tween to play. If null, it pauses this tween.
 	*/
 	public function pause(tween:Tween):Tween;
 	
 	/**
-	* Queues an action to to play (unpause) the specified tween. This enables you to sequence multiple tweens.
+	* Queues an action to play (unpause) the specified tween. This enables you to sequence multiple tweens.
 	* @param tween The tween to play.
 	*/
 	public function play(tween:Tween):Tween;
+	
+	/**
+	* Queues an action to set the specified props on the specified target. If target is null, it will use this tween's
+	*	target.
+	* @param props The properties to set (ex. <code>{visible:false}</code>).
+	* @param target Optional. The target to set the properties on. If omitted, they will be set on the tween's target.
+	*/
+	public function set(props:Dynamic, target:Dynamic):Tween;
 	
 	/**
 	* Registers or unregisters a tween with the ticking system.
@@ -298,7 +296,7 @@ extern class Tween extends EventDispatcher
 	*	All properties default to false. Supported props are:<UL>
 	*	   <LI> loop: sets the loop property on this tween.</LI>
 	*	   <LI> useTicks: uses ticks for all durations instead of milliseconds.</LI>
-	*	   <LI> ignoreGlobalPause: sets the ignoreGlobalPause property on this tween.</LI>
+	*	   <LI> ignoreGlobalPause: sets the {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}} property on this tween.</LI>
 	*	   <LI> override: if true, Tween.removeTweens(target) will be called to remove any other tweens with the same target.
 	*	   <LI> paused: indicates whether to start the tween paused.</LI>
 	*	   <LI> position: indicates the initial position for this tween.</LI>
@@ -336,7 +334,5 @@ extern class Tween extends EventDispatcher
 	private function _updateTargetProps(step:Dynamic, ratio:Float):Dynamic;
 	
 	private function clone():Dynamic;
-	
-	private function initialize(target:Dynamic, props:Dynamic, pluginData:Dynamic):Dynamic;
 	
 }

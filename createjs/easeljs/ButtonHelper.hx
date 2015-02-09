@@ -59,36 +59,18 @@ extern class ButtonHelper
 	private var _isPressed:Bool;
 	
 	/**
-	* Enables or disables the button functionality on the target.
-	* @param value 
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
 	*/
-	public function setEnabled(value:Bool):Dynamic;
-	
-	/**
-	* Initialization method.
-	* @param target The instance to manage.
-	* @param outLabel The label or animation to go to when the user rolls out of the button.
-	* @param overLabel The label or animation to go to when the user rolls over the button.
-	* @param downLabel The label or animation to go to when the user presses the button.
-	* @param play If the helper should call "gotoAndPlay" or "gotoAndStop" on the button when changing
-	*	states.
-	* @param hitArea An optional item to use as the hit state for the button. If this is not defined,
-	*	then the button's visible states will be used instead. Note that the same instance as the "target" argument can be
-	*	used for the hitState.
-	* @param hitLabel The label or animation on the hitArea instance that defines the hitArea bounds. If this is
-	*	null, then the default state of the hitArea will be used.
-	*/
-	private function initialize(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:DisplayObject, ?hitLabel:String):Dynamic;
+	private function initialize():Dynamic;
 	
 	/**
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;
-	
-	/**
-	* Returns enabled state of this instance.
-	*/
-	public function getEnabled():Bool;
 	
 	/**
 	* The ButtonHelper is a helper class to create interactive buttons from {{#crossLink "MovieClip"}}{{/crossLink}} or
@@ -121,6 +103,17 @@ extern class ButtonHelper
 	*	null, then the default state of the hitArea will be used. *
 	*/
 	public function new(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:DisplayObject, ?hitLabel:String):Void;
+	
+	/**
+	* Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
+	* @param value 
+	*/
+	public function setEnabled(value:Bool):Dynamic;
+	
+	/**
+	* Use the {{#crossLink "ButtonHelper/enabled:property"}}{{/crossLink}} property instead.
+	*/
+	public function getEnabled():Bool;
 	
 	private function handleEvent(evt:Dynamic):Dynamic;
 	

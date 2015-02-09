@@ -1,32 +1,63 @@
 package createjs.easeljs;
 
+import createjs.easeljs.graphics.BeginPath;
+import createjs.easeljs.graphics.Fill;
+import createjs.easeljs.graphics.Stroke;
+import createjs.easeljs.graphics.StrokeDash;
+import createjs.easeljs.graphics.StrokeStyle;
 import js.html.CanvasRenderingContext2D;
 
 /**
 * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
-*	specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "DisplayObject/draw"}}{{/crossLink}}
+*	specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
 *	directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
-*	context of an Easel display list.
+*	context of an EaselJS display list.
 *	
-*	<h4>Example</h4>
+*	There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
+*	instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
+*	The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
+*	
 *	     var g = new createjs.Graphics();
-*		    g.setStrokeStyle(1);
-*		    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
-*		    g.beginFill(createjs.Graphics.getRGB(255,0,0));
-*		    g.drawCircle(0,0,3);
+*	     g.setStrokeStyle(1);
+*	     g.beginStroke("#000000");
+*	     g.beginFill("red");
+*	     g.drawCircle(0,0,30);
 *	
-*		    var s = new createjs.Shape(g);
-*		    	s.x = 100;
-*		    	s.y = 100;
+*	All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+*	the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
 *	
-*		    stage.addChild(s);
-*		    stage.update();
+*	     myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
 *	
-*	Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
-*	the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then
-*	render it to the specified context2D:
+*	Each graphics API call generates a command object (see below). The last command to be created can be accessed via
+*	{{#crossLink "Graphics/command:property"}}{{/crossLink}}:
 *	
-*	     myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+*	     var fillCommand = myGraphics.beginFill("red").command;
+*	     // ... later, update the fill style/color:
+*	     fillCommand.style = "blue";
+*	     // or change it to a bitmap fill:
+*	     fillCommand.bitmap(myImage);
+*	
+*	For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
+*	need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
+*	
+*	     // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+*	     myGraphics.append(createjs.Graphics.beginCmd);
+*	     // we need to define the path before applying the fill:
+*	     var circle = new createjs.Graphics.Circle(0,0,30);
+*	     myGraphics.append(circle);
+*	     // fill the path we just defined:
+*	     var fill = new createjs.Graphics.Fill("red");
+*	     myGraphics.append(fill);
+*	
+*	These approaches can be used together, for example to insert a custom command:
+*	
+*	     myGraphics.beginFill("red");
+*	     var customCommand = new CustomSpiralCommand(etc);
+*	     myGraphics.append(customCommand);
+*	     myGraphics.beginFill("blue");
+*	     myGraphics.drawCircle(0, 0, 30);
+*	
+*	See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
 *	
 *	<h4>Tiny API</h4>
 *	The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
@@ -49,7 +80,7 @@ import js.html.CanvasRenderingContext2D;
 *	    <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
 *	    <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
 *	    <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
-*	    <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+*	    <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
 *	    <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
 *	    <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
 *	    <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
@@ -66,15 +97,30 @@ import js.html.CanvasRenderingContext2D;
 *	
 *	Here is the above example, using the tiny API instead.
 *	
-*	     myGraphics.s("#F00").f("#00F").r(20, 20, 100, 50).draw(myContext2D);
+*	     myGraphics.s("red").f("blue").r(20, 20, 100, 50);
 */
 @:native("createjs.Graphics")
 extern class Graphics
 {
 	/**
-	* Exposes the Command class used internally by Graphics. Useful for extending the Graphics class or injecting functionality.
+	* A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid unnecessary instantiation.
 	*/
-	public static var Command:Dynamic;
+	public static var beginCmd:BeginPath;
+	
+	/**
+	* Holds a reference to the last command that was created or appended. For example, you could retain a reference to a Fill command in order to dynamically update the color later by using: 		myFill = myGraphics.beginFill("red").command; 		// update color later: 		myFill.style = "yellow";
+	*/
+	public var command:Dynamic;
+	
+	/**
+	* Index to draw from if a store operation has happened.
+	*/
+	private var _storeIndex:Float;
+	
+	/**
+	* Indicates the last instruction index that was committed.
+	*/
+	private var _commitIndex:Float;
 	
 	/**
 	* Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
@@ -91,33 +137,72 @@ extern class Graphics
 	*/
 	public static var STROKE_JOINTS_MAP:Array<Dynamic>;
 	
-	private var _active:Bool;
+	/**
+	* Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect) Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.  This property is mainly intended for introspection of the instructions (ex. for graphics export).
+	*/
+	public var instructions:Array<Dynamic>;
 	
-	private var _activeInstructions:Array<Dynamic>;
-	
+	/**
+	* This indicates that there have been changes to the activeInstruction list since the last updateInstructions call.
+	*/
 	private var _dirty:Bool;
 	
-	private var _fillInstructions:Array<Dynamic>;
+	/**
+	* Uncommitted instructions.
+	*/
+	private var _activeInstructions:Array<Dynamic>;
+	
+	private var _fill:Fill;
 	
 	private var _instructions:Array<Dynamic>;
 	
-	private var _oldInstructions:Array<Dynamic>;
+	private var _oldStrokeDash:StrokeDash;
+	
+	private var _oldStrokeStyle:StrokeStyle;
+	
+	private var _stroke:Stroke;
+	
+	private var _strokeDash:StrokeDash;
 	
 	private var _strokeIgnoreScale:Bool;
 	
-	private var _strokeInstructions:Array<Dynamic>;
-	
-	private var _strokeMatrix:Array<Dynamic>;
-	
-	private var _strokeStyleInstructions:Array<Dynamic>;
+	private var _strokeStyle:StrokeStyle;
 	
 	public static var _ctx:CanvasRenderingContext2D;
 	
-	public static var beginCmd:Command;
+	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
 	
-	public static var fillCmd:Command;
-	
-	public static var strokeCmd:Command;
+	/**
+	* Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
+	*	that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
+	*	{{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
+	*	
+	*	This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
+	*	built-in or custom graphics commands. For example:
+	*	
+	*			// attach data to our shape, so we can access it during the draw:
+	*			myShape.color = "red";
+	*	
+	*			// append a Circle command object:
+	*			myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	*	
+	*			// append a custom command object with an exec method that sets the fill style
+	*			// based on the shape's data, and then fills the circle.
+	*			myShape.graphics.append({exec:function(ctx, shape) {
+	*				ctx.fillStyle = shape.color;
+	*				ctx.fill();
+	*			}});
+	* @param command A graphics command object exposing an "exec" method.
+	* @param clean The clean param is primarily for internal use. A value of true indicates that a command does not generate a path that should be stroked or filled.
+	*/
+	public function append(command:Dynamic, clean:Bool):Graphics;
 	
 	/**
 	* Begins a fill with the specified color. This ends the current sub-path. A tiny API method "f" also exists.
@@ -169,7 +254,7 @@ extern class Graphics
 	* Begins a pattern fill using the specified image. This ends the current sub-path. A tiny API method "bf" also
 	*	exists.
 	* @param image The Image, Canvas, or Video object to use
-	*	as the pattern.
+	*	as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
 	*	"repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
 	*	"repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
@@ -183,7 +268,7 @@ extern class Graphics
 	*	strokes do not currently support a matrix parameter due to limitations in the canvas API. A tiny API method "bs"
 	*	also exists.
 	* @param image The Image, Canvas, or Video object to use
-	*	as the pattern.
+	*	as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of
 	*	"repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
 	*/
@@ -336,17 +421,6 @@ extern class Graphics
 	public function lineTo(x:Float, y:Float):Graphics;
 	
 	/**
-	* Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
-	*	information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
-	*	whatwg spec</a>. A tiny API method "qt" also exists.
-	* @param cpx 
-	* @param cpy 
-	* @param x 
-	* @param y 
-	*/
-	public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
-	
-	/**
 	* Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
 	*	For detailed information, read the
 	*	<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-rect">
@@ -447,7 +521,9 @@ extern class Graphics
 	
 	/**
 	* Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
-	*	stroke descriptions. Used by <code>DisplayObject.clippingPath</code> to draw the clipping path, for example.
+	*	stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
+	*	
+	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param ctx The canvas 2D context object to draw into.
 	*/
 	public function drawAsPath(ctx:CanvasRenderingContext2D):Dynamic;
@@ -458,8 +534,9 @@ extern class Graphics
 	*	
 	*	NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	* @param ctx The canvas 2D context object to draw into.
+	* @param data Optional data that is passed to graphics command exec methods. When called from a Shape instance, the shape passes itself as the data parameter. This can be used by custom graphic commands to insert contextual data.
 	*/
-	public function draw(ctx:CanvasRenderingContext2D):Dynamic;
+	public function draw(ctx:CanvasRenderingContext2D, data:Dynamic):Dynamic;
 	
 	/**
 	* Ends the current sub-path, and begins a new one with no fill. Functionally identical to <code>beginFill(null)</code>.
@@ -474,19 +551,22 @@ extern class Graphics
 	public function endStroke():Graphics;
 	
 	/**
-	* Initialization method.
-	*/
-	private function initialize():Dynamic;
-	
-	/**
 	* Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	*	method.
+	* @param cpx 
+	* @param cpy 
+	* @param x 
+	* @param y 
 	*/
-	public function curveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
+	public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
 	
 	/**
 	* Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
-	*	method.
+	*	 method.
+	* @param x 
+	* @param y 
+	* @param w Width of the rectangle
+	* @param h Height of the rectangle
 	*/
 	public function drawRect(x:Float, y:Float, w:Float, h:Float):Graphics;
 	
@@ -498,44 +578,12 @@ extern class Graphics
 	public function moveTo(x:Float, y:Float):Graphics;
 	
 	/**
-	* Provides a method for injecting arbitrary Context2D (aka Canvas) API calls into a Graphics queue. The specified
-	*	callback function will be called in sequence with other drawing instructions. The callback will be executed in the
-	*	scope of the target canvas's Context2D object, and will be passed the data object as a parameter.
-	*	
-	*	This is an advanced feature. It can allow for powerful functionality, like injecting output from tools that
-	*	export Context2D instructions, executing raw canvas calls within the context of the display list, or dynamically
-	*	modifying colors or stroke styles within a Graphics instance over time, but it is not intended for general use.
-	*	
-	*	Within a Graphics queue, each path begins by applying the fill and stroke styles and settings, followed by
-	*	drawing instructions, followed by the fill() and/or stroke() commands. This means that within a path, inject() can
-	*	update the fill & stroke styles, but for it to be applied in a predictable manner, you must have begun a fill or
-	*	stroke (as appropriate) normally via the Graphics API. For example:
-	*	
-	*		function setColor(color) {
-	*			this.fillStyle = color;
-	*		}
-	*	
-	*		// this will not draw anything - no fill was begun, so fill() is not called:
-	*		myGraphics.inject(setColor, "red").drawRect(0,0,100,100);
-	*	
-	*		// this will draw the rect in green:
-	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100);
-	*	
-	*		// this will draw both rects in blue, because there is only a single path
-	*		// so the second inject overwrites the first:
-	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	*			.inject(setColor, "blue").drawRect(100,0,100,100);
-	*	
-	*		// this will draw the first rect in green, and the second in blue:
-	*		myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	*			.beginFill("#000").inject(setColor, "blue").drawRect(100,0,100,100);
-	* @param callback The function to execute.
-	* @param data Arbitrary data that will be passed to the callback when it is executed.
+	* Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
 	*/
-	public function inject(_callback:Dynamic, data:Dynamic):Graphics;
+	public function inject():Dynamic;
 	
 	/**
-	* Returns a clone of this Graphics instance.
+	* Returns a clone of this Graphics instance. Note that the individual command objects are not cloned.
 	*/
 	public function clone():Graphics;
 	
@@ -582,10 +630,23 @@ extern class Graphics
 	public function isEmpty():Bool;
 	
 	/**
-	* Sets the stroke style for the current sub-path. Like all drawing methods, this can be chained, so you can define
+	* Sets or clears the stroke dash pattern.
+	*	
+	*		myGraphics.setStrokeDash([20, 10], 0);
+	*	
+	*	A tiny API method `sd` also exists.
+	* @param segments An array specifying the dash pattern, alternating between line and gap.
+	*	For example, `[20,10]` would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	*	Passing null or an empty array will clear the existing stroke dash.
+	* @param offset The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	*/
+	public function setStrokeDash(?segments:Array<Dynamic>, ?offset:Float):Graphics;
+	
+	/**
+	* Sets the stroke style. Like all drawing methods, this can be chained, so you can define
 	*	the stroke style and color in a single line of code like so:
 	*	
-	*	     myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+	*		myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	*	
 	*	A tiny API method "ss" also exists.
 	* @param thickness The width of the stroke.
@@ -603,30 +664,363 @@ extern class Graphics
 	public function setStrokeStyle(thickness:Float, ?caps:Dynamic, ?joints:Dynamic, ?miterLimit:Float, ?ignoreScale:Bool):Graphics;
 	
 	/**
+	* Shortcut to arc.
+	* @param x 
+	* @param y 
+	* @param radius 
+	* @param startAngle Measured in radians.
+	* @param endAngle Measured in radians.
+	* @param anticlockwise 
+	*/
+	private function a(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, anticlockwise:Bool):Graphics;
+	
+	/**
+	* Shortcut to arcTo.
+	* @param x1 
+	* @param y1 
+	* @param x2 
+	* @param y2 
+	* @param radius 
+	*/
+	private function at(x1:Float, y1:Float, x2:Float, y2:Float, radius:Float):Graphics;
+	
+	/**
+	* Shortcut to beginBitmapFill.
+	* @param image The Image, Canvas, or Video object to use
+	*	as the pattern.
+	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
+	*	"repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
+	*	"repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
+	* @param matrix Optional. Specifies a transformation matrix for the bitmap fill. This transformation
+	*	will be applied relative to the parent transform.
+	*/
+	private function bf(image:Dynamic, repetition:String, matrix:Matrix2D):Graphics;
+	
+	/**
+	* Shortcut to beginBitmapStroke.
+	* @param image The Image, Canvas, or Video object to use
+	*	as the pattern.
+	* @param repetition Optional. Indicates whether to repeat the image in the fill area. One of
+	*	"repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
+	*/
+	private function bs(image:Dynamic, ?repetition:String):Graphics;
+	
+	/**
+	* Shortcut to beginFill.
+	* @param color A CSS compatible color value (ex. "red", "#FF0000", or "rgba(255,0,0,0.5)"). Setting to
+	*	null will result in no fill.
+	*/
+	private function f(color:String):Graphics;
+	
+	/**
+	* Shortcut to beginLinearGradientFill.
+	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define a gradient
+	*	drawing from red to blue.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1, 0.9] would draw
+	*	the first color to 10% then interpolating to the second color at 90%.
+	* @param x0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
+	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
+	*/
+	private function lf(colors:Array<Dynamic>, ratios:Array<Dynamic>, x0:Float, y0:Float, x1:Float, y1:Float):Graphics;
+	
+	/**
+	* Shortcut to beginLinearGradientStroke.
+	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	*	a gradient drawing from red to blue.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	*	0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	* @param x0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param y0 The position of the first point defining the line that defines the gradient direction and size.
+	* @param x1 The position of the second point defining the line that defines the gradient direction and size.
+	* @param y1 The position of the second point defining the line that defines the gradient direction and size.
+	*/
+	private function ls(colors:Array<Dynamic>, ratios:Array<Dynamic>, x0:Float, y0:Float, x1:Float, y1:Float):Graphics;
+	
+	/**
+	* Shortcut to beginRadialGradientFill.
+	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	*	a gradient drawing from red to blue.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	*	0.9] would draw the first color to 10% then interpolating to the second color at 90%.
+	* @param x0 Center position of the inner circle that defines the gradient.
+	* @param y0 Center position of the inner circle that defines the gradient.
+	* @param r0 Radius of the inner circle that defines the gradient.
+	* @param x1 Center position of the outer circle that defines the gradient.
+	* @param y1 Center position of the outer circle that defines the gradient.
+	* @param r1 Radius of the outer circle that defines the gradient.
+	*/
+	private function rf(colors:Array<Dynamic>, ratios:Array<Dynamic>, x0:Float, y0:Float, r0:Float, x1:Float, y1:Float, r1:Float):Graphics;
+	
+	/**
+	* Shortcut to beginRadialGradientStroke.
+	* @param colors An array of CSS compatible color values. For example, ["#F00","#00F"] would define
+	*	a gradient drawing from red to blue.
+	* @param ratios An array of gradient positions which correspond to the colors. For example, [0.1,
+	*	0.9] would draw the first color to 10% then interpolating to the second color at 90%, then draw the second color
+	*	to 100%.
+	* @param x0 Center position of the inner circle that defines the gradient.
+	* @param y0 Center position of the inner circle that defines the gradient.
+	* @param r0 Radius of the inner circle that defines the gradient.
+	* @param x1 Center position of the outer circle that defines the gradient.
+	* @param y1 Center position of the outer circle that defines the gradient.
+	* @param r1 Radius of the outer circle that defines the gradient.
+	*/
+	private function rs(colors:Array<Dynamic>, ratios:Array<Dynamic>, x0:Float, y0:Float, r0:Float, x1:Float, y1:Float, r1:Float):Graphics;
+	
+	/**
+	* Shortcut to beginStroke.
+	* @param color A CSS compatible color value (ex. "#FF0000", "red", or "rgba(255,0,0,0.5)"). Setting to
+	*	null will result in no stroke.
+	*/
+	private function s(color:String):Graphics;
+	
+	/**
+	* Shortcut to bezierCurveTo.
+	* @param cp1x 
+	* @param cp1y 
+	* @param cp2x 
+	* @param cp2y 
+	* @param x 
+	* @param y 
+	*/
+	private function bt(cp1x:Float, cp1y:Float, cp2x:Float, cp2y:Float, x:Float, y:Float):Graphics;
+	
+	/**
+	* Shortcut to clear.
+	*/
+	private function c():Graphics;
+	
+	/**
+	* Shortcut to closePath.
+	*/
+	private function cp():Graphics;
+	
+	/**
+	* Shortcut to decodePath.
+	* @param str The path string to decode.
+	*/
+	private function p(str:String):Graphics;
+	
+	/**
+	* Shortcut to drawCircle.
+	* @param x x coordinate center point of circle.
+	* @param y y coordinate center point of circle.
+	* @param radius Radius of circle.
+	*/
+	private function dc(x:Float, y:Float, radius:Float):Graphics;
+	
+	/**
+	* Shortcut to drawEllipse.
+	* @param x The left coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	*	which draws from center.
+	* @param y The top coordinate point of the ellipse. Note that this is different from {{#crossLink "Graphics/drawCircle"}}{{/crossLink}}
+	*	which draws from the center.
+	* @param w The height (horizontal diameter) of the ellipse. The horizontal radius will be half of this
+	*	number.
+	* @param h The width (vertical diameter) of the ellipse. The vertical radius will be half of this number.
+	*/
+	private function de(x:Float, y:Float, w:Float, h:Float):Graphics;
+	
+	/**
+	* Shortcut to drawPolyStar.
+	* @param x Position of the center of the shape.
+	* @param y Position of the center of the shape.
+	* @param radius The outer radius of the shape.
+	* @param sides The number of points on the star or sides on the polygon.
+	* @param pointSize The depth or "pointy-ness" of the star points. A pointSize of 0 will draw a regular
+	*	polygon (no points), a pointSize of 1 will draw nothing because the points are infinitely pointy.
+	* @param angle The angle of the first point / corner. For example a value of 0 will draw the first point
+	*	directly to the right of the center.
+	*/
+	private function dp(x:Float, y:Float, radius:Float, sides:Float, pointSize:Float, angle:Float):Graphics;
+	
+	/**
+	* Shortcut to drawRect.
+	* @param x 
+	* @param y 
+	* @param w Width of the rectangle
+	* @param h Height of the rectangle
+	*/
+	private function dr(x:Float, y:Float, w:Float, h:Float):Graphics;
+	
+	/**
+	* Shortcut to drawRoundRect.
+	* @param x 
+	* @param y 
+	* @param w 
+	* @param h 
+	* @param radius Corner radius.
+	*/
+	private function rr(x:Float, y:Float, w:Float, h:Float, radius:Float):Graphics;
+	
+	/**
+	* Shortcut to drawRoundRectComplex.
+	* @param x The horizontal coordinate to draw the round rect.
+	* @param y The vertical coordinate to draw the round rect.
+	* @param w The width of the round rect.
+	* @param h The height of the round rect.
+	* @param radiusTL Top left corner radius.
+	* @param radiusTR Top right corner radius.
+	* @param radiusBR Bottom right corner radius.
+	* @param radiusBL Bottom left corner radius.
+	*/
+	private function rc(x:Float, y:Float, w:Float, h:Float, radiusTL:Float, radiusTR:Float, radiusBR:Float, radiusBL:Float):Graphics;
+	
+	/**
+	* Shortcut to endFill.
+	*/
+	private function ef():Graphics;
+	
+	/**
+	* Shortcut to endStroke.
+	*/
+	private function es():Graphics;
+	
+	/**
+	* Shortcut to lineTo.
+	* @param x The x coordinate the drawing point should draw to.
+	* @param y The y coordinate the drawing point should draw to.
+	*/
+	private function lt(x:Float, y:Float):Graphics;
+	
+	/**
+	* Shortcut to moveTo.
+	* @param x The x coordinate the drawing point should move to.
+	* @param y The y coordinate the drawing point should move to.
+	*/
+	private function mt(x:Float, y:Float):Graphics;
+	
+	/**
+	* Shortcut to quadraticCurveTo / curveTo.
+	* @param cpx 
+	* @param cpy 
+	* @param x 
+	* @param y 
+	*/
+	private function qt(cpx:Float, cpy:Float, x:Float, y:Float):Dynamic;
+	
+	/**
+	* Shortcut to rect.
+	* @param x 
+	* @param y 
+	* @param w Width of the rectangle
+	* @param h Height of the rectangle
+	*/
+	private function r(x:Float, y:Float, w:Float, h:Float):Graphics;
+	
+	/**
+	* Shortcut to setStrokeDash.
+	* @param segments An array specifying the dash pattern, alternating between line and gap.
+	*	For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	*	Passing null or an empty array will clear any existing dash.
+	* @param offset The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	*/
+	private function sd(?segments:Array<Dynamic>, ?offset:Float):Graphics;
+	
+	/**
+	* Shortcut to setStrokeStyle.
+	* @param thickness The width of the stroke.
+	* @param caps Indicates the type of caps to use at the end of lines. One of butt,
+	*	round, or square. Defaults to "butt". Also accepts the values 0 (butt), 1 (round), and 2 (square) for use with
+	*	the tiny API.
+	* @param joints Specifies the type of joints that should be used where two lines meet.
+	*	One of bevel, round, or miter. Defaults to "miter". Also accepts the values 0 (miter), 1 (round), and 2 (bevel)
+	*	for use with the tiny API.
+	* @param miterLimit If joints is set to "miter", then you can specify a miter limit ratio which
+	*	controls at what point a mitered joint will be clipped.
+	* @param ignoreScale If true, the stroke will be drawn at the specified thickness regardless
+	*	of active transformations.
+	*/
+	private function ss(thickness:Float, ?caps:Dynamic, ?joints:Dynamic, ?miterLimit:Float, ?ignoreScale:Bool):Graphics;
+	
+	/**
+	* Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
+	*	the existing store. This also affects `drawAsPath()`.
+	*	
+	*	This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
+	*	that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+	*	of the vector instructions for later use (ex. scaling, modifying, or exporting).
+	*	
+	*	Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
+	*	the fill or stroke.
+	*	
+	*	For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
+	*	segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}},
+	*	and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVG.
+	*	
+	*		// set up cache:
+	*		myShape.cache(0,0,500,500,scale);
+	*	
+	*		// when the user drags, draw a new line:
+	*		myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
+	*		// then draw it into the existing cache:
+	*		myShape.updateCache("source-over");
+	*		// store the new line, so it isn't redrawn next time:
+	*		myShape.store();
+	*	
+	*		// then, when the window resizes, we can re-render at a different scale:
+	*		// first, unstore all our lines:
+	*		myShape.unstore();
+	*		// then cache using the new scale:
+	*		myShape.cache(0,0,500,500,newScale);
+	*		// finally, store the existing commands again:
+	*		myShape.store();
+	*/
+	public function store():Graphics;
+	
+	/**
 	* The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
-	*	specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "DisplayObject/draw"}}{{/crossLink}}
+	*	specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
 	*	directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
-	*	context of an Easel display list.
+	*	context of an EaselJS display list.
 	*	
-	*	<h4>Example</h4>
+	*	There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
+	*	instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
+	*	The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
+	*	
 	*	     var g = new createjs.Graphics();
-	*		    g.setStrokeStyle(1);
-	*		    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
-	*		    g.beginFill(createjs.Graphics.getRGB(255,0,0));
-	*		    g.drawCircle(0,0,3);
+	*	     g.setStrokeStyle(1);
+	*	     g.beginStroke("#000000");
+	*	     g.beginFill("red");
+	*	     g.drawCircle(0,0,30);
 	*	
-	*		    var s = new createjs.Shape(g);
-	*		    	s.x = 100;
-	*		    	s.y = 100;
+	*	All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+	*	the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
 	*	
-	*		    stage.addChild(s);
-	*		    stage.update();
+	*	     myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
 	*	
-	*	Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
-	*	the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then
-	*	render it to the specified context2D:
+	*	Each graphics API call generates a command object (see below). The last command to be created can be accessed via
+	*	{{#crossLink "Graphics/command:property"}}{{/crossLink}}:
 	*	
-	*	     myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+	*	     var fillCommand = myGraphics.beginFill("red").command;
+	*	     // ... later, update the fill style/color:
+	*	     fillCommand.style = "blue";
+	*	     // or change it to a bitmap fill:
+	*	     fillCommand.bitmap(myImage);
+	*	
+	*	For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
+	*	need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
+	*	
+	*	     // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+	*	     myGraphics.append(createjs.Graphics.beginCmd);
+	*	     // we need to define the path before applying the fill:
+	*	     var circle = new createjs.Graphics.Circle(0,0,30);
+	*	     myGraphics.append(circle);
+	*	     // fill the path we just defined:
+	*	     var fill = new createjs.Graphics.Fill("red");
+	*	     myGraphics.append(fill);
+	*	
+	*	These approaches can be used together, for example to insert a custom command:
+	*	
+	*	     myGraphics.beginFill("red");
+	*	     var customCommand = new CustomSpiralCommand(etc);
+	*	     myGraphics.append(customCommand);
+	*	     myGraphics.beginFill("blue");
+	*	     myGraphics.drawCircle(0, 0, 30);
+	*	
+	*	See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
 	*	
 	*	<h4>Tiny API</h4>
 	*	The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
@@ -649,7 +1043,7 @@ extern class Graphics
 	*	    <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
 	*	    <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
 	*	    <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
-	*	    <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+	*	    <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
 	*	    <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
 	*	    <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
 	*	    <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
@@ -666,77 +1060,25 @@ extern class Graphics
 	*	
 	*	Here is the above example, using the tiny API instead.
 	*	
-	*	     myGraphics.s("#F00").f("#00F").r(20, 20, 100, 50).draw(myContext2D);
+	*	     myGraphics.s("red").f("blue").r(20, 20, 100, 50);
 	*/
 	public function new():Void;
 	
 	/**
-	* Used to create Commands that set properties
-	* @param name 
-	* @param value 
+	* Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
+	*	so that they will be executed in subsequent draw calls.
 	*/
-	private function _setProp(name:String, value:String):Dynamic;
+	public function unstore():Graphics;
 	
-	private function _appendDraw():Dynamic;
+	/**
+	* Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
+	*/
+	public function getInstructions():Array<Dynamic>;
 	
-	private function _appendInstructions():Dynamic;
+	private function _setFill(fill:Dynamic):Dynamic;
 	
-	private function _newPath():Dynamic;
+	private function _setStroke(stroke:Dynamic):Dynamic;
 	
-	private function _updateInstructions():Dynamic;
-	
-	private function a():Dynamic;
-	
-	private function at():Dynamic;
-	
-	private function bf():Dynamic;
-	
-	private function bs():Dynamic;
-	
-	private function bt():Dynamic;
-	
-	private function c():Dynamic;
-	
-	private function cp():Dynamic;
-	
-	private function dc():Dynamic;
-	
-	private function de():Dynamic;
-	
-	private function dp():Dynamic;
-	
-	private function dr():Dynamic;
-	
-	private function ef():Dynamic;
-	
-	private function es():Dynamic;
-	
-	private function f():Dynamic;
-	
-	private function lf():Dynamic;
-	
-	private function ls():Dynamic;
-	
-	private function lt():Dynamic;
-	
-	private function mt():Dynamic;
-	
-	private function p():Dynamic;
-	
-	private function qt():Dynamic;
-	
-	private function r():Dynamic;
-	
-	private function rc():Dynamic;
-	
-	private function rf():Dynamic;
-	
-	private function rr():Dynamic;
-	
-	private function rs():Dynamic;
-	
-	private function s():Dynamic;
-	
-	private function ss():Dynamic;
+	private function _updateInstructions(commit:Dynamic):Dynamic;
 	
 }

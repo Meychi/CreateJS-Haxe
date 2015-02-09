@@ -85,11 +85,6 @@ extern class Timeline extends EventDispatcher
 	public function resolve(positionOrLabel:Dynamic):Dynamic;
 	
 	/**
-	* Initialization method.
-	*/
-	private function initialize():Dynamic;
-	
-	/**
 	* Pauses or plays this timeline.
 	* @param value Indicates whether the tween should be paused (true) or played (false).
 	*/

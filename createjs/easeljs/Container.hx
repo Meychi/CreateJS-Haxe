@@ -14,6 +14,7 @@ import js.html.CanvasRenderingContext2D;
 *	Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
 *	
 *	<h4>Example</h4>
+*	
 *	     var container = new createjs.Container();
 *	     container.addChild(bitmapInstance, shapeInstance);
 *	     container.x = 100;
@@ -32,17 +33,14 @@ extern class Container extends DisplayObject
 	public var mouseChildren:Bool;
 	
 	/**
+	* Returns the number of children in the container.
+	*/
+	public var numChildren:Float;
+	
+	/**
 	* The array of children in the display list. You should usually use the child management methods such as {{#crossLink "Container/addChild"}}{{/crossLink}}, {{#crossLink "Container/removeChild"}}{{/crossLink}}, {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is included for advanced uses.
 	*/
 	public var children:Array<Dynamic>;
-	
-	private var DisplayObject__tick:Dynamic;
-	
-	private var DisplayObject_draw:Dynamic;
-	
-	private var DisplayObject_getBounds:Dynamic;
-	
-	private var DisplayObject_initialize:Dynamic;
 	
 	/**
 	* A Container is a nestable display list that allows you to work with compound display elements. For  example you could
@@ -56,6 +54,7 @@ extern class Container extends DisplayObject
 	*	Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var container = new createjs.Container();
 	*	     container.addChild(bitmapInstance, shapeInstance);
 	*	     container.x = 100;
@@ -67,6 +66,7 @@ extern class Container extends DisplayObject
 	*	setting its parent to this Container.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     addChildAt(child1, index);
 	*	
 	*	You can also add multiple children, such as:
@@ -88,11 +88,12 @@ extern class Container extends DisplayObject
 	* Adds a child to the top of the display list.
 	*	
 	*	<h4>Example</h4>
-	*	     container.addChild(bitmapInstance);
 	*	
-	*	 You can also add multiple children at once:
+	*			container.addChild(bitmapInstance);
 	*	
-	*	     container.addChild(bitmapInstance, shapeInstance, textInstance);
+	*	You can also add multiple children at once:
+	*	
+	*			container.addChild(bitmapInstance, shapeInstance, textInstance);
 	* @param child The display object to add.
 	*/
 	public function addChild(child:DisplayObject):DisplayObject;
@@ -105,6 +106,12 @@ extern class Container extends DisplayObject
 	public function setChildIndex(child:DisplayObject, index:Float):Dynamic;
 	
 	/**
+	* Constructor alias for backwards compatibility. This method will be removed in future versions.
+	*	Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	*/
+	public function initialize():Dynamic;
+	
+	/**
 	* Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	*	Returns true if the draw was handled (useful for overriding functionality).
 	*	
@@ -115,11 +122,6 @@ extern class Container extends DisplayObject
 	*	into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Dynamic;
-	
-	/**
-	* Initialization method.
-	*/
-	//private function initialize():Dynamic;
 	
 	/**
 	* Performs an array sort operation on the child list.
@@ -138,9 +140,16 @@ extern class Container extends DisplayObject
 	public function sortChildren(sortFunction:Dynamic):Dynamic;
 	
 	/**
+	* Recursively clones all children of this container, and adds them to the target container.
+	* @param o The target container.
+	*/
+	private function cloneChildren(o:Container):Dynamic;
+	
+	/**
 	* Removes all children from the display list.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     container.removeAlLChildren();
 	*/
 	public function removeAllChildren():Dynamic;
@@ -166,6 +175,7 @@ extern class Container extends DisplayObject
 	*	already known.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     container.removeChild(child);
 	*	
 	*	You can also remove multiple children:
@@ -183,7 +193,7 @@ extern class Container extends DisplayObject
 	* @param recursive If true, all of the descendants of this container will be cloned recursively. If false, the
 	*	properties of the container will be cloned, but the new instance will not have any children.
 	*/
-	//public function clone(recursive:Bool):Container;
+	//public function clone(?recursive:Bool):Container;
 	
 	/**
 	* Returns a string representation of this object.
@@ -192,19 +202,34 @@ extern class Container extends DisplayObject
 	
 	/**
 	* Returns an array of all display objects under the specified coordinates that are in this container's display
-	*	list. This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order
-	*	of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
-	*	expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
-	*	mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	*	list. This routine ignores any display objects with {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
+	*	set to `false`. The array will be sorted in order of visual depth, with the top-most display object at index 0.
+	*	This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully.
+	*	For example, if testing for objects under the mouse, test on tick (instead of on {{#crossLink "DisplayObject/mousemove:event"}}{{/crossLink}}),
+	*	and only if the mouse's position has changed.
+	*	
+	*	<ul>
+	*	    <li>By default (mode=0) this method evaluates all display objects.</li>
+	*	    <li>By setting the `mode` parameter to `1`, the {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
+	*			and {{#crossLink "mouseChildren:property"}}{{/crossLink}} properties will be respected.</li>
+	*		   <li>Setting the `mode` to `2` additionally excludes display objects that do not have active mouse event
+	*		   	listeners or a {{#crossLink "DisplayObject:cursor:property"}}{{/crossLink}} property. That is, only objects
+	*		   	that would normally intercept mouse interaction will be included. This can significantly improve performance
+	*		   	in some cases by reducing the number of display objects that need to be tested.</li>
+	*	</li>
+	*	
+	*	This method accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	* @param x The x position in the container to test.
 	* @param y The y position in the container to test.
+	* @param mode The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	*/
-	public function getObjectsUnderPoint(x:Float, y:Float):Array<Dynamic>;
+	public function getObjectsUnderPoint(x:Float, y:Float, ?mode:Float):Array<Dynamic>;
 	
 	/**
 	* Returns the child at the specified index.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     container.getChildAt(2);
 	* @param index The index of the child to return.
 	*/
@@ -220,15 +245,11 @@ extern class Container extends DisplayObject
 	* Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var index = container.getChildIndex(child);
 	* @param child The child to return the index of.
 	*/
 	public function getChildIndex(child:DisplayObject):Float;
-	
-	/**
-	* Returns the number of children in the display list.
-	*/
-	public function getNumChildren():Float;
 	
 	/**
 	* Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
@@ -246,13 +267,14 @@ extern class Container extends DisplayObject
 	//public function isVisible():Bool;
 	
 	/**
-	* Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
-	*	object. This runs significantly faster than <code>getObjectsUnderPoint()<code>, but is still an expensive
+	* Similar to {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}, but returns only the top-most display
+	*	object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
 	*	operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	* @param x The x position in the container to test.
 	* @param y The y position in the container to test.
+	* @param mode The mode to use to determine which display objects to include.  0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	*/
-	public function getObjectUnderPoint(x:Float, y:Float):DisplayObject;
+	public function getObjectUnderPoint(x:Float, y:Float, mode:Float):DisplayObject;
 	
 	/**
 	* Swaps the children at the specified indexes. Fails silently if either index is out of range.
@@ -278,10 +300,17 @@ extern class Container extends DisplayObject
 	*/
 	//public function hitTest(x:Float, y:Float):Bool;
 	
+	/**
+	* Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
+	*/
+	public function getNumChildren():Float;
+	
 	//private function _getBounds(matrix:Matrix2D, ignoreTransform:Bool):Rectangle;
 	
-	//private function _tick(params:Array<Dynamic>):Dynamic;
+	//private function _tick(evtObj:Dynamic):Dynamic;
 	
-	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouse:Bool, activeListener:Bool):Array<Dynamic>;
+	private function _getObjectsUnderPoint(x:Float, y:Float, arr:Array<Dynamic>, mouse:Bool, activeListener:Bool, currentDepth:Float):DisplayObject;
+	
+	private function _testMask(target:DisplayObject, x:Float, y:Float):Bool;
 	
 }

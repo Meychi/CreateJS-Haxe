@@ -1,5 +1,7 @@
 package createjs.preloadjs;
 
+import js.html.Event;
+
 /**
 * A PreloadJS plugin provides a way to inject functionality into PreloadJS to load file types that are unsupported,
 *	or in a way that PreloadJS does not.
@@ -10,11 +12,14 @@ package createjs.preloadjs;
 *	the {{#crossLink "LoadQueue"}}{{/crossLink}} class. Available load types are:
 *	<ul>
 *	    <li>binary ({{#crossLink "LoadQueue/BINARY:property"}}{{/crossLink}})</li>
+*	    <li>css ({{#crossLink "LoadQueue/CSS:property"}}{{/crossLink}})</li>
 *	    <li>image ({{#crossLink "LoadQueue/IMAGE:property"}}{{/crossLink}})</li>
 *	    <li>javascript ({{#crossLink "LoadQueue/JAVASCRIPT:property"}}{{/crossLink}})</li>
 *	    <li>json ({{#crossLink "LoadQueue/JSON:property"}}{{/crossLink}})</li>
 *	    <li>jsonp ({{#crossLink "LoadQueue/JSONP:property"}}{{/crossLink}})</li>
+*	    <li>manifest ({{#crossLink "LoadQueue/MANIFEST:property"}}{{/crossLink}})</li>
 *	    <li>sound ({{#crossLink "LoadQueue/SOUND:property"}}{{/crossLink}})</li>
+*	    <li>spriteSheet ({{#crossLink "LoadQueue/SPRITESHEET:property"}}{{/crossLink}})</li>
 *	    <li>svg ({{#crossLink "LoadQueue/SVG:property"}}{{/crossLink}})</li>
 *	    <li>text ({{#crossLink "LoadQueue/TEXT:property"}}{{/crossLink}})</li>
 *	    <li>xml ({{#crossLink "LoadQueue/XML:property"}}{{/crossLink}})</li>
@@ -32,89 +37,64 @@ package createjs.preloadjs;
 *	
 *	The {{#crossLink "SamplePlugin/getPreloadHandlers"}}{{/crossLink}} method can also return a `callback`
 *	property, which is a function that will be invoked before each file is loaded. Check out the {{#crossLink "SamplePlugin/preloadHandler"}}{{/crossLink}}
-*	for more information on how the callback works.
-*	
-*	For example, the SoundJS plugin allows PreloadJS to manage a download that
-*	happens in Flash
+*	for more information on how the callback works. For example, the SoundJS plugin allows PreloadJS to manage a
+*	download that uses the Flash Player.
 */
 @:native("createjs.SamplePlugin")
 extern class SamplePlugin
 {
 	/**
 	* This is a sample method to show a `completeHandler`, which is optionally specified by the return object in the
-	*	{{#crossLink "SamplePlugin/preloadHandler"}}{{/crossLink}}. This method is called after the item has completely
-	*	loaded, but before the {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event is dispatched from the
-	*	{{#crossLink "LoadQueue"}}{{/crossLink}}.
+	*	{{#crossLink "SamplePlugin/preloadHandler"}}{{/crossLink}}. This sample provides a `completeHandler` to the
+	*	{{#crossLink "LoadItem"}}{{/crossLink}}. This method is called after the item has completely loaded, but before
+	*	the {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event is dispatched from the {{#crossLink "LoadQueue"}}{{/crossLink}}.
+	*	
+	*	The provided sample also listens for the {{#crossLink "AbstractLoader/complete:event"}}{{/crossLink}}
+	*	event on the loader it returns to show a different usage.
 	* @param event A {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event.
 	*/
-	public function fileLoadHandler(event:Dynamic):Dynamic;
+	public function fileLoadHandler(event:Event):Dynamic;
 	
 	/**
 	* This is a sample method to show how to handle the callback specified in the {{#crossLink "LoadQueue/getPreloadHandlers"}}{{/crossLink}}.
 	*	Right before a file is loaded, if a plugin for the file type or extension is found, then the callback for that
-	*	plugin will be invoked. The arguments provided match most of those specified in load items passed into {{#crossLink "LoadQueue/loadFile"}}{{/crossLink}}:
-	*	<ul>
-	*	    <li><strong>src:</strong> The item source</li>
-	*	    <li><strong>type:</strong> The item type</li>
-	*	    <li><strong>id:</strong> The item id</li>
-	*	    <li><strong>data:</strong> Arbitrary data attached to the item</li>
-	*	</li>
-	*	Two additional arguments are appended:
-	*	<ul>
-	*	    <li><strong>basePath:</strong> A path that is prepended to all items loaded with PreloadJS. <strong>Note
-	*	    that basePath is deprecated, but is left in for backwards compatibility</strong></li>
-	*	    <li><strong>queue:</strong> The {{#crossLink "LoadQueue"}}{{/crossLink}} instance that is loading the
-	*	    item.</li>
-	*	</ul>
-	*	
-	*	This gives the plugin an opportunity to modify the load item, or even cancel the load. The return value of the
-	*	callback determines how PreloadJS will handle the file:
+	*	plugin will be invoked. This gives the plugin an opportunity to modify the load item, or even cancel the load.
+	*	The return value of the callback determines how PreloadJS will handle the file:
 	*	<ul>
 	*	    <li><strong>false:</strong> Skip the item. This allows plugins to determine if a file should be loaded or
 	*	    not. For example,the plugin could determine if a file type is supported at all on the current system, and
 	*	    skip those that do not.</li>
 	*	    <li><strong>true:</strong> Continue normally. The plugin will not affect the load.</li>
+	*	    <li><strong>AbstractLoader instance:</strong> Used as the loader for the content. This is new in 0.6.0.</li>
 	*	</ul>
 	*	
-	*	An object can also be returned which has properties that can override the existing load object. The return object
-	*	can include modified `src` and `id` parameters, as well as "tag" and "completeHandler" properties:
-	*	<ul>
-	*	    <li><strong>tag:</strong> a JavaScript object that will handle the actual loading of the file. This is
-	*	    modeled after HTML image &amp; audio tags, and must contain a <code>load()</code> method or a `src` setter,
-	*	    as well as and <code>onload</code> and <code>onerror</code> callback.</li>
-	*	    <li><strong>completeHandler:</strong> A method to call on the plugin once the item has been loaded. This is
-	*	    useful to provide any necessary post-load functionality. Check out the {{#crossLink "SamplePlugin/fileLoadHandler"}}{{/crossLink}}
-	*	    for more information.</li>
-	*	</ul>
+	*	Since the {{#crossLink "LoadItem"}}{{/crossLink}} is passed by reference, a plugin can modify as needed, even
+	*	appending additional data to it. Note that if the {{#crossLink "LoadItem/src:property"}}{{/crossLink}} is
+	*	modified, PreloadJS will automatically update the {{#crossLink "LoadItem/ext:property"}}{{/crossLink}} property.
 	*	
 	*	<h4>Example</h4>
 	*	
-	*	     //Check out the SamplePlugin source for a more complete example.
-	*	
 	*	     // Cancel a load
-	*	     SamplePlugin.preloadHandler = function(src, type, id, data, basePath, queue) {
-	*	         if (id.indexOf("thumb") { return false; } // Don't load items like "image-thumb.png"
+	*	     SamplePlugin.preloadHandler = function(loadItem, queue) {
+	*	         if (loadItem.id.indexOf("thumb") { return false; } // Don't load items like "image-thumb.png"
 	*	         return true;
 	*	     }
 	*	
 	*	     // Specify a completeHandler
-	*	     SamplePlugin.preloadHandler = function(src, type, id, data, basePath, queue) {
-	*	         return {
-	*	             completeHandler: SamplePlugin.fileLoadHandler
-	*	         };
+	*	     SamplePlugin.preloadHandler = function(loadItem, queue) {
+	*	         item.completeHandler = SamplePlugin.fileLoadHandler;
 	*	     }
-	* @param src The path to the file, as specified by the developer, without a base path.
-	* @param type The file type, which is either passed in by the developer, or determined based on the
-	*	extension. Supported load types are "binary","image", "javascript", "json", "jsonp", "sound", "svg", "text", and
-	*	"xml". This value may be null if the extension is not recognized by PreloadJS.
-	* @param id The string-based ID, which is optionally passed in by the user.
-	* @param data Arbitrary data optionally attached to the load item by the user, which is maintained until the
-	*	item is loaded and returned to the user from PreloadJS.
-	* @param basePath A base path which is supplied to PreloadJS, which is prepended to the source of any
-	*	load item.
+	*	
+	*	     // Check out the SamplePlugin source to see another example.
+	*	
+	*	<em>Note: In 0.4.2 and earlier, instead of a {{#crossLink "LoadItem"}}{{/crossLink}}, arguments were passed in,
+	*	and a modified object was returned to PreloadJS. This has been changed to passing a reference to the LoadItem,
+	*	which can be directly modified.</em>
+	* @param loadItem The item that PreloadJS is going to load. This item is passes by reference,
+	*	so it can be directly modified.
 	* @param queue The {{#crossLink "LoadQueue"}}{{/crossLink}} instance that is preloading the item.
 	*/
-	public function preloadHandler(src:String, type:String, id:String, data:*, basePath:String, queue:LoadQueue):Dynamic;
+	public function preloadHandler(loadItem:Dynamic, queue:LoadQueue):Dynamic;
 	
 	/**
 	* When a plugin is installed, this method will be called to let PreloadJS know when to invoke the plugin.

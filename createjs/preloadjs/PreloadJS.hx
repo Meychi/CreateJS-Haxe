@@ -1,11 +1,7 @@
 package createjs.preloadjs;
 
 /**
-* Static class holding library specific information such as the version and buildDate of
-*	the library.
-*	
-*	The old PreloadJS class has been renamed to LoadQueue. Please see the {{#crossLink "LoadQueue"}}{{/crossLink}}
-*	class for information on loading files.
+* Static class holding library specific information such as the version and buildDate of the library.
 */
 @:native("createjs.PreloadJS")
 extern class PreloadJS

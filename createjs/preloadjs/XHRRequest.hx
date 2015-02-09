@@ -7,8 +7,8 @@ package createjs.preloadjs;
 *	can be canceled during load. Note that XHR is not supported in IE 6 or earlier, and is not recommended for
 *	cross-domain loading.
 */
-@:native("createjs.XHRLoader")
-extern class XHRLoader extends AbstractLoader
+@:native("createjs.XHRRequest")
+extern class XHRRequest extends AbstractLoader
 {
 	/**
 	* A list of XMLHTTP object IDs to try when building an ActiveX object for XHR requests in earlier versions of IE.
@@ -26,11 +26,6 @@ extern class XHRLoader extends AbstractLoader
 	private var _request:Dynamic;
 	
 	/**
-	* See {{#crossLink "LoadQueue/_crossOrigin:property"}}{{/crossLink}}
-	*/
-	private var _crossOrigin:String;
-	
-	/**
 	* The browser's XHR (XMLHTTPRequest) version. Supported versions are 1 and 2. There is no official way to detect the version, so we use capabilities to make a best guess.
 	*/
 	private var _xhrLevel:Float;
@@ -46,11 +41,6 @@ extern class XHRLoader extends AbstractLoader
 	private var _rawResponse:Dynamic;
 	
 	/**
-	* A generated tag is now ready for use.
-	*/
-	private function _handleTagReady():Dynamic;
-	
-	/**
 	* A preloader that loads items using XHR requests, usually XMLHttpRequest. However XDomainRequests will be used
 	*	for cross-domain requests if possible, and older versions of IE fall back on to ActiveX objects when necessary.
 	*	XHR requests load the content as text or binary data, provide progress and consistent completion events, and
@@ -58,10 +48,8 @@ extern class XHRLoader extends AbstractLoader
 	*	cross-domain loading.
 	* @param item The object that defines the file to load. Please see the {{#crossLink "LoadQueue/loadFile"}}{{/crossLink}}
 	*	for an overview of supported file properties.
-	* @param crossOrigin An optional flag to support images loaded from a CORS-enabled server. Please see
-	*	{{#crossLink "LoadQueue/_crossOrigin:property"}}{{/crossLink}} for more info.
 	*/
-	public function new(item:Dynamic, ?crossOrigin:String):Void;
+	public function new(item:Dynamic):Void;
 	
 	/**
 	* A request has completed (or failed or canceled), and needs to be disposed.
@@ -84,13 +72,7 @@ extern class XHRLoader extends AbstractLoader
 	* Determine if there is an error in the current load. This checks the status of the request for problem codes. Note
 	*	that this does not check for an actual response. Currently, it only checks for 404 or 0 error code.
 	*/
-	private function _checkError():Bool;
-	
-	/**
-	* Generate a tag for items that can be represented as tags. For example, IMAGE, SCRIPT, and LINK. This also handles
-	*	XML and SVG objects.
-	*/
-	private function _generateTag():Bool;
+	private function _checkError():Int;
 	
 	/**
 	* Get a specific response header from the XmlHttpRequest.
@@ -113,18 +95,11 @@ extern class XHRLoader extends AbstractLoader
 	
 	/**
 	* Look up the loaded result.
-	* @param rawResult Return a raw result instead of a formatted result. This applies to content
+	* @param raw Return a raw result instead of a formatted result. This applies to content
 	*	loaded via XHR such as scripts, XML, CSS, and Images. If there is no raw result, the formatted result will be
 	*	returned instead.
 	*/
-	public function getResult(?rawResult:Bool):Dynamic;
-	
-	/**
-	* Parse XML using the DOM. This is required when preloading XML or SVG.
-	* @param text The raw text or XML that is loaded by XHR.
-	* @param type The mime type of the XML.
-	*/
-	private function _parseXML(text:String, type:String):XML;
+	//public function getResult(?raw:Bool):Dynamic;
 	
 	/**
 	* The XHR request has completed. This is called by the XHR request directly, or by a readyStateChange that has

@@ -1,26 +1,24 @@
-package createjs.easeljs;
+package createjs;
+
+import js.html.svg.Number;
 
 /**
-* The Ticker provides  a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
+* The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
 *	event to be notified when a set time interval has elapsed.
 *	
 *	Note that the interval that the tick event is called is a target interval, and may be broadcast at a slower interval
-*	during times of high CPU load. The Ticker class uses a static interface (ex. <code>Ticker.getPaused()</code>) and
-*	should not be instantiated.
+*	when under high CPU load. The Ticker class uses a static interface (ex. `Ticker.framerate = 30;`) and
+*	can not be instantiated.
 *	
 *	<h4>Example</h4>
+*	
 *	     createjs.Ticker.addEventListener("tick", handleTick);
 *	     function handleTick(event) {
-*	         // Actions carried out each frame
+*	         // Actions carried out each tick (aka frame)
 *	         if (!event.paused) {
 *	             // Actions carried out when the Ticker is not paused.
 *	         }
 *	     }
-*	
-*	To update a stage every tick, the {{#crossLink "Stage"}}{{/crossLink}} instance can also be used as a listener, as
-*	it will automatically update when it receives a tick event:
-*	
-*	     createjs.Ticker.addEventListener("tick", stage);
 */
 @:native("createjs.Ticker")
 extern class Ticker
@@ -46,9 +44,19 @@ extern class Ticker
 	public static var TIMEOUT:String;
 	
 	/**
+	* Indicates the target frame rate in frames per second (FPS). Effectively just a shortcut to `interval`, where `framerate == 1000/interval`.
+	*/
+	public static var framerate:Float;
+	
+	/**
+	* Indicates the target time (in milliseconds) between ticks. Default is 50 (20 FPS). Note that actual time between ticks may be more than specified depending on CPU load. This property is ignored if the ticker is using the `RAF` timing mode.
+	*/
+	public static var interval:Float;
+	
+	/**
 	* Specifies a maximum value for the delta property in the tick event object. This is useful when building time based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep, alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value (ex. maxDelta=50 when running at 40fps).  This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta when using both delta and other values.  If 0, there is no maximum.
 	*/
-	public static var maxDelta:Float;
+	public static var maxDelta:Number;
 	
 	/**
 	* Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
@@ -58,72 +66,41 @@ extern class Ticker
 	/**
 	* Stores the timeout or requestAnimationFrame id.
 	*/
-	private var _timerId:Float;
+	public static var _timerId:Float;
 	
 	/**
 	* The number of ticks that have passed
 	*/
-	private var _ticks:Float;
+	public static var _ticks:Float;
 	
 	/**
 	* The number of ticks that have passed while Ticker has been paused
 	*/
-	private var _pausedTicks:Float;
+	public static var _pausedTicks:Float;
 	
 	/**
-	* True if currently using requestAnimationFrame, false if using setTimeout.
+	* True if currently using requestAnimationFrame, false if using setTimeout. This may be different than timingMode if that property changed and a tick hasn't fired.
 	*/
-	private var _raf:Bool;
-	
-	private var _inited:Bool;
-	
-	private var _interval:Float;
-	
-	private var _lastTime:Float;
-	
-	private var _paused:Bool;
-	
-	private var _pausedTime:Float;
-	
-	private var _startTime:Float;
-	
-	private var _tickTimes:Array<Dynamic>;
-	
-	private var _times:Array<Dynamic>;
+	public static var _raf:Bool;
 	
 	/**
-	* Changes the "paused" state of the Ticker, which can be retrieved by the {{#crossLink "Ticker/getPaused"}}{{/crossLink}}
-	*	method, and is passed as the "paused" property of the <code>tick</code> event. When the ticker is paused, all
-	*	listeners will still receive a tick event, but the <code>paused</code> property will be false.
-	*	
-	*	Note that in EaselJS v0.5.0 and earlier, "pauseable" listeners would <strong>not</strong> receive the tick
-	*	callback when Ticker was paused. This is no longer the case.
-	*	
-	*	<h4>Example</h4>
-	*	     createjs.Ticker.addEventListener("tick", handleTick);
-	*	     createjs.Ticker.setPaused(true);
-	*	     function handleTick(event) {
-	*	         console.log("Paused:", event.paused, createjs.Ticker.getPaused());
-	*	     }
-	* @param value Indicates whether to pause (true) or unpause (false) Ticker.
+	* When the ticker is paused, all listeners will still receive a tick event, but the <code>paused</code> property of the event will be false. Also, while paused the `runTime` will not increase. See {{#crossLink "Ticker/tick:event"}}{{/crossLink}}, {{#crossLink "Ticker/getTime"}}{{/crossLink}}, and {{#crossLink "Ticker/getEventTime"}}{{/crossLink}} for more info.  <h4>Example</h4>       createjs.Ticker.addEventListener("tick", handleTick);      createjs.Ticker.paused = true;      function handleTick(event) {          console.log(event.paused,          	createjs.Ticker.getTime(false),          	createjs.Ticker.getTime(true));      }
 	*/
-	public static function setPaused(value:Bool):Dynamic;
+	public static var paused:Bool;
 	
-	/**
-	* Returns a boolean indicating whether Ticker is currently paused, as set with {{#crossLink "Ticker/setPaused"}}{{/crossLink}}.
-	*	When the ticker is paused, all listeners will still receive a tick event, but this value will be false.
-	*	
-	*	Note that in EaselJS v0.5.0 and earlier, "pauseable" listeners would <strong>not</strong> receive the tick
-	*	callback when Ticker was paused. This is no longer the case.
-	*	
-	*	<h4>Example</h4>
-	*	     createjs.Ticker.addEventListener("tick", handleTick);
-	*	     createjs.Ticker.setPaused(true);
-	*	     function handleTick(event) {
-	*	         console.log("Paused:", createjs.Ticker.getPaused());
-	*	     }
-	*/
-	public static function getPaused():Bool;
+	public static var _inited:Bool;
+	
+	public static var _interval:Float;
+	
+	public static var _lastTime:Float;
+	
+	public static var _pausedTime:Float;
+	
+	public static var _startTime:Float;
+	
+	public static var _tickTimes:Array<Dynamic>;
+	
+	public static var _times:Array<Dynamic>;
 	
 	/**
 	* Returns the actual frames / ticks per second.
@@ -149,12 +126,8 @@ extern class Ticker
 	public static function getMeasuredTickTime(?ticks:Float):Float;
 	
 	/**
-	* Returns the current target time between ticks, as set with {{#crossLink "Ticker/setInterval"}}{{/crossLink}}.
-	*/
-	public static function getInterval():Float;
-	
-	/**
-	* Returns the number of milliseconds that have elapsed since Ticker was initialized. For example, you could use
+	* Returns the number of milliseconds that have elapsed since Ticker was initialized via {{#crossLink "Ticker/init"}}.
+	*	Returns -1 if Ticker has not been initialized. For example, you could use
 	*	this in a time synchronized animation to determine the exact amount of time that has elapsed.
 	* @param runTime If true only time elapsed while Ticker was not paused will be returned.
 	*	If false, the value returned will be total time elapsed since the first tick event listener was added.
@@ -171,31 +144,10 @@ extern class Ticker
 	public static function getTicks(pauseable:Bool):Float;
 	
 	/**
-	* Returns the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
-	*	will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	*/
-	public static function getFPS():Float;
-	
-	/**
-	* Sets the target frame rate in frames per second (FPS). For example, with an interval of 40, <code>getFPS()</code>
-	*	will return 25 (1000ms per second divided by 40 ms per tick = 25fps).
-	* @param value Target number of ticks broadcast per second.
-	*/
-	public static function setFPS(value:Float):Dynamic;
-	
-	/**
-	* Sets the target time (in milliseconds) between ticks. Default is 50 (20 FPS).
-	*	
-	*	Note actual time between ticks may be more than requested depending on CPU load.
-	* @param interval Time in milliseconds between ticks. Default value is 50.
-	*/
-	public static function setInterval(interval:Float):Dynamic;
-	
-	/**
-	* Similar to getTime(), but returns the time included with the current (or most recent) tick event object.
+	* Similar to getTime(), but returns the time on the most recent tick event object.
 	* @param runTime [runTime=false] If true, the runTime property will be returned instead of time.
 	*/
-	public function getEventTime(runTime:Bool):Float;
+	public static function getEventTime(runTime:Bool):Float;
 	
 	/**
 	* Starts the tick. This is called automatically when the first listener is added.
@@ -206,6 +158,39 @@ extern class Ticker
 	* Stops the Ticker and removes all listeners. Use init() to restart the Ticker.
 	*/
 	public static function reset():Dynamic;
+	
+	/**
+	* Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+	* @param value 
+	*/
+	public static function setFPS(value:Float):Dynamic;
+	
+	/**
+	* Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
+	*/
+	public static function getInterval():Float;
+	
+	/**
+	* Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+	* @param interval 
+	*/
+	public static function setInterval(interval:Float):Dynamic;
+	
+	/**
+	* Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
+	*/
+	public static function getFPS():Float;
+	
+	/**
+	* Use the {{#crossLink "Ticker/paused:property"}}{{/crossLink}} property instead.
+	* @param value 
+	*/
+	public static function setPaused(value:Bool):Dynamic;
+	
+	/**
+	* Use the {{#crossLink "Ticker/paused:property"}}{{/crossLink}} property instead.
+	*/
+	public static function getPaused():Bool;
 	
 	private static function _getTime():Dynamic;
 	
@@ -221,7 +206,43 @@ extern class Ticker
 	
 	// EventDispatcher injects...
 	
-	private var _listeners:Dynamic;
+	/**
+	* A shortcut method for using addEventListener that makes it easier to specify an execution scope, have a listener
+	*	only run once, associate arbitrary data with the listener, and remove the listener.
+	*	
+	*	This method works by creating an anonymous wrapper function and subscribing it with addEventListener.
+	*	The created anonymous function is returned for use with .removeEventListener (or .off).
+	*	
+	*	<h4>Example</h4>
+	*	
+	*			var listener = myBtn.on("click", handleClick, null, false, {count:3});
+	*			function handleClick(evt, data) {
+	*				data.count -= 1;
+	*				console.log(this == myBtn); // true - scope defaults to the dispatcher
+	*				if (data.count == 0) {
+	*					alert("clicked 3 times!");
+	*					myBtn.off("click", listener);
+	*					// alternately: evt.remove();
+	*				}
+	*			}
+	* @param type The string type of the event.
+	* @param listener An object with a handleEvent method, or a function that will be called when
+	*	the event is dispatched.
+	* @param scope The scope to execute the listener in. Defaults to the dispatcher/currentTarget for function listeners, and to the listener itself for object listeners (ie. using handleEvent).
+	* @param once If true, the listener will remove itself after the first time it is triggered.
+	* @param data Arbitrary data that will be included as the second parameter when the listener is called.
+	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	*/
+	public static function on(type:String, listener:Dynamic, ?scope:Dynamic, ?once:Bool, ?data:Dynamic, ?useCapture:Bool):Dynamic;
+	
+	/**
+	* A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
+	*	.on method.
+	* @param type The string type of the event.
+	* @param listener The listener function or object.
+	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.
+	*/
+	public static function off(type:String, listener:Dynamic, ?useCapture:Bool):Dynamic;
 	
 	/**
 	* Adds the specified event listener. Note that adding multiple listeners to the same function will result in
@@ -253,14 +274,26 @@ extern class Ticker
 	*	     this.dispatchEvent(event);
 	* @param eventObj An object with a "type" property, or a string type.
 	*	While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
-	*	dispatchEvent will construct an Event instance with the specified type.
-	* @param target The object to use as the target property of the event object. This will default to the
-	*	dispatching object. <b>This parameter is deprecated and will be removed.</b>
+	*	dispatchEvent will construct an Event instance if necessary with the specified type. This latter approach can
+	*	be used to avoid event object instantiation for non-bubbling events that may not have any listeners.
+	* @param bubbles Specifies the `bubbles` value when a string was passed to eventObj.
+	* @param cancelable Specifies the `cancelable` value when a string was passed to eventObj.
 	*/
-	public static function dispatchEvent(eventObj:Dynamic, ?target:Dynamic):Bool;
+	public static function dispatchEvent(eventObj:Dynamic, ?bubbles:Bool, ?cancelable:Bool):Bool;
 	
 	/**
-	* Indicates whether there is at least one listener for the specified event type and `useCapture` value.
+	* Indicates whether there is at least one listener for the specified event type on this object or any of its
+	*	ancestors (parent, parent's parent, etc). A return value of true indicates that if a bubbling event of the
+	*	specified type is dispatched from this object, it will trigger at least one listener.
+	*	
+	*	This is similar to {{#crossLink "EventDispatcher/hasEventListener"}}{{/crossLink}}, but it searches the entire
+	*	event flow for a listener, not just this object.
+	* @param type The string type of the event.
+	*/
+	public static function willTrigger(type:String):Bool;
+	
+	/**
+	* Indicates whether there is at least one listener for the specified event type.
 	* @param type The string type of the event.
 	*/
 	public static function hasEventListener(type:String):Bool;
@@ -271,7 +304,7 @@ extern class Ticker
 	*	<h4>Example</h4>
 	*	
 	*	     // Remove all listeners
-	*	     displayObject.removeAllEvenListeners();
+	*	     displayObject.removeAllEventListeners();
 	*	
 	*	     // Remove all click listeners
 	*	     displayObject.removeAllEventListeners("click");

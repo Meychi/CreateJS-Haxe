@@ -1,7 +1,5 @@
 package createjs.easeljs;
 
-import js.html.Image;
-
 /**
 * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
 *	you to maintain your assets as vector graphics (for low file size), and render them at run time as sprite sheets
@@ -66,6 +64,15 @@ extern class SpriteSheetBuilder extends EventDispatcher
 	private var _timerID:Float;
 	
 	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
+	
+	/**
 	* Adds a frame to the {{#crossLink "SpriteSheet"}}{{/crossLink}}. Note that the frame will not be drawn until you
 	*	call {{#crossLink "SpriteSheetBuilder/build"}}{{/crossLink}} method. The optional setup params allow you to have
 	*	a function run immediately before the draw occurs. For example, this allows you to add a single source multiple
@@ -79,11 +86,10 @@ extern class SpriteSheetBuilder extends EventDispatcher
 	*	source to draw to the frame. If not specified, it will look for a <code>getBounds</code> method, bounds property,
 	*	or <code>nominalBounds</code> property on the source to use. If one is not found, the frame will be skipped.
 	* @param scale Optional. The scale to draw this frame at. Default is 1.
-	* @param setupFunction Optional. A function to call immediately before drawing this frame.
-	* @param setupParams Parameters to pass to the setup function.
-	* @param setupScope The scope to call the setupFunction in.
+	* @param setupFunction A function to call immediately before drawing this frame. It will be called with two parameters: the source, and setupData.
+	* @param setupData Arbitrary setup data to pass to setupFunction as the second parameter.
 	*/
-	public function addFrame(source:DisplayObject, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupParams:Array<Dynamic>, ?setupScope:Dynamic):Float;
+	public function addFrame(source:DisplayObject, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupData:Dynamic):Float;
 	
 	/**
 	* Adds an animation that will be included in the created sprite sheet.
@@ -109,11 +115,6 @@ extern class SpriteSheetBuilder extends EventDispatcher
 	* Builds a SpriteSheet instance based on the current frames.
 	*/
 	public function build():SpriteSheet;
-	
-	/**
-	* Initialization method.
-	*/
-	private function initialize():Dynamic;
 	
 	/**
 	* Returns a string representation of this object.
@@ -144,30 +145,35 @@ extern class SpriteSheetBuilder extends EventDispatcher
 	public function new():Void;
 	
 	/**
-	* This will take a MovieClip, and add its frames and labels to this builder. Labels will be added as an animation
+	* This will take a MovieClip instance, and add its frames and labels to this builder. Labels will be added as an animation
 	*	running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
 	*	named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
 	*	index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
 	*	
 	*	Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
-	* @param source The source MovieClip to add to the sprite sheet.
+	* @param source The source MovieClip instance to add to the sprite sheet.
 	* @param sourceRect A {{#crossLink "Rectangle"}}{{/crossLink}} defining the portion of the source to
 	*	draw to the frame. If not specified, it will look for a <code>getBounds</code> method, <code>frameBounds</code>
 	*	Array, <code>bounds</code> property, or <code>nominalBounds</code> property on the source to use. If one is not
 	*	found, the MovieClip will be skipped.
 	* @param scale The scale to draw the movie clip at.
+	* @param setupFunction A function to call immediately before drawing each frame. It will be called with three parameters: the source, setupData, and the frame index.
+	* @param setupData Arbitrary setup data to pass to setupFunction as the second parameter.
+	* @param labelFunction This method will be called for each movieclip label that is added with four parameters: the label name, the source movieclip instance, the starting frame index (in the movieclip timeline) and the end index. It must return a new name for the label/animation, or false to exclude the label.
 	*/
-	public function addMovieClip(source:MovieClip, ?sourceRect:Rectangle, ?scale:Float):Dynamic;
+	public function addMovieClip(source:MovieClip, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupData:Dynamic, ?labelFunction:Dynamic):Dynamic;
 	
 	private function _drawNext():Dynamic;
 	
 	private function _endBuild():Dynamic;
 	
-	private function _fillRow(frames:Array<Dynamic>, y:Float, img:Image, dataFrames:Dynamic, pad:Float):Float;
+	private function _fillRow(frames:Array<Dynamic>, y:Float, img:HTMLImageElement, dataFrames:Dynamic, pad:Float):Float;
 	
 	private function _getSize():Float;
 	
 	private function _run():Dynamic;
+	
+	private function _setupMovieClipFrame():Float;
 	
 	private function _startBuild():Dynamic;
 	

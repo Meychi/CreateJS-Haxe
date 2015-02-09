@@ -65,9 +65,19 @@ extern class Stage extends Container
 	private var _pointerCount:Dynamic;
 	
 	/**
+	* Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas. This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
+	*/
+	public var preventSelection:Bool;
+	
+	/**
 	* Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them. This can be useful in cases where you have multiple layered canvases and want user interactions events to pass through. For example, this would relay mouse events from topStage to bottomStage:       topStage.nextStage = bottomStage;  To disable relaying, set nextStage to null.  MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings of the top-most stage, but are only processed if the target stage has mouse over interactions enabled. Considerations when using roll over in relay targets:<OL> <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI> <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI> <LI> All relay targets will share the frequency value of the top-most stage</LI> </OL> To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing 30 as it's desired frequency): 	topStage.nextStage = targetStage; 	topStage.enableMouseOver(10); 	targetStage.enableMouseOver(30);  If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its DOM events using:  	targetStage.enableDOMEvents(false);
 	*/
 	public var nextStage:Stage;
+	
+	/**
+	* Specifies the area of the stage to affect when calling update. This can be use to selectively re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
+	*/
+	public var drawRect:Rectangle;
 	
 	/**
 	* The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the first stage that will be ticked (or they will clear each other's render).  When changing the canvas property you must disable the events on the old canvas, and enable events on the new canvas or mouse events will not work as expected. For example:       myStage.enableDOMEvents(false);      myStage.canvas = anotherCanvas;      myStage.enableDOMEvents(true);
@@ -96,6 +106,15 @@ extern class Stage extends Container
 	private var _prevStage:Stage;
 	
 	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	//private function initialize():Dynamic;
+	
+	/**
 	* A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
 	*	method is called, it will render its display list to its target canvas.
 	*	
@@ -122,21 +141,12 @@ extern class Stage extends Container
 	public function clear():Dynamic;
 	
 	/**
-	* Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	*	and then render the display list to the canvas. Any parameters passed to `update()` will be passed on to any
-	*	{{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	*	
-	*	Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	*	a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	*	
-	*	     Ticker.addEventListener("tick", handleTick);
-	*		    function handleTick(evtObj) {
-	*		     	// do some work here, then update the stage, passing through the event object:
-	*		    	myStage.update(evtObj);
-	*		    }
-	* @param params Params to include when ticking descendants. The first param should usually be a tick event.
+	* Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
+	*	unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
+	*	and then render the display list to the canvas.
+	* @param props Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
 	*/
-	public function update(?params:Dynamic):Dynamic;
+	public function update(?props:Dynamic):Dynamic;
 	
 	/**
 	* Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
@@ -146,6 +156,7 @@ extern class Stage extends Container
 	*	independently of mouse move events via the optional `frequency` parameter.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var stage = new createjs.Stage("canvasId");
 	*	     stage.enableMouseOver(10); // 10 updates per second
 	* @param frequency Optional param specifying the maximum number of times per second to broadcast
@@ -170,30 +181,54 @@ extern class Stage extends Container
 	public function enableDOMEvents(?enable:Bool):Dynamic;
 	
 	/**
-	* Initialization method.
-	* @param canvas A canvas object, or the string id of a canvas object in the current document.
+	* Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
+	*	unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
+	*	
+	*	If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
+	*	propagated to listeners.
+	*	
+	*	Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	*	a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
+	*	passed as the `props` parameter to `tick()`. For example:
+	*	
+	*		Ticker.on("tick", handleTick);
+	*		function handleTick(evtObj) {
+	*			// clone the event object from Ticker, and add some custom data to it:
+	*			var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	*			
+	*			// pass it to stage.update():
+	*			myStage.update(evt); // subsequently calls tick() with the same param
+	*		}
+	*		
+	*		// ...
+	*		myDisplayObject.on("tick", handleDisplayObjectTick);
+	*		function handleDisplayObjectTick(evt) {
+	*			console.log(evt.delta); // the delta property from the Ticker tick event object
+	*			console.log(evt.greeting, evt.name); // custom data: "hello world"
+	*		}
+	* @param props An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	*/
-	//private function initialize(canvas:Dynamic):Dynamic;
-	
-	/**
-	* Returns a clone of this Stage.
-	*/
-	//public function clone():Stage;
+	public function tick(?props:Dynamic):Dynamic;
 	
 	/**
 	* Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	*	be specified as the src value of an image element.
-	* @param backgroundColor The background color to be used for the generated image. The value can be any value HTML color
-	*	value, including HEX colors, rgb and rgba. The default value is a transparent background.
+	* @param backgroundColor The background color to be used for the generated image. Any valid CSS color
+	*	value is allowed. The default value is a transparent background.
 	* @param mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	*	is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	*/
-	public function toDataURL(backgroundColor:String, mimeType:String):String;
+	public function toDataURL(?backgroundColor:String, ?mimeType:String):String;
 	
 	/**
 	* Returns a string representation of this object.
 	*/
 	//public function toString():String;
+	
+	/**
+	* Stage instances cannot be cloned.
+	*/
+	//public function clone():Dynamic;
 	
 	private function _dispatchMouseEvent(target:DisplayObject, type:String, bubbles:Bool, pointerId:Float, o:Dynamic, ?nativeEvent:MouseEvent):Dynamic;
 	

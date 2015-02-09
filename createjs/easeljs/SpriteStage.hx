@@ -2,7 +2,6 @@ package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
 import js.html.Float32Array;
-import js.html.Image;
 import js.html.Uint16Array;
 
 /**
@@ -55,7 +54,7 @@ extern class SpriteStage extends Stage
 	private var _antialias:Bool;
 	
 	/**
-	* Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true. If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if p._alphaEnabled is false. Useful if you want to use p.autoClear = false.
+	* Specifies whether or not the canvas is auto-cleared by WebGL. Spec discourages true. If true, the canvas is NOT auto-cleared by WebGL. Value is ignored if `_alphaEnabled` is false. Useful if you want to use `autoClear = false`.
 	*/
 	private var _preserveDrawingBuffer:Bool;
 	
@@ -100,7 +99,7 @@ extern class SpriteStage extends Stage
 	private var _viewportHeight:Float;
 	
 	/**
-	* The indices to the vertices defined in p._vertices.
+	* The indices to the vertices defined in this._vertices.
 	*/
 	private var _indices:Uint16Array;
 	
@@ -164,10 +163,6 @@ extern class SpriteStage extends Stage
 	*/
 	private var _viewportWidth:Float;
 	
-	private var Stage_draw:Dynamic;
-	
-	private var Stage_initialize:Dynamic;
-	
 	/**
 	* A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
 	*	method is called, it will render its display list to its target canvas. WebGL content is fully compatible with the existing Context2D renderer.
@@ -207,6 +202,7 @@ extern class SpriteStage extends Stage
 	*	Children also MUST have either an image or spriteSheet defined on them (unless it's a DOMElement).
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     addChildAt(child1, index);
 	*	
 	*	You can also add multiple children, such as:
@@ -243,7 +239,7 @@ extern class SpriteStage extends Stage
 	* Clears an image's texture to free it up for garbage collection.
 	* @param image 
 	*/
-	public function clearImageTexture(image:Image):Dynamic;
+	public function clearImageTexture(image:HTMLImageElement):Dynamic;
 	
 	/**
 	* Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
@@ -290,33 +286,6 @@ extern class SpriteStage extends Stage
 	*	into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Dynamic;
-	
-	/**
-	* Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	*	and then render the display list to the canvas using WebGL. If WebGL is not supported in the browser, it will default to a 2D context.
-	*	
-	*	Any parameters passed to `update()` will be passed on to any
-	*	{{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	*	
-	*	Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	*	a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	*	
-	*	     Ticker.addEventListener("tick", handleTick);
-	*	     function handleTick(evtObj) {
-	*	         // do some work here, then update the stage, passing through the event object:
-	*	         myStage.update(evtObj);
-	*	     }
-	* @param params Params to include when ticking descendants. The first param should usually be a tick event.
-	*/
-	//public function update(?params:*):Dynamic;
-	
-	/**
-	* Initialization method.
-	* @param canvas A canvas object, or the string id of a canvas object in the current document.
-	* @param preserveDrawingBuffer If true, the canvas is NOT auto-cleared by WebGL (spec discourages true). Useful if you want to use p.autoClear = false.
-	* @param antialias Specifies whether or not the browser's WebGL implementation should try to perform antialiasing.
-	*/
-	//private function initialize(canvas:Dynamic, preserveDrawingBuffer:Bool, antialias:Bool):Dynamic;
 	
 	/**
 	* Initializes rendering with WebGL using the current canvas element.

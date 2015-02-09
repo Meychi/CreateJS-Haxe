@@ -12,6 +12,7 @@ import js.html.CanvasRenderingContext2D;
 *	rendering cost.
 *	
 *	<h4>Example</h4>
+*	
 *	     var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
 *	     var shape = new createjs.Shape(graphics);
 *	
@@ -27,10 +28,6 @@ extern class Shape extends DisplayObject
 	*/
 	public var graphics:Graphics;
 	
-	private var DisplayObject_draw:Dynamic;
-	
-	private var DisplayObject_initialize:Dynamic;
-	
 	/**
 	* A Shape allows you to display vector art in the display list. It composites a {{#crossLink "Graphics"}}{{/crossLink}}
 	*	instance which exposes all of the vector drawing methods. The Graphics instance can be shared between multiple Shape
@@ -41,6 +38,7 @@ extern class Shape extends DisplayObject
 	*	rendering cost.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
 	*	     var shape = new createjs.Shape(graphics);
 	*	
@@ -61,12 +59,6 @@ extern class Shape extends DisplayObject
 	*	used for drawing the cache (to prevent it from simply drawing an existing cache back into itself).
 	*/
 	//public function draw(ctx:CanvasRenderingContext2D, ?ignoreCache:Bool):Bool;
-	
-	/**
-	* Initialization method.
-	* @param graphics 
-	*/
-	//private function initialize(graphics:Graphics):Dynamic;
 	
 	/**
 	* Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to

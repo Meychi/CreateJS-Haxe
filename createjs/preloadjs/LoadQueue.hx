@@ -1,11 +1,15 @@
 package createjs.preloadjs;
 
+import js.html.ErrorEvent;
+import js.html.Event;
+import js.html.ProgressEvent;
+
 /**
 * The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
 *	a single file, or queue of files.
 *	
 *	<b>Creating a Queue</b><br />
-*	To use LoadQueue, create a LoadQueue instance. If you want to force tag loading where possible, set the useXHR
+*	To use LoadQueue, create a LoadQueue instance. If you want to force tag loading where possible, set the preferXHR
 *	argument to false.
 *	
 *	     var queue = new createjs.LoadQueue(true);
@@ -37,6 +41,10 @@ package createjs.preloadjs;
 *	     queue.loadFile({id:"image", src:"filePath/file.jpg"});
 *	     queue.loadManifest(["filePath/file.jpg", {id:"image", src:"filePath/file.jpg"}]);
 *	
+*	     // Use an external manifest
+*	     queue.loadManifest("path/to/manifest.json");
+*	     queue.loadManifest({src:"manifest.json", type:"manifest"});
+*	
 *	If you pass `false` as the `loadNow` parameter, the queue will not kick of the load of the files, but it will not
 *	stop if it has already been started. Call the {{#crossLink "AbstractLoader/load"}}{{/crossLink}} method to begin
 *	a paused queue. Note that a paused queue will automatically resume when new files are added to it with a
@@ -50,41 +58,49 @@ package createjs.preloadjs;
 *	either a non-standard file extension, or are serving the file using a proxy script, then you can pass in a
 *	<code>type</code> property with any manifest item.
 *	
-*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.LoadQueue.SOUND});
+*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.AbstractLoader.SOUND});
 *	
 *	     // Note that PreloadJS will not read a file extension from the query string
-*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.LoadQueue.IMAGE});
+*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.AbstractLoader.IMAGE});
 *	
-*	Supported types are defined on the LoadQueue class, and include:
+*	Supported types are defined on the {{#crossLink "AbstractLoader"}}{{/crossLink}} class, and include:
 *	<ul>
-*	    <li>{{#crossLink "LoadQueue/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
-*	    <li>{{#crossLink "LoadQueue/CSS:property"}}{{/crossLink}}: CSS files</li>
-*	    <li>{{#crossLink "LoadQueue/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
-*	    <li>{{#crossLink "LoadQueue/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
-*	    <li>{{#crossLink "LoadQueue/JSON:property"}}{{/crossLink}}: JSON data</li>
-*	    <li>{{#crossLink "LoadQueue/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
-*	    <li>{{#crossLink "LoadQueue/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
-*	    {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}}</li>
-*	    <li>{{#crossLink "LoadQueue/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
-*	    <li>{{#crossLink "LoadQueue/SVG:property"}}{{/crossLink}}: SVG files</li>
-*	    <li>{{#crossLink "LoadQueue/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
-*	    <li>{{#crossLink "LoadQueue/XML:property"}}{{/crossLink}}: XML data</li>
+*	    <li>{{#crossLink "AbstractLoader/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
+*	    <li>{{#crossLink "AbstractLoader/CSS:property"}}{{/crossLink}}: CSS files</li>
+*	    <li>{{#crossLink "AbstractLoader/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
+*	    <li>{{#crossLink "AbstractLoader/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
+*	    <li>{{#crossLink "AbstractLoader/JSON:property"}}{{/crossLink}}: JSON data</li>
+*	    <li>{{#crossLink "AbstractLoader/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
+*	    <li>{{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
+*	    {{#crossLink "AbstractLoader/loadManifest"}}{{/crossLink}}</li>
+*	    <li>{{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
+*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definiteions. This
+*	    will also load sub-images, and provide a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance.</li>
+*	    <li>{{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}: SVG files</li>
+*	    <li>{{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
+*	    <li>{{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}: XML data</li>
 *	</ul>
+*	
+*	<em>Note: Loader types used to be defined on LoadQueue, but have been moved to AbstractLoader for better
+*	portability of loader classes, which can be used individually now. The properties on LoadQueue still exist, but
+*	are deprecated.</em>
 *	
 *	<b>Handling Results</b><br />
 *	When a file is finished downloading, a {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event is
 *	dispatched. In an example above, there is an event listener snippet for fileload. Loaded files are usually a
-*	resolved object that can be used immediately, including:
+*	formatted object that can be used immediately, including:
 *	<ul>
-*	    <li>Image: An &lt;img /&gt; tag</li>
-*	    <li>Audio: An &lt;audio /&gt; tag</a>
-*	    <li>JavaScript: A &lt;script /&gt; tag</li>
-*	    <li>CSS: A &lt;link /&gt; tag</li>
-*	    <li>XML: An XML DOM node</li>
-*	    <li>SVG: An &lt;object /&gt; tag</li>
-*	    <li>JSON: A formatted JavaScript Object</li>
-*	    <li>Text: Raw text</li>
 *	    <li>Binary: The binary loaded result</li>
+*	    <li>CSS: A &lt;link /&gt; tag</li>
+*	    <li>Image: An &lt;img /&gt; tag</li>
+*	    <li>JavaScript: A &lt;script /&gt; tag</li>
+*	    <li>JSON/JSONP: A formatted JavaScript Object</li>
+*	    <li>Manifest: A JavaScript object.
+*	    <li>Sound: An &lt;audio /&gt; tag</a>
+*	    <li>SpriteSheet: A {{#crossLink "SpriteSheet"}}{{/crossLink}} instance, containing loaded images.
+*	    <li>SVG: An &lt;object /&gt; tag</li>
+*	    <li>Text: Raw text</li>
+*	    <li>XML: An XML DOM node</li>
 *	</ul>
 *	
 *	     function handleFileLoad(event) {
@@ -98,9 +114,9 @@ package createjs.preloadjs;
 *	     }
 *	
 *	At any time after the file has been loaded (usually after the queue has completed), any result can be looked up
-*	via its "id" using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}. If no id was provided, then the "src" or
-*	file path can be used instead, including the `path` defined by a manifest, but <strong>not including</strong> a
-*	base path defined on the LoadQueue. It is recommended to always pass an id.
+*	via its "id" using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}. If no id was provided, then the
+*	"src" or file path can be used instead, including the `path` defined by a manifest, but <strong>not including</strong>
+*	a base path defined on the LoadQueue. It is recommended to always pass an id if you want to look up content.
 *	
 *	     var image = queue.getResult("image");
 *	     document.body.appendChild(image);
@@ -147,7 +163,7 @@ extern class LoadQueue extends AbstractLoader
 	private var _loadedScripts:Array<Dynamic>;
 	
 	/**
-	* A path that will be prepended on to the item's `src`. The `_basePath` property will only be used if an item's source is relative, and does not include a protocol such as `http://`, or a relative path such as `../`.
+	* A path that will be prepended on to the item's {{#crossLink "LoadItem/src:property"}}{{/crossLink}}. The `_basePath` property will only be used if an item's source is relative, and does not include a protocol such as `http://`, or a relative path such as `../`.
 	*/
 	private var _basePath:String;
 	
@@ -167,6 +183,11 @@ extern class LoadQueue extends AbstractLoader
 	private var _loadQueue:Array<Dynamic>;
 	
 	/**
+	* An internal list of all the default Loaders that are included with PreloadJS. Before an item is loaded, the available loader list is iterated, in the order they are included, and as soon as a loader indicates it can handle the content, it will be selected. The default loader, ({{#crossLink "TextLoader"}}{{/crossLink}} is last in the list, so it will be used if no other match is found. Typically, loaders will match based on the {{#crossLink "LoadItem/type"}}{{/crossLink}}, which is automatically determined using the file extension of the {{#crossLink "LoadItem/src:property"}}{{/crossLink}}.  Loaders can be removed from PreloadJS by simply not including them.  Custom loaders installed using {{#crossLink "registerLoader"}}{{/crossLink}} will be prepended to this list so that they are checked first.
+	*/
+	private var _availableLoaders:Array<Dynamic>;
+	
+	/**
 	* An object hash of callbacks that are fired for each file extension before the file is loaded, giving plugins the ability to override properties of the load. Please see the {{#crossLink "LoadQueue/installPlugin"}}{{/crossLink}} method for more information.
 	*/
 	private var _extensionCallbacks:Dynamic;
@@ -177,22 +198,22 @@ extern class LoadQueue extends AbstractLoader
 	private var _typeCallbacks:Dynamic;
 	
 	/**
-	* An object hash of items that have finished downloading, indexed by item IDs.
+	* An object hash of items that have finished downloading, indexed by the {{#crossLink "LoadItem"}}{{/crossLink}} id.
 	*/
 	private var _loadItemsById:Dynamic;
 	
 	/**
-	* An object hash of items that have finished downloading, indexed by item source.
+	* An object hash of items that have finished downloading, indexed by {{#crossLink "LoadItem"}}{{/crossLink}} source.
 	*/
 	private var _loadItemsBySrc:Dynamic;
 	
 	/**
-	* An object hash of loaded items, indexed by the ID of the load item.
+	* An object hash of loaded items, indexed by the ID of the {{#crossLink "LoadItem"}}{{/crossLink}}.
 	*/
 	private var _loadedResults:Dynamic;
 	
 	/**
-	* An object hash of un-parsed loaded items, indexed by the ID of the load item.
+	* An object hash of un-parsed loaded items, indexed by the ID of the {{#crossLink "LoadItem"}}{{/crossLink}}.
 	*/
 	private var _loadedRawResults:Dynamic;
 	
@@ -217,9 +238,14 @@ extern class LoadQueue extends AbstractLoader
 	private var _currentlyLoadingScript:Bool;
 	
 	/**
-	* Ensure loaded scripts "complete" in the order they are specified. Loaded scripts are added to the document head once they are loaded. Scripts loaded via tags will load one-at-a-time when this property is `true`, whereas scripts loaded using XHR can load in any order, but will "finish" and be added to the document in the order specified.  Any items can be set to load in order by setting the `maintainOrder` property on the load item, or by ensuring that only one connection can be open at a time using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}. Note that when the `maintainScriptOrder` property is set to `true`, scripts items are automatically set to `maintainOrder=true`, and changing the `maintainScriptOrder` to `false` during a load will not change items already in a queue.  <h4>Example</h4>       var queue = new createjs.LoadQueue();      queue.setMaxConnections(3); // Set a higher number to load multiple items at once      queue.maintainScriptOrder = true; // Ensure scripts are loaded in order      queue.loadManifest([          "script1.js",          "script2.js",          "image.png", // Load any time          {src: "image2.png", maintainOrder: true} // Will wait for script2.js          "image3.png",          "script3.js" // Will wait for image2.png before loading (or completing when loading with XHR)      ]);
+	* Ensure loaded scripts "complete" in the order they are specified. Loaded scripts are added to the document head once they are loaded. Scripts loaded via tags will load one-at-a-time when this property is `true`, whereas scripts loaded using XHR can load in any order, but will "finish" and be added to the document in the order specified.  Any items can be set to load in order by setting the {{#crossLink "maintainOrder:property"}}{{/crossLink}} property on the load item, or by ensuring that only one connection can be open at a time using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}. Note that when the `maintainScriptOrder` property is set to `true`, scripts items are automatically set to `maintainOrder=true`, and changing the `maintainScriptOrder` to `false` during a load will not change items already in a queue.  <h4>Example</h4>       var queue = new createjs.LoadQueue();      queue.setMaxConnections(3); // Set a higher number to load multiple items at once      queue.maintainScriptOrder = true; // Ensure scripts are loaded in order      queue.loadManifest([          "script1.js",          "script2.js",          "image.png", // Load any time          {src: "image2.png", maintainOrder: true} // Will wait for script2.js          "image3.png",          "script3.js" // Will wait for image2.png before loading (or completing when loading with XHR)      ]);
 	*/
 	public var maintainScriptOrder:Bool;
+	
+	/**
+	* The last progress amount. This is used to suppress duplicate progress events.
+	*/
+	private var _lastProgress:Float;
 	
 	/**
 	* The next preload queue to process when this one is complete. If an error is thrown in the current queue, and {{#crossLink "LoadQueue/stopOnError:property"}}{{/crossLink}} is `true`, the next queue will not be processed.
@@ -227,7 +253,12 @@ extern class LoadQueue extends AbstractLoader
 	public var next:LoadQueue;
 	
 	/**
-	* The number of items that have been requested. This helps manage an overall progress without knowing how large the files are before they are downloaded.
+	* The number of built in loaders, so they can't be removed by {{#crossLink "unregisterLoader"}}{{/crossLink}.
+	*/
+	private var _defaultLoaderLength:Float;
+	
+	/**
+	* The number of items that have been requested. This helps manage an overall progress without knowing how large the files are before they are downloaded. This does not include items inside of loaders such as the {{#crossLink "ManifestLoader"}}{{/crossLink}}.
 	*/
 	private var _numItems:Float;
 	
@@ -242,69 +273,66 @@ extern class LoadQueue extends AbstractLoader
 	private var _maxConnections:Float;
 	
 	/**
-	* The preload type for css files. CSS files are loaded using a &lt;link&gt; when loaded with XHR, or a &lt;style&gt; tag when loaded with tags.
+	* The time in milliseconds to assume a load has failed.
 	*/
-	public static var CSS:String;
+	public var LOAD_TIMEOUT:Float;
 	
 	/**
-	* The preload type for generic binary types. Note that images are loaded as binary files when using XHR.
-	*/
-	public static var BINARY:String;
-	
-	/**
-	* The preload type for image files, usually png, gif, or jpg/jpeg. Images are loaded into an &lt;image&gt; tag.
-	*/
-	public static var IMAGE:String;
-	
-	/**
-	* The preload type for javascript files, usually with the "js" file extension. JavaScript files are loaded into a &lt;script&gt; tag.  Since version 0.4.1+, due to how tag-loaded scripts work, all JavaScript files are automatically injected into the body of the document to maintain parity between XHR and tag-loaded scripts. In version 0.4.0 and earlier, only tag-loaded scripts are injected.
-	*/
-	public static var JAVASCRIPT:String;
-	
-	/**
-	* The preload type for json files, usually with the "json" file extension. JSON data is loaded and parsed into a JavaScript object. Note that if a `callback` is present on the load item, the file will be loaded with JSONP, no matter what the {{#crossLink "LoadQueue/useXHR:property"}}{{/crossLink}} property is set to, and the JSON must contain a matching wrapper function.
-	*/
-	public static var JSON:String;
-	
-	/**
-	* The preload type for json-based manifest files, usually with the "json" file extension. The JSON data is loaded and parsed into a JavaScript object. PreloadJS will then look for a "manifest" property in the JSON, which is an Array of files to load, following the same format as the {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}} method. If a "callback" is specified on the manifest object, then it will be loaded using JSONP instead, regardless of what the {{#crossLink "LoadQueue/useXHR:property"}}{{/crossLink}} property is set to.
-	*/
-	public static var MANIFEST:String;
-	
-	/**
-	* The preload type for jsonp files, usually with the "json" file extension. JSON data is loaded and parsed into a JavaScript object. You are required to pass a callback parameter that matches the function wrapper in the JSON. Note that JSONP will always be used if there is a callback present, no matter what the {{#crossLink "LoadQueue/useXHR:property"}}{{/crossLink}} property is set to.
-	*/
-	public static var JSONP:String;
-	
-	/**
-	* The preload type for sound files, usually mp3, ogg, or wav. When loading via tags, audio is loaded into an &lt;audio&gt; tag.
-	*/
-	public static var SOUND:String;
-	
-	/**
-	* The preload type for SVG files.
-	*/
-	public static var SVG:String;
-	
-	/**
-	* The preload type for text files, which is also the default file type if the type can not be determined. Text is loaded as raw text.
-	*/
-	public static var TEXT:String;
-	
-	/**
-	* The preload type for xml files. XML is loaded into an XML document.
-	*/
-	public static var XML:String;
-	
-	/**
-	* Time in milliseconds to assume a load has failed. An {{#crossLink "AbstractLoader/error:event"}}{{/crossLink}} event is dispatched if the timeout is reached before any data is received.
+	* The time in milliseconds to assume a load has failed. An {{#crossLink "AbstractLoader/error:event"}}{{/crossLink}} event is dispatched if the timeout is reached before any data is received.
 	*/
 	public static var loadTimeout:Float;
 	
 	/**
-	* Use XMLHttpRequest (XHR) when possible. Note that LoadQueue will default to tag loading or XHR loading depending on the requirements for a media type. For example, HTML audio can not be loaded with XHR, and WebAudio can not be loaded with tags, so it will default the the correct type instead of using the user-defined type.  <b>Note: This property is read-only.</b> To change it, please use the {{#crossLink "LoadQueue/setUseXHR"}}{{/crossLink}} method, or specify the `useXHR` argument in the LoadQueue constructor.
+	* Whether the queue is currently paused or not.
 	*/
+	private var _paused:Boolean;
+	
+	public static var BINARY:String;
+	
+	public static var CSS:String;
+	
+	public static var IMAGE:String;
+	
+	public static var JAVASCRIPT:String;
+	
+	public static var JSON:String;
+	
+	public static var JSONP:String;
+	
+	public static var MANIFEST:String;
+	
+	public static var SOUND:String;
+	
+	public static var SVG:String;
+	
+	public static var TEXT:String;
+	
+	public static var VIDEO:String;
+	
+	public static var XML:String;
+	
+	public var GET:String;
+	
+	public var POST:String;
+	
 	public var useXHR:Bool;
+	
+	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	private function initialize():Dynamic;
+	
+	/**
+	* A file has completed loading, and the LoadQueue can move on. This triggers the complete event, and kick-starts
+	*	the next item.
+	* @param item 
+	* @param loader 
+	*/
+	private function _processFinishedLoad(item:Dynamic, loader:AbstractLoader):Dynamic;
 	
 	/**
 	* A load item is completed or was canceled, and needs to be removed from the LoadQueue.
@@ -328,32 +356,39 @@ extern class LoadQueue extends AbstractLoader
 	private function _addItem(value:Dynamic, ?path:String, ?basePath:String):Dynamic;
 	
 	/**
-	* An item has dispatched progress. Propagate that progress, and update the LoadQueue overall progress.
+	* An internal initialization method, which is used for initial set up, but also to reset the LoadQueue.
+	* @param preferXHR 
+	* @param basePath 
+	* @param crossOrigin 
+	*/
+	private function init(preferXHR:Dynamic, basePath:Dynamic, crossOrigin:Dynamic):Dynamic;
+	
+	/**
+	* An item has dispatched progress. Propagate that progress, and update the LoadQueue's overall progress.
 	* @param event The progress event from the item.
 	*/
-	private function _handleProgress(event:Dynamic):Dynamic;
+	private function _handleProgress(event:ProgressEvent):Dynamic;
 	
 	/**
 	* An item has finished loading. We can assume that it is totally loaded, has been parsed for immediate use, and
 	*	is available as the "result" property on the load item. The raw text result for a parsed item (such as JSON, XML,
-	*	CSS, JavaScript, etc) is available as the "rawResult" event, and can also be looked up using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}.
+	*	CSS, JavaScript, etc) is available as the "rawResult" property, and can also be looked up using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}.
 	* @param event The event object from the loader.
 	*/
-	private function _handleFileComplete(event:Dynamic):Dynamic;
+	private function _handleFileComplete(event:Event):Dynamic;
 	
 	/**
-	* Begin loading an item. Events are not added to the loaders until the load starts.
+	* Begin loading an item. Event listeners are not added to the loaders until the load starts.
 	* @param loader The loader instance to start. Currently, this will be an XHRLoader or TagLoader.
 	*/
 	private function _loadItem(loader:AbstractLoader):Dynamic;
 	
 	/**
-	* Change the usXHR value. Note that if this is set to true, it may fail depending on the browser's capabilities.
-	*	Additionally, some files require XHR in order to load, such as JSON (without JSONP), Text, and XML, so XHR will
-	*	be used regardless of what is passed to this method.
-	* @param value The new useXHR value to set.
+	* Change the {{#crossLink "preferXHR:property"}}{{/crossLink}} value. Note that if this is set to `true`, it may
+	*	fail, or be ignored depending on the browser's capabilities and the load type.
+	* @param value 
 	*/
-	public function setUseXHR(value:Bool):Bool;
+	public function setPreferXHR(value:Bool):Bool;
 	
 	/**
 	* Clean out item results, to free them from memory. Mainly, the loaded item and results are cleared from internal
@@ -363,13 +398,21 @@ extern class LoadQueue extends AbstractLoader
 	private function _disposeItem(item:Dynamic):Dynamic;
 	
 	/**
+	* Close the active queue. Closing a queue completely empties the queue, and prevents any remaining items from
+	*	starting to download. Note that currently any active loads will remain open, and events may be processed.
+	*	
+	*	To stop and restart a queue, use the {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}} method instead.
+	*/
+	public function close():Dynamic;
+	
+	/**
 	* Create a loader for a load item.
 	* @param item A formatted load item that can be used to generate a loader.
 	*/
 	private function _createLoader(item:Dynamic):AbstractLoader;
 	
 	/**
-	* Create a refined load item, which contains all the required properties (src, type, extension, tag). The type of
+	* Create a refined {{#crossLink "LoadItem"}}{{/crossLink}}, which contains all the required properties. The type of
 	*	item is determined by browser support, requirements based on the file type, and developer settings. For example,
 	*	XHR is only used for file types that support it in new browsers.
 	*	
@@ -385,37 +428,7 @@ extern class LoadQueue extends AbstractLoader
 	private function _createLoadItem(value:Dynamic, ?path:String, ?basePath:String):Dynamic;
 	
 	/**
-	* Create an HTML tag. This is in LoadQueue instead of {{#crossLink "TagLoader"}}{{/crossLink}} because no matter
-	*	how we load the data, we may need to return it in a tag.
-	* @param type The item type. Items are passed in by the developer, or deteremined by the extension.
-	*/
-	private function _createTag(type:String):Dynamic;
-	
-	/**
-	* Determine if a specific type is a text based asset, and should be loaded as UTF-8.
-	* @param type The item type.
-	*/
-	private function isText(type:String):Bool;
-	
-	/**
-	* Determine if a specific type should be loaded as a binary file. Currently, only images and items marked
-	*	specifically as "binary" are loaded as binary. Note that audio is <b>not</b> a binary type, as we can not play
-	*	back using an audio tag if it is loaded as binary. Plugins can change the item type to binary to ensure they get
-	*	a binary result to work with. Binary files are loaded using XHR2.
-	* @param type The item type.
-	*/
-	private function isBinary(type:String):Bool;
-	
-	/**
-	* Dispatch a fileload event. Please see the {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event for
-	*	details on the event payload.
-	* @param item The item that is being loaded.
-	* @param loader 
-	*/
-	private function _sendFileComplete(item:Dynamic, loader:Dynamic):Dynamic;
-	
-	/**
-	* Dispatch a fileprogress event (and onFileProgress callback). Please see the <code>LoadQueue.fileprogress</code>
+	* Dispatch a "fileprogress" {{#crossLink "Event"}}{{/crossLink}}. Please see the LoadQueue {{#crossLink "LoadQueue/fileprogress:event"}}{{/crossLink}}
 	*	event for details on the event payload.
 	* @param item The item that is being loaded.
 	* @param progress The amount the item has been loaded (between 0 and 1).
@@ -423,8 +436,16 @@ extern class LoadQueue extends AbstractLoader
 	private function _sendFileProgress(item:Dynamic, progress:Float):Dynamic;
 	
 	/**
-	* Dispatch a filestart event immediately before a file starts to load. Please see the {{#crossLink "LoadQueue/filestart:event"}}{{/crossLink}}
-	*	event for details on the event payload.
+	* Dispatch a fileload {{#crossLink "Event"}}{{/crossLink}}. Please see the {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event for
+	*	details on the event payload.
+	* @param item The item that is being loaded.
+	* @param loader 
+	*/
+	private function _sendFileComplete(item:LoadItemObject, loader:AbstractLoader):Dynamic;
+	
+	/**
+	* Dispatch a filestart {{#crossLink "Event"}}{{/crossLink}} immediately before a file starts to load. Please see
+	*	the {{#crossLink "LoadQueue/filestart:event"}}{{/crossLink}} event for details on the event payload.
 	* @param item The item that is being loaded.
 	*/
 	private function _sendFileStart(item:Dynamic):Dynamic;
@@ -435,22 +456,31 @@ extern class LoadQueue extends AbstractLoader
 	*	the script can even be started, since it exist in the DOM while loading.
 	* @param loader The loader for the item
 	*/
-	private function _canStartLoad(loader:Dynamic):Bool;
+	private function _canStartLoad(loader:AbstractLoader):Bool;
 	
 	/**
 	* Ensure the scripts load and dispatch in the correct order. When using XHR, scripts are stored in an array in the
 	*	order they were added, but with a "null" value. When they are completed, the value is set to the load item,
-	*	and then when they are processed and dispatched, the value is set to <code>true</code>. This method simply
-	*	iterates the array, and ensures that any loaded items that are not preceded by a <code>null</code> value are
+	*	and then when they are processed and dispatched, the value is set to `true`. This method simply
+	*	iterates the array, and ensures that any loaded items that are not preceded by a `null` value are
 	*	dispatched.
 	*/
 	private function _checkScriptLoadOrder():Dynamic;
 	
 	/**
-	* Flag an item as finished. If the item's order is being managed, then set it up to finish
+	* Flag an item as finished. If the item's order is being managed, then ensure that it is allowed to finish, and if
+	*	so, trigger prior items to trigger as well.
 	* @param loader 
+	* @param loadFailed 
 	*/
-	private function _finishOrderedItem(loader:AbstractLoader):Bool;
+	private function _finishOrderedItem(loader:AbstractLoader, loadFailed:Bool):Bool;
+	
+	/**
+	* Generate an list of items loaded by this queue.
+	* @param loaded Determines if only items that have been loaded should be returned. If false, in-progress
+	*	and failed load items will also be included.
+	*/
+	public function getItems(loaded:Bool):Array<Dynamic>;
 	
 	/**
 	* Load a single file. To add multiple files at once, use the {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}}
@@ -460,35 +490,16 @@ extern class LoadQueue extends AbstractLoader
 	*	To clear the queue first, use the {{#crossLink "AbstractLoader/close"}}{{/crossLink}} method.
 	* @param file The file object or path to load. A file can be either
 	*	<ul>
-	*	    <li>A string path to a resource. Note that this kind of load item will be converted to an object (see below)
+	*	    <li>A {{#crossLink "LoadItem"}}{{/crossLink}} instance</li>
+	*	    <li>An object containing properties defined by {{#crossLink "LoadItem"}}{{/crossLink}}</li>
+	*	    <li>OR A string path to a resource. Note that this kind of load item will be converted to a {{#crossLink "LoadItem"}}{{/crossLink}}
 	*	    in the background.</li>
-	*	    <li>OR an object that contains:<ul>
-	*	        <li>src: The source of the file that is being loaded. This property is <b>required</b>. The source can
-	*	        either be a string (recommended), or an HTML tag.</li>
-	*	        <li>type: The type of file that will be loaded (image, sound, json, etc). PreloadJS does auto-detection
-	*	        of types using the extension. Supported types are defined on LoadQueue, such as <code>LoadQueue.IMAGE</code>.
-	*	        It is recommended that a type is specified when a non-standard file URI (such as a php script) us used.</li>
-	*	        <li>id: A string identifier which can be used to reference the loaded object.</li>
-	*	        <li>maintainOrder: Set to `true` to ensure this asset loads in the order defined in the manifest. This
-	*	        will happen when the max connections has been set above 1 (using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}),
-	*	        and will only affect other assets also defined as `maintainOrder`. Everything else will finish as it is
-	*	        loaded. Ordered items are combined with script tags loading in order when {{#crossLink "LoadQueue/maintainScriptOrder:property"}}{{/crossLink}}
-	*	        is set to `true`.</li>
-	*	        <li>callback: Optional, used for JSONP requests, to define what method to call when the JSONP is loaded.</li>
-	*	        <li>data: An arbitrary data object, which is included with the loaded object</li>
-	*	        <li>method: used to define if this request uses GET or POST when sending data to the server. The default
-	*	        value is "GET"</li>
-	*	        <li>values: Optional object of name/value pairs to send to the server.</li>
-	*	        <li>headers: Optional object hash of headers to attach to an XHR request. PreloadJS will automatically
-	*	        attach some default headers when required, including Origin, Content-Type, and X-Requested-With. You may
-	*	        override the default headers if needed.</li>
-	*	    </ul>
 	*	</ul>
 	* @param loadNow Kick off an immediate load (true) or wait for a load call (false). The default
 	*	value is true. If the queue is paused using {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}}, and the value is
 	*	`true`, the queue will resume automatically.
 	* @param basePath A base path that will be prepended to each file. The basePath argument overrides the
-	*	path specified in the constructor. Note that if you load a manifest using a file of type {{#crossLink "LoadQueue/MANIFEST:property"}}{{/crossLink}},
+	*	path specified in the constructor. Note that if you load a manifest using a file of type {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}},
 	*	its files will <strong>NOT</strong> use the basePath parameter. <strong>The basePath parameter is deprecated.</strong>
 	*	This parameter will be removed in a future version. Please either use the `basePath` parameter in the LoadQueue
 	*	constructor, or a `path` property in a manifest definition.
@@ -520,29 +531,10 @@ extern class LoadQueue extends AbstractLoader
 	*	
 	*	Each "file" in a manifest can be either:
 	*	<ul>
-	*	    <li>A string path to a resource (string). Note that this kind of load item will be converted to an object
-	*	    (see below) in the background.</li>
-	*	     <li>OR an object that contains:<ul>
-	*	        <li>src: The source of the file that is being loaded. This property is <b>required</b>. The source can
-	*	        either be a string (recommended), or an HTML tag.</li>
-	*	        <li>type: The type of file that will be loaded (image, sound, json, etc). PreloadJS does auto-detection
-	*	        of types using the extension. Supported types are defined on LoadQueue, such as {{#crossLink "LoadQueue/IMAGE:property"}}{{/crossLink}}.
-	*	        It is recommended that a type is specified when a non-standard file URI (such as a php script) us used.</li>
-	*	        <li>id: A string identifier which can be used to reference the loaded object.</li>
-	*	        <li>maintainOrder: Set to `true` to ensure this asset loads in the order defined in the manifest. This
-	*	        will happen when the max connections has been set above 1 (using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}),
-	*	        and will only affect other assets also defined as `maintainOrder`. Everything else will finish as it is
-	*	        loaded. Ordered items are combined with script tags loading in order when {{#crossLink "LoadQueue/maintainScriptOrder:property"}}{{/crossLink}}
-	*	        is set to `true`.</li>
-	*	        <li>callback: Optional, used for JSONP requests, to define what method to call when the JSONP is loaded.</li>
-	*	        <li>data: An arbitrary data object, which is included with the loaded object</li>
-	*	        <li>method: used to define if this request uses GET or POST when sending data to the server. The default
-	*	        value is "GET"</li>
-	*	        <li>values: Optional object of name/value pairs to send to the server.</li>
-	*	        <li>headers: Optional object hash of headers to attach to an XHR request. PreloadJS will automatically
-	*	        attach some default headers when required, including Origin, Content-Type, and X-Requested-With. You may
-	*	        override the default headers if needed.</li>
-	*	    </ul>
+	*	    <li>A {{#crossLink "LoadItem"}}{{/crossLink}} instance</li>
+	*	    <li>An object containing properties defined by {{#crossLink "LoadItem"}}{{/crossLink}}</li>
+	*	    <li>OR A string path to a resource. Note that this kind of load item will be converted to a {{#crossLink "LoadItem"}}{{/crossLink}}
+	*	    in the background.</li>
 	*	</ul>
 	* @param loadNow Kick off an immediate load (true) or wait for a load call (false). The default
 	*	value is true. If the queue is paused using {{#crossLink "LoadQueue/setPaused"}}{{/crossLink}} and this value is
@@ -564,14 +556,6 @@ extern class LoadQueue extends AbstractLoader
 	private function _loadNext():Dynamic;
 	
 	/**
-	* Look up a load item using either the "id" or "src" that was specified when loading it. Note that if no "id" was
-	*	supplied with the load item, the ID will be the "src", including a `path` property defined by a manifest. The
-	*	`basePath` will not be part of the ID.
-	* @param value The <code>id</code> or <code>src</code> of the load item.
-	*/
-	public function getItem(value:String):Dynamic;
-	
-	/**
 	* Look up a loaded result using either the "id" or "src" that was specified when loading it. Note that if no "id"
 	*	was supplied with the load item, the ID will be the "src", including a `path` property defined by a manifest. The
 	*	`basePath` will not be part of the ID.
@@ -580,18 +564,28 @@ extern class LoadQueue extends AbstractLoader
 	*	loaded via XHR such as scripts, XML, CSS, and Images. If there is no raw result, the formatted result will be
 	*	returned instead.
 	*/
-	public function getResult(value:String, ?rawResult:Bool):Dynamic;
+	//public function getResult(value:String, ?rawResult:Bool):Dynamic;
+	
+	/**
+	* Look up a {{#crossLink "LoadItem"}}{{/crossLink}} using either the "id" or "src" that was specified when loading it. Note that if no "id" was
+	*	supplied with the load item, the ID will be the "src", including a `path` property defined by a manifest. The
+	*	`basePath` will not be part of the ID.
+	* @param value The <code>id</code> or <code>src</code> of the load item.
+	*/
+	//public function getItem(value:String):Dynamic;
 	
 	/**
 	* Overall progress has changed, so determine the new progress amount and dispatch it. This changes any time an
-	*	item dispatches progress or completes. Note that since we don't know the actual filesize of items before they are
-	*	loaded, and even then we can only get the size of items loaded with XHR. In this case, we define a "slot" for
-	*	each item (1 item in 10 would get 10%), and then append loaded progress on top of the already-loaded items.
+	*	item dispatches progress or completes. Note that since we don't always know the actual filesize of items before
+	*	they are loaded. In this case, we define a "slot" for each item (1 item in 10 would get 10%), and then append
+	*	loaded progress on top of the already-loaded items.
 	*	
-	*	For example, if 5/10 items have loaded, and item 6 is 20% loaded, the total progress would be:<ul>
+	*	For example, if 5/10 items have loaded, and item 6 is 20% loaded, the total progress would be:
+	*	<ul>
 	*	     <li>5/10 of the items in the queue (50%)</li>
 	*	     <li>plus 20% of item 6's slot (2%)</li>
-	*	     <li>equals 52%</li></ul>
+	*	     <li>equals 52%</li>
+	*	</ul>
 	*/
 	private function _updateProgress():Dynamic;
 	
@@ -599,11 +593,20 @@ extern class LoadQueue extends AbstractLoader
 	* Pause or resume the current load. Active loads will not be cancelled, but the next items in the queue will not
 	*	be processed when active loads complete. LoadQueues are not paused by default.
 	*	
-	*	Note that if new items are added to the queue using {{#crossLink "LoadQueue/loadFile"}}{{/crossLink}} or {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}},
-	*	a paused queue will be resumed, unless the `loadNow` argument is `false`.
+	*	Note that if new items are added to the queue using {{#crossLink "LoadQueue/loadFile"}}{{/crossLink}} or
+	*	{{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}}, a paused queue will be resumed, unless the `loadNow`
+	*	argument is `false`.
 	* @param value Whether the queue should be paused or not.
 	*/
 	public function setPaused(value:Bool):Dynamic;
+	
+	/**
+	* Register a custom loaders class. New loaders are given precedence over loaders added earlier and default loaders.
+	*	It is recommended that loaders extend {{#crossLink "AbstractLoader"}}{{/crossLink}}. Loaders can only be added
+	*	once, and will be prepended to the list of available loaders.
+	* @param loader The AbstractLoader class to add.
+	*/
+	public function registerLoader(loader:Dynamic):Dynamic;
 	
 	/**
 	* Register a plugin. Plugins can map to load types (sound, image, etc), or specific extensions (png, mp3, etc).
@@ -624,11 +627,11 @@ extern class LoadQueue extends AbstractLoader
 	public function installPlugin(plugin:Dynamic):Dynamic;
 	
 	/**
-	* REMOVED.  Use createjs.proxy instead
-	* @param method The function to call
-	* @param scope The scope to call the method name on
+	* Remove a custom loader added usig {{#crossLink "registerLoader"}}{{/crossLink}}. Only custom loaders can be
+	*	unregistered, the default loaders will always be available.
+	* @param loader The AbstractLoader class to remove
 	*/
-	private static function proxy(method:Dynamic, scope:Dynamic):Dynamic;
+	public function unregisterLoader(loader:Dynamic):Dynamic;
 	
 	/**
 	* Set the maximum number of concurrent connections. Note that browsers and servers may have a built-in maximum
@@ -644,6 +647,20 @@ extern class LoadQueue extends AbstractLoader
 	*	is open at any time.
 	*/
 	public function setMaxConnections(value:Float):Dynamic;
+	
+	/**
+	* Some loaders might load additional content, other than the item they were passed (such as {{#crossLink "ManifestLoader"}}{{/crossLink}}).
+	*	Any items exposed by the loader using {{#crossLink "AbstractLoader/getLoadItems"}}{{/crossLink}} are added to the
+	*	LoadQueue's look-ups, including {{#crossLink "getItem"}}{{/crossLink}} and {{#crossLink "getResult"}}{{/crossLink}}
+	*	methods.
+	* @param loader 
+	*/
+	private function _saveLoadedItems(loader:AbstractLoader):Dynamic;
+	
+	/**
+	* Start a LoadQueue that was created, but not automatically started.
+	*/
+	//public function load():Dynamic;
 	
 	/**
 	* Stops all open loads, destroys any loaded items, and resets the queue, so all items can
@@ -683,14 +700,14 @@ extern class LoadQueue extends AbstractLoader
 	*	is set to `true`.
 	* @param event The error event, containing relevant error information.
 	*/
-	private function _handleFileError(event:Dynamic):Dynamic;
+	private function _handleError(event:ErrorEvent):Dynamic;
 	
 	/**
 	* The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
 	*	a single file, or queue of files.
 	*	
 	*	<b>Creating a Queue</b><br />
-	*	To use LoadQueue, create a LoadQueue instance. If you want to force tag loading where possible, set the useXHR
+	*	To use LoadQueue, create a LoadQueue instance. If you want to force tag loading where possible, set the preferXHR
 	*	argument to false.
 	*	
 	*	     var queue = new createjs.LoadQueue(true);
@@ -722,6 +739,10 @@ extern class LoadQueue extends AbstractLoader
 	*	     queue.loadFile({id:"image", src:"filePath/file.jpg"});
 	*	     queue.loadManifest(["filePath/file.jpg", {id:"image", src:"filePath/file.jpg"}]);
 	*	
+	*	     // Use an external manifest
+	*	     queue.loadManifest("path/to/manifest.json");
+	*	     queue.loadManifest({src:"manifest.json", type:"manifest"});
+	*	
 	*	If you pass `false` as the `loadNow` parameter, the queue will not kick of the load of the files, but it will not
 	*	stop if it has already been started. Call the {{#crossLink "AbstractLoader/load"}}{{/crossLink}} method to begin
 	*	a paused queue. Note that a paused queue will automatically resume when new files are added to it with a
@@ -735,41 +756,49 @@ extern class LoadQueue extends AbstractLoader
 	*	either a non-standard file extension, or are serving the file using a proxy script, then you can pass in a
 	*	<code>type</code> property with any manifest item.
 	*	
-	*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.LoadQueue.SOUND});
+	*	     queue.loadFile({src:"path/to/myFile.mp3x", type:createjs.AbstractLoader.SOUND});
 	*	
 	*	     // Note that PreloadJS will not read a file extension from the query string
-	*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.LoadQueue.IMAGE});
+	*	     queue.loadFile({src:"http://server.com/proxy?file=image.jpg", type:createjs.AbstractLoader.IMAGE});
 	*	
-	*	Supported types are defined on the LoadQueue class, and include:
+	*	Supported types are defined on the {{#crossLink "AbstractLoader"}}{{/crossLink}} class, and include:
 	*	<ul>
-	*	    <li>{{#crossLink "LoadQueue/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
-	*	    <li>{{#crossLink "LoadQueue/CSS:property"}}{{/crossLink}}: CSS files</li>
-	*	    <li>{{#crossLink "LoadQueue/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
-	*	    <li>{{#crossLink "LoadQueue/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
-	*	    <li>{{#crossLink "LoadQueue/JSON:property"}}{{/crossLink}}: JSON data</li>
-	*	    <li>{{#crossLink "LoadQueue/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
-	*	    <li>{{#crossLink "LoadQueue/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
-	*	    {{#crossLink "LoadQueue/loadManifest"}}{{/crossLink}}</li>
-	*	    <li>{{#crossLink "LoadQueue/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
-	*	    <li>{{#crossLink "LoadQueue/SVG:property"}}{{/crossLink}}: SVG files</li>
-	*	    <li>{{#crossLink "LoadQueue/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
-	*	    <li>{{#crossLink "LoadQueue/XML:property"}}{{/crossLink}}: XML data</li>
+	*	    <li>{{#crossLink "AbstractLoader/BINARY:property"}}{{/crossLink}}: Raw binary data via XHR</li>
+	*	    <li>{{#crossLink "AbstractLoader/CSS:property"}}{{/crossLink}}: CSS files</li>
+	*	    <li>{{#crossLink "AbstractLoader/IMAGE:property"}}{{/crossLink}}: Common image formats</li>
+	*	    <li>{{#crossLink "AbstractLoader/JAVASCRIPT:property"}}{{/crossLink}}: JavaScript files</li>
+	*	    <li>{{#crossLink "AbstractLoader/JSON:property"}}{{/crossLink}}: JSON data</li>
+	*	    <li>{{#crossLink "AbstractLoader/JSONP:property"}}{{/crossLink}}: JSON files cross-domain</li>
+	*	    <li>{{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
+	*	    {{#crossLink "AbstractLoader/loadManifest"}}{{/crossLink}}</li>
+	*	    <li>{{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
+	*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definiteions. This
+	*	    will also load sub-images, and provide a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance.</li>
+	*	    <li>{{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}: SVG files</li>
+	*	    <li>{{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
+	*	    <li>{{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}: XML data</li>
 	*	</ul>
+	*	
+	*	<em>Note: Loader types used to be defined on LoadQueue, but have been moved to AbstractLoader for better
+	*	portability of loader classes, which can be used individually now. The properties on LoadQueue still exist, but
+	*	are deprecated.</em>
 	*	
 	*	<b>Handling Results</b><br />
 	*	When a file is finished downloading, a {{#crossLink "LoadQueue/fileload:event"}}{{/crossLink}} event is
 	*	dispatched. In an example above, there is an event listener snippet for fileload. Loaded files are usually a
-	*	resolved object that can be used immediately, including:
+	*	formatted object that can be used immediately, including:
 	*	<ul>
-	*	    <li>Image: An &lt;img /&gt; tag</li>
-	*	    <li>Audio: An &lt;audio /&gt; tag</a>
-	*	    <li>JavaScript: A &lt;script /&gt; tag</li>
-	*	    <li>CSS: A &lt;link /&gt; tag</li>
-	*	    <li>XML: An XML DOM node</li>
-	*	    <li>SVG: An &lt;object /&gt; tag</li>
-	*	    <li>JSON: A formatted JavaScript Object</li>
-	*	    <li>Text: Raw text</li>
 	*	    <li>Binary: The binary loaded result</li>
+	*	    <li>CSS: A &lt;link /&gt; tag</li>
+	*	    <li>Image: An &lt;img /&gt; tag</li>
+	*	    <li>JavaScript: A &lt;script /&gt; tag</li>
+	*	    <li>JSON/JSONP: A formatted JavaScript Object</li>
+	*	    <li>Manifest: A JavaScript object.
+	*	    <li>Sound: An &lt;audio /&gt; tag</a>
+	*	    <li>SpriteSheet: A {{#crossLink "SpriteSheet"}}{{/crossLink}} instance, containing loaded images.
+	*	    <li>SVG: An &lt;object /&gt; tag</li>
+	*	    <li>Text: Raw text</li>
+	*	    <li>XML: An XML DOM node</li>
 	*	</ul>
 	*	
 	*	     function handleFileLoad(event) {
@@ -783,9 +812,9 @@ extern class LoadQueue extends AbstractLoader
 	*	     }
 	*	
 	*	At any time after the file has been loaded (usually after the queue has completed), any result can be looked up
-	*	via its "id" using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}. If no id was provided, then the "src" or
-	*	file path can be used instead, including the `path` defined by a manifest, but <strong>not including</strong> a
-	*	base path defined on the LoadQueue. It is recommended to always pass an id.
+	*	via its "id" using {{#crossLink "LoadQueue/getResult"}}{{/crossLink}}. If no id was provided, then the
+	*	"src" or file path can be used instead, including the `path` defined by a manifest, but <strong>not including</strong>
+	*	a base path defined on the LoadQueue. It is recommended to always pass an id if you want to look up content.
 	*	
 	*	     var image = queue.getResult("image");
 	*	     document.body.appendChild(image);
@@ -817,7 +846,7 @@ extern class LoadQueue extends AbstractLoader
 	*	    <li>Content loaded via tags will not show progress, and will continue to download in the background when
 	*	    canceled, although no events will be dispatched.</li>
 	*	</ul>
-	* @param useXHR Determines whether the preload instance will favor loading with XHR (XML HTTP
+	* @param preferXHR Determines whether the preload instance will favor loading with XHR (XML HTTP
 	*	Requests), or HTML tags. When this is `false`, the queue will use tag loading when possible, and fall back on XHR
 	*	when necessary.
 	* @param basePath A path that will be prepended on to the source parameter of all items in the queue
@@ -825,10 +854,11 @@ extern class LoadQueue extends AbstractLoader
 	*	will not receive a base path.
 	* @param crossOrigin An optional flag to support images loaded from a CORS-enabled server. To
 	*	use it, set this value to `true`, which will default the crossOrigin property on images to "Anonymous". Any
-	*	string value will be passed through, but only "" and "Anonymous" are recommended.
+	*	string value will be passed through, but only "" and "Anonymous" are recommended. <strong>Note: The crossOrigin
+	*	parameter is deprecated. Use LoadItem.crossOrigin instead</strong>
 	*/
-	public function new(?useXHR:Bool, ?basePath:String, ?crossOrigin:Dynamic):Void;
+	public function new(?preferXHR:Bool, ?basePath:String, ?crossOrigin:Dynamic):Void;
 	
-	private function _processFinishedLoad(item:Dynamic, loader:AbstractLoader):Dynamic;
+	public function setUseXHR(value:Bool):Bool;
 	
 }

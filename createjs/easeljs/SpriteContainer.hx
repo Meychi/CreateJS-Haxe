@@ -10,6 +10,7 @@ package createjs.easeljs;
 *	    - all children (with the exception of DOMElement) MUST use the same spriteSheet.
 *	
 *	<h4>Example</h4>
+*	
 *	     var data = {
 *	         images: ["sprites.jpg"],
 *	         frames: {width:50, height:50},
@@ -30,7 +31,14 @@ extern class SpriteContainer extends Container
 	*/
 	public var spriteSheet:SpriteSheet;
 	
-	private var Container_initialize:Dynamic;
+	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	//private function initialize():Dynamic;
 	
 	/**
 	* A SpriteContainer is a nestable display list that enables aggressively optimized rendering of bitmap content.
@@ -42,6 +50,7 @@ extern class SpriteContainer extends Container
 	*	    - all children (with the exception of DOMElement) MUST use the same spriteSheet.
 	*	
 	*	<h4>Example</h4>
+	*	
 	*	     var data = {
 	*	         images: ["sprites.jpg"],
 	*	         frames: {width:50, height:50},
@@ -97,12 +106,6 @@ extern class SpriteContainer extends Container
 	* @param child The display object to add.
 	*/
 	//public function addChild(child:DisplayObject):DisplayObject;
-	
-	/**
-	* Initialization method.
-	* @param spriteSheet Optional. The spriteSheet to use for this SpriteContainer and its children.
-	*/
-	//private function initialize(spriteSheet:SpriteSheet):Dynamic;
 	
 	/**
 	* Returns a string representation of this object.

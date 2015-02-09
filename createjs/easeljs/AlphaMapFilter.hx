@@ -1,5 +1,7 @@
 package createjs.easeljs;
 
+import js.html.Uint8ClampedArray;
+
 /**
 * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
 *	be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -32,6 +34,10 @@ extern class AlphaMapFilter extends Filter
 	*/
 	public var alphaMap:Dynamic;
 	
+	private var _alphaMap:Dynamic;
+	
+	private var _mapData:Uint8ClampedArray;
+	
 	/**
 	* Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
 	*	be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -60,9 +66,6 @@ extern class AlphaMapFilter extends Filter
 	*/
 	public function new(alphaMap:Dynamic):Void;
 	
-	/**
-	* Returns a clone of this object.
-	*/
-	//public function clone():AlphaMapFilter;
+	private function _prepAlphaMap():Dynamic;
 	
 }

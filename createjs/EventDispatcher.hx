@@ -53,6 +53,15 @@ extern class EventDispatcher
 	private var _listeners:Dynamic;
 	
 	/**
+	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
+	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
+	*	for details.
+	*	
+	*	There is an inheritance tutorial distributed with EaselJS in /tutorials/Inheritance.
+	*/
+	//private function initialize():Dynamic;
+	
+	/**
 	* A shortcut method for using addEventListener that makes it easier to specify an execution scope, have a listener
 	*	only run once, associate arbitrary data with the listener, and remove the listener.
 	*	
@@ -120,11 +129,12 @@ extern class EventDispatcher
 	*	     this.dispatchEvent(event);
 	* @param eventObj An object with a "type" property, or a string type.
 	*	While a generic object will work, it is recommended to use a CreateJS Event instance. If a string is used,
-	*	dispatchEvent will construct an Event instance with the specified type.
-	* @param target The object to use as the target property of the event object. This will default to the
-	*	dispatching object. <b>This parameter is deprecated and will be removed.</b>
+	*	dispatchEvent will construct an Event instance if necessary with the specified type. This latter approach can
+	*	be used to avoid event object instantiation for non-bubbling events that may not have any listeners.
+	* @param bubbles Specifies the `bubbles` value when a string was passed to eventObj.
+	* @param cancelable Specifies the `cancelable` value when a string was passed to eventObj.
 	*/
-	public function dispatchEvent(eventObj:Dynamic, ?target:Dynamic):Bool;
+	public function dispatchEvent(eventObj:Dynamic, ?bubbles:Bool, ?cancelable:Bool):Bool;
 	
 	/**
 	* EventDispatcher provides methods for managing queues of event listeners and dispatching events.
@@ -189,11 +199,6 @@ extern class EventDispatcher
 	* @param type The string type of the event.
 	*/
 	public function hasEventListener(type:String):Bool;
-	
-	/**
-	* Initialization method.
-	*/
-	//private function initialize():Dynamic;
 	
 	/**
 	* Removes all listeners for the specified type, or all listeners of all types.

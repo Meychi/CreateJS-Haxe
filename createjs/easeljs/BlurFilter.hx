@@ -23,6 +23,16 @@ package createjs.easeljs;
 extern class BlurFilter extends Filter
 {
 	/**
+	* Array of multiply values for blur calculations.
+	*/
+	public static var MUL_TABLE:Array<Dynamic>;
+	
+	/**
+	* Array of shift values for blur calculations.
+	*/
+	public static var SHG_TABLE:Array<Dynamic>;
+	
+	/**
 	* Horizontal blur radius in pixels
 	*/
 	public var blurX:Float;
@@ -60,10 +70,5 @@ extern class BlurFilter extends Filter
 	* @param quality The number of blur iterations.
 	*/
 	public function new(?blurX:Float, ?blurY:Float, ?quality:Float):Void;
-	
-	/**
-	* Returns a clone of this object.
-	*/
-	//public function clone():BlurFilter;
 	
 }
