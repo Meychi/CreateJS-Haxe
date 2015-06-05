@@ -441,7 +441,7 @@ extern class LoadQueue extends AbstractLoader
 	* @param item The item that is being loaded.
 	* @param loader 
 	*/
-	private function _sendFileComplete(item:LoadItemObject, loader:AbstractLoader):Dynamic;
+	private function _sendFileComplete(item:LoadItem, loader:AbstractLoader):Dynamic;
 	
 	/**
 	* Dispatch a filestart {{#crossLink "Event"}}{{/crossLink}} immediately before a file starts to load. Please see
