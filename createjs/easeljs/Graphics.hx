@@ -561,6 +561,20 @@ extern class Graphics
 	public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
 	
 	/**
+	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
+	 * method.
+	 * @method quadraticCurveTo
+	 * @param {Number} cpx
+	 * @param {Number} cpy
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 **/
+	
+	public function curveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
+	
+	/**
 	* Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
 	*	 method.
 	* @param x 
