@@ -1,9 +1,5 @@
 package createjs.preloadjs;
 
-import js.html.ErrorEvent;
-import js.html.Event;
-import js.html.ProgressEvent;
-
 /**
 * The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
 *	a single file, or queue of files.

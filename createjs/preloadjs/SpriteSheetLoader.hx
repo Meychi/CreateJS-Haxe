@@ -1,10 +1,5 @@
 package createjs.preloadjs;
 
-import js.html.ErrorEvent;
-import js.html.Event;
-import js.html.ProgressEvent;
-import js.html.svg.Number;
-
 /**
 * A loader for EaselJS SpriteSheets. Images inside the spritesheet definition are loaded before the loader
 *	completes. To load SpriteSheets using JSONP, specify a {{#crossLink "LoadItem/callback:property"}}{{/crossLink}}
@@ -19,7 +14,7 @@ extern class SpriteSheetLoader extends AbstractLoader
 	/**
 	* The amount of progress that the manifest itself takes up.
 	*/
-	public static var SPRITESHEET_PROGRESS:Number;
+	public static var SPRITESHEET_PROGRESS:Float;
 	
 	/**
 	* A loader for EaselJS SpriteSheets. Images inside the spritesheet definition are loaded before the loader
@@ -36,7 +31,7 @@ extern class SpriteSheetLoader extends AbstractLoader
 	* An image has reported an error.
 	* @param event 
 	*/
-	private function _handleManifestError(event:ErrorEvent):Dynamic;
+	private function _handleManifestError(event:Event):Dynamic;
 	
 	/**
 	* An internal queue which loads the SpriteSheet's images.

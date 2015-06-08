@@ -1,7 +1,4 @@
 package createjs.preloadjs;
-
-import js.html.Event;
-
 /**
 * A PreloadJS plugin provides a way to inject functionality into PreloadJS to load file types that are unsupported,
 *	or in a way that PreloadJS does not.

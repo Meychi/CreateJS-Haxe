@@ -37,7 +37,7 @@ extern class LoadItem
 	/**
 	* Default duration in milliseconds to wait before a request times out. This only applies to tag-based and and XHR (level one) loading, as XHR (level 2) provides its own timeout event.
 	*/
-	public static var LOAD_TIMEOUT_DEFAULT:Number;
+	public static var LOAD_TIMEOUT_DEFAULT:Float;
 	
 	/**
 	* Determines if a manifest will maintain the order of this item, in relation to other items in the manifest that have also set the `maintainOrder` property to `true`. This only applies when the max connections has been set above 1 (using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}). Everything with this property set to `false` will finish as it is loaded. Ordered items are combined with script tags loading in order when {{#crossLink "LoadQueue/maintainScriptOrder:property"}}{{/crossLink}} is set to `true`.

@@ -1,10 +1,5 @@
 package createjs.preloadjs;
 
-import js.html.ErrorEvent;
-import js.html.Event;
-import js.html.ProgressEvent;
-import js.html.svg.Number;
-
 /**
 * A loader for JSON manifests. Items inside the manifest are loaded before the loader completes. To load manifests
 *	using JSONP, specify a {{#crossLink "LoadItem/callback:property"}}{{/crossLink}} as part of the
@@ -45,7 +40,7 @@ extern class ManifestLoader extends AbstractLoader
 	/**
 	* The amount of progress that the manifest itself takes up.
 	*/
-	public static var MANIFEST_PROGRESS:Number;
+	public static var MANIFEST_PROGRESS:Float;
 	
 	/**
 	* A loader for JSON manifests. Items inside the manifest are loaded before the loader completes. To load manifests
@@ -104,7 +99,7 @@ extern class ManifestLoader extends AbstractLoader
 	* The manifest has reported an error with one of the files.
 	* @param event 
 	*/
-	private function _handleManifestError(event:ErrorEvent):Dynamic;
+	private function _handleManifestError(event:Event):Dynamic;
 	
 	/**
 	* The manifest has reported progress.

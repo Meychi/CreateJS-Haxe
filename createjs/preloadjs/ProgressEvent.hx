@@ -1,7 +1,4 @@
 package createjs.preloadjs;
-
-import js.html.ProgressEvent;
-
 /**
 * A CreateJS {{#crossLink "Event"}}{{/crossLink}} that is dispatched when progress changes.
 */
