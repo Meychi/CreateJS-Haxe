@@ -44,11 +44,6 @@ extern class WebAudioPlugin extends AbstractPlugin
 	public static var _capabilities:Dynamic;
 	
 	/**
-	* The internal master volume value of the plugin.
-	*/
-	private var _volume:Float;
-	
-	/**
 	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.
 	*/
 	//public var context:AudioContext;

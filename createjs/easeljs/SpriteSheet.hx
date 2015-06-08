@@ -284,7 +284,7 @@ extern class SpriteSheet extends EventDispatcher
 	/**
 	* Returns a string representation of this object.
 	*/
-	public override function toString():String;
+	override public function toString():String;
 	
 	/**
 	* Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative

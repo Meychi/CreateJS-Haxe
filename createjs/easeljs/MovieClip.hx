@@ -90,6 +90,16 @@ extern class MovieClip extends Container
 	public var labels:Array<Dynamic>;
 	
 	/**
+	* Returns the duration of this MovieClip in seconds or ticks.
+	*/
+	public var duration:Float;
+	
+	/**
+	* Returns the duration of this MovieClip in seconds or ticks. Identical to {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} and provided for Flash API compatibility.
+	*/
+	public var totalFrames:Float;
+	
+	/**
 	* Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel() for more information.
 	*/
 	public var currentLabel:String;
@@ -265,6 +275,11 @@ extern class MovieClip extends Container
 	* Use the {{#crossLink "MovieClip/currentLabel:property"}}{{/crossLink}} property instead.
 	*/
 	public function getCurrentLabel():String;
+	
+	/**
+	* Use the {{#crossLink "MovieClip/duration:property"}}{{/crossLink}} property instead.
+	*/
+	private function getDuration():Float;
 	
 	/**
 	* Use the {{#crossLink "MovieClip/labels:property"}}{{/crossLink}} property instead.

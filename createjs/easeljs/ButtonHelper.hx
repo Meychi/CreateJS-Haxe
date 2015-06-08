@@ -68,6 +68,11 @@ extern class ButtonHelper
 	private function initialize():Dynamic;
 	
 	/**
+	* Injected into target. Preserves the paused state through a reset.
+	*/
+	private function _reset():Dynamic;
+	
+	/**
 	* Returns a string representation of this object.
 	*/
 	public function toString():String;

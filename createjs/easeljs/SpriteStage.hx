@@ -312,11 +312,11 @@ extern class SpriteStage extends Stage
 	private function _setWebGLContext():WebGLRenderingContext;
 	
 	/**
-	* Sets up a kid's WebGL texture.
+	* Sets up an image's WebGL texture.
 	* @param ctx The canvas WebGL context object to draw into.
-	* @param kid The list of kids to draw.
+	* @param image 
 	*/
-	private function _setUpKidTexture(ctx:WebGLRenderingContext, kid:Dynamic):WebGLTexture;
+	private function _setupImageTexture(ctx:WebGLRenderingContext, image:Dynamic):WebGLTexture;
 	
 	/**
 	* Sets up the necessary vertices and indices buffers.

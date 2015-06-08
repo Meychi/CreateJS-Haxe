@@ -105,7 +105,7 @@ extern class ColorMatrix
 	* @param saturation 
 	* @param hue 
 	*/
-	public function new(brightness:Float, contrast:Float, saturation:Float, hue:Float):Void;
+	public function new(?brightness:Float, ?contrast:Float, ?saturation:Float, ?hue:Float):Void;
 	
 	/**
 	* Resets the instance with the specified values.

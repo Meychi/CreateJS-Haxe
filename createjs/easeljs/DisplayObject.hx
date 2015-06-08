@@ -2,6 +2,7 @@ package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
 import js.html.Point;
+import haxe.extern.Rest;
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -311,7 +312,8 @@ extern class DisplayObject extends EventDispatcher
 	*	<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
 	*	whatwg spec on compositing</a>.
 	*/
-	public function updateCache(compositeOperation:String):Dynamic;
+	@:overload(function(params:Rest<Dynamic>):Dynamic{})
+	public function updateCache(?compositeOperation:String):Dynamic;
 	
 	/**
 	* Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
@@ -405,7 +407,7 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	* Returns a string representation of this object.
 	*/
-	public override function toString():String;
+	override public function toString():String;
 	
 	/**
 	* Returns true or false indicating whether the display object would be visible if drawn to a canvas.

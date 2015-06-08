@@ -6,7 +6,7 @@ package createjs.tweenjs;
 *	<h4>Example</h4>
 *	
 *	     target.alpha = 1;
-*		    Tween.get(target)
+*		    createjs.Tween.get(target)
 *		         .wait(500)
 *		         .to({alpha:0, visible:false}, 1000)
 *		         .call(handleComplete);
@@ -15,14 +15,15 @@ package createjs.tweenjs;
 *		    }
 *	
 *	Multiple tweens can point to the same instance, however if they affect the same properties there could be unexpected
-*	behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass <code>override:true</code>
+*	behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass `override:true`
 *	in the props argument.
 *	
-*	     Tween.get(target, {override:true}).to({x:100});
+*	     createjs.Tween.get(target, {override:true}).to({x:100});
 *	
-*	Subscribe to the "change" event to get notified when a property of the target is changed.
+*	Subscribe to the {{#crossLink "Tween/change:event"}}{{/crossLink}} event to get notified when a property of the
+*	target is changed.
 *	
-*	     Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
+*	     createjs.Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
 *	     function handleChange(event) {
 *	         // The tween changed.
 *	     }
@@ -68,6 +69,16 @@ extern class Tween extends EventDispatcher
 	public var loop:Bool;
 	
 	/**
+	* Indicates the tween's current position is within a passive wait.
+	*/
+	public var passive:Bool;
+	
+	/**
+	* Indicates whether the tween is currently registered with Tween.
+	*/
+	private var _registered:Boolean;
+	
+	/**
 	* Normalized position.
 	*/
 	private var _prevPos:Float;
@@ -78,35 +89,30 @@ extern class Tween extends EventDispatcher
 	private var _prevPosition:Float;
 	
 	/**
-	* Read-only. Indicates the tween's current position is within a passive wait.
-	*/
-	public var passive:Bool;
-	
-	/**
-	* Read-only. Specifies the total duration of this tween in milliseconds (or ticks if useTicks is true). This value is automatically updated as you modify the tween. Changing it directly could result in unexpected behaviour.
+	* Specifies the total duration of this tween in milliseconds (or ticks if useTicks is true). This value is automatically updated as you modify the tween. Changing it directly could result in unexpected behaviour.
 	*/
 	public var duration:Float;
 	
 	/**
-	* Read-only. The current normalized position of the tween. This will always be a value between 0 and duration. Changing this property directly will have no effect.
+	* The current normalized position of the tween. This will always be a value between 0 and duration. Changing this property directly will have no effect.
 	*/
 	public var position:Dynamic;
-	
-	/**
-	* Read-only. The target of this tween. This is the object on which the tweened properties will be changed. Changing this property after the tween is created will not have any effect.
-	*/
-	public var target:Dynamic;
 	
 	/**
 	* The position within the current step.
 	*/
 	private var _stepPosition:Float;
 	
+	/**
+	* The target of this tween. This is the object on which the tweened properties will be changed. Changing this property after the tween is created will not have any effect.
+	*/
+	public var target:Dynamic;
+	
 	private var _actions:Array<Dynamic>;
 	
 	private var _curQueueProps:Dynamic;
 	
-	private var _inited:Bool;
+	private var _inited:Boolean;
 	
 	private var _initQueueProps:Dynamic;
 	
@@ -118,7 +124,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _useTicks:Bool;
 	
-	//public static var _listeners:Array<Tween>;
+	public static var _listeners:Array<Tween>;
 	
 	public static var _plugins:Dynamic;
 	
@@ -128,7 +134,7 @@ extern class Tween extends EventDispatcher
 	*	<h4>Example</h4>
 	*	
 	*	     target.alpha = 1;
-	*		    Tween.get(target)
+	*		    createjs.Tween.get(target)
 	*		         .wait(500)
 	*		         .to({alpha:0, visible:false}, 1000)
 	*		         .call(handleComplete);
@@ -137,14 +143,15 @@ extern class Tween extends EventDispatcher
 	*		    }
 	*	
 	*	Multiple tweens can point to the same instance, however if they affect the same properties there could be unexpected
-	*	behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass <code>override:true</code>
+	*	behaviour. To stop all tweens on an object, use {{#crossLink "Tween/removeTweens"}}{{/crossLink}} or pass `override:true`
 	*	in the props argument.
 	*	
-	*	     Tween.get(target, {override:true}).to({x:100});
+	*	     createjs.Tween.get(target, {override:true}).to({x:100});
 	*	
-	*	Subscribe to the "change" event to get notified when a property of the target is changed.
+	*	Subscribe to the {{#crossLink "Tween/change:event"}}{{/crossLink}} event to get notified when a property of the
+	*	target is changed.
 	*	
-	*	     Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
+	*	     createjs.Tween.get(target, {override:true}).to({x:100}).addEventListener("change", handleChange);
 	*	     function handleChange(event) {
 	*	         // The tween changed.
 	*	     }
@@ -170,7 +177,7 @@ extern class Tween extends EventDispatcher
 	* Advances all tweens. This typically uses the {{#crossLink "Ticker"}}{{/crossLink}} class, but you can call it
 	*	manually if you prefer to use your own "heartbeat" implementation.
 	* @param delta The change in time in milliseconds since the last tick. Required unless all tweens have
-	*	<code>useTicks</code> set to true.
+	*	`useTicks` set to true.
 	* @param paused Indicates whether a global pause is in effect. Tweens with {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}}
 	*	will ignore this, but all others will pause if this is `true`.
 	*/
@@ -179,24 +186,29 @@ extern class Tween extends EventDispatcher
 	/**
 	* Advances the tween to a specified position.
 	* @param value The position to seek to in milliseconds (or ticks if useTicks is true).
-	* @param actionsMode Optional parameter specifying how actions are handled (ie. call, set, play, pause):
-	*	     <code>Tween.NONE</code> (0) - run no actions. <code>Tween.LOOP</code> (1) - if new position is less than old, then run all actions
-	*	     between old and duration, then all actions between 0 and new. Defaults to <code>LOOP</code>. <code>Tween.REVERSE</code> (2) - if new
-	*	     position is less than old, run all actions between them in reverse.
+	* @param actionsMode Specifies how actions are handled (ie. call, set, play, pause):
+	*	<ul>
+	*	     <li>{{#crossLink "Tween/NONE:property"}}{{/crossLink}} (0) - run no actions.</li>
+	*	     <li>{{#crossLink "Tween/LOOP:property"}}{{/crossLink}} (1) - if new position is less than old, then run all
+	*	     actions between old and duration, then all actions between 0 and new.</li>
+	*	     <li>{{#crossLink "Tween/REVERSE:property"}}{{/crossLink}} (2) - if new position is less than old, run all
+	*	     actions between them in reverse.</li>
+	*	</ul>
 	*/
-	public function setPosition(value:Float, actionsMode:Float):Bool;
+	public function setPosition(value:Float, ?actionsMode:Float):Bool;
 	
 	/**
-	* Advances this tween by the specified amount of time in milliseconds (or ticks if <code>useTicks</code> is true).
-	*	This is normally called automatically by the Tween engine (via <code>Tween.tick</code>), but is exposed for
-	*	advanced uses.
-	* @param delta The time to advance in milliseconds (or ticks if <code>useTicks</code> is true).
+	* Advances this tween by the specified amount of time in milliseconds (or ticks if`useTicks` is `true`).
+	*	This is normally called automatically by the Tween engine (via {{#crossLink "Tween/tick"}}{{/crossLink}}), but is
+	*	exposed for advanced uses.
+	* @param delta The time to advance in milliseconds (or ticks if `useTicks` is `true`).
 	*/
 	//public function tick(delta:Float):Dynamic;
 	
 	/**
 	* Handle events that result from Tween being used as an event handler. This is included to allow Tween to handle
-	*	tick events from <code>createjs.Ticker</code>. No other events are handled in Tween.
+	*	{{#crossLink "Ticker/tick:event"}}{{/crossLink}} events from the createjs {{#crossLink "Ticker"}}{{/crossLink}}.
+	*	No other events are handled in Tween.
 	* @param event An event object passed in by the {{#crossLink "EventDispatcher"}}{{/crossLink}}. Will
 	*	usually be of type "tick".
 	*/
@@ -219,7 +231,7 @@ extern class Tween extends EventDispatcher
 	
 	/**
 	* Pauses or plays this tween.
-	* @param value Indicates whether the tween should be paused (true) or played (false).
+	* @param value Indicates whether the tween should be paused (`true`) or played (`false`).
 	*/
 	public function setPaused(value:Bool):Tween;
 	
@@ -227,41 +239,55 @@ extern class Tween extends EventDispatcher
 	* Queues a tween from the current values to the target properties. Set duration to 0 to jump to these value.
 	*	Numeric properties will be tweened from their current value in the tween to the target value. Non-numeric
 	*	properties will be set at the end of the specified duration.
-	* @param props An object specifying property target values for this tween (Ex. <code>{x:300}</code> would tween the x
-	*	     property of the target to 300).
-	* @param duration Optional. The duration of the wait in milliseconds (or in ticks if <code>useTicks</code> is true).
-	*	     Defaults to 0.
-	* @param ease Optional. The easing function to use for this tween. Defaults to a linear ease.
+	*	<h4>Example</h4>
+	*	
+	*			createjs.Tween.get(target).to({alpha:0}, 1000);
+	* @param props An object specifying property target values for this tween (Ex. `{x:300}` would tween the x
+	*	property of the target to 300).
+	* @param duration The duration of the wait in milliseconds (or in ticks if `useTicks` is true).
+	* @param ease The easing function to use for this tween. See the {{#crossLink "Ease"}}{{/crossLink}}
+	*	class for a list of built-in ease functions.
 	*/
 	public function to(props:Dynamic, ?duration:Float, ?ease:Dynamic):Tween;
 	
 	/**
 	* Queues a wait (essentially an empty tween).
-	* @param duration The duration of the wait in milliseconds (or in ticks if <code>useTicks</code> is true).
+	*	<h4>Example</h4>
+	*	
+	*			//This tween will wait 1s before alpha is faded to 0.
+	*			createjs.Tween.get(target).wait(1000).to({alpha:0}, 1000);
+	* @param duration The duration of the wait in milliseconds (or in ticks if `useTicks` is true).
 	* @param passive Tween properties will not be updated during a passive wait. This
-	*	is mostly useful for use with Timeline's that contain multiple tweens affecting the same target
-	*	at different times.
+	*	is mostly useful for use with {{#crossLink "Timeline"}}{{/crossLink}} instances that contain multiple tweens
+	*	affecting the same target at different times.
 	*/
-	public function wait(duration:Float, passive:Bool):Tween;
+	public function wait(duration:Float, ?passive:Bool):Tween;
 	
 	/**
 	* Queues an action to call the specified function.
+	*	<h4>Example</h4>
+	*	
+	*	  	//would call myFunction() after 1 second.
+	*	  	myTween.wait(1000).call(myFunction);
 	* @param callback The function to call.
-	* @param params Optional. The parameters to call the function with. If this is omitted, then the function
+	* @param params . The parameters to call the function with. If this is omitted, then the function
 	*	     will be called with a single param pointing to this tween.
-	* @param scope Optional. The scope to call the function in. If omitted, it will be called in the target's
+	* @param scope . The scope to call the function in. If omitted, it will be called in the target's
 	*	     scope.
 	*/
 	public function call(_callback:Dynamic, ?params:Array<Dynamic>, ?scope:Dynamic):Tween;
 	
 	/**
 	* Queues an action to pause the specified tween.
-	* @param tween The tween to play. If null, it pauses this tween.
+	* @param tween The tween to pause. If null, it pauses this tween.
 	*/
 	public function pause(tween:Tween):Tween;
 	
 	/**
 	* Queues an action to play (unpause) the specified tween. This enables you to sequence multiple tweens.
+	*	<h4>Example</h4>
+	*	
+	*			myTween.to({x:100},500).play(otherTween);
 	* @param tween The tween to play.
 	*/
 	public function play(tween:Tween):Tween;
@@ -269,21 +295,24 @@ extern class Tween extends EventDispatcher
 	/**
 	* Queues an action to set the specified props on the specified target. If target is null, it will use this tween's
 	*	target.
-	* @param props The properties to set (ex. <code>{visible:false}</code>).
-	* @param target Optional. The target to set the properties on. If omitted, they will be set on the tween's target.
+	*	<h4>Example</h4>
+	*	
+	*			myTween.wait(1000).set({visible:false},foo);
+	* @param props The properties to set (ex. `{visible:false}`).
+	* @param target The target to set the properties on. If omitted, they will be set on the tween's target.
 	*/
-	public function set(props:Dynamic, target:Dynamic):Tween;
+	public function set(props:Dynamic, ?target:Dynamic):Tween;
 	
 	/**
 	* Registers or unregisters a tween with the ticking system.
 	* @param tween The tween instance to register or unregister.
-	* @param value If true, the tween is registered. If false the tween is unregistered.
+	* @param value If `true`, the tween is registered. If `false` the tween is unregistered.
 	*/
 	private static function _register(tween:Tween, value:Bool):Dynamic;
 	
 	/**
-	* Removes all existing tweens for a target. This is called automatically by new tweens if the <code>override</code>
-	*	property is <code>true</code>.
+	* Removes all existing tweens for a target. This is called automatically by new tweens if the `override`
+	*	property is `true`.
 	* @param target The target object to remove existing tweens from.
 	*/
 	public static function removeTweens(target:Dynamic):Dynamic;
@@ -291,28 +320,34 @@ extern class Tween extends EventDispatcher
 	/**
 	* Returns a new tween instance. This is functionally identical to using "new Tween(...)", but looks cleaner
 	*	with the chained syntax of TweenJS.
+	*	<h4>Example</h4>
+	*	
+	*			var tween = createjs.Tween.get(target);
 	* @param target The target object that will have its properties tweened.
-	* @param props The configuration properties to apply to this tween instance (ex. <code>{loop:true, paused:true}</code>).
-	*	All properties default to false. Supported props are:<UL>
+	* @param props The configuration properties to apply to this tween instance (ex. `{loop:true, paused:true}`).
+	*	All properties default to `false`. Supported props are:
+	*	<UL>
 	*	   <LI> loop: sets the loop property on this tween.</LI>
 	*	   <LI> useTicks: uses ticks for all durations instead of milliseconds.</LI>
-	*	   <LI> ignoreGlobalPause: sets the {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}} property on this tween.</LI>
-	*	   <LI> override: if true, Tween.removeTweens(target) will be called to remove any other tweens with the same target.
+	*	   <LI> ignoreGlobalPause: sets the {{#crossLink "Tween/ignoreGlobalPause:property"}}{{/crossLink}} property on
+	*	   this tween.</LI>
+	*	   <LI> override: if true, `createjs.Tween.removeTweens(target)` will be called to remove any other tweens with
+	*	   the same target.
 	*	   <LI> paused: indicates whether to start the tween paused.</LI>
 	*	   <LI> position: indicates the initial position for this tween.</LI>
-	*	   <LI> onChange: specifies a listener for the "change" event.</LI>
+	*	   <LI> onChange: specifies a listener for the {{#crossLink "Tween/change:event"}}{{/crossLink}} event.</LI>
 	*	</UL>
-	* @param pluginData An object containing data for use by installed plugins. See individual
-	*	plugins' documentation for details.
-	* @param override If true, any previous tweens on the same target will be removed. This is the same as
-	*	calling <code>Tween.removeTweens(target)</code>.
+	* @param pluginData An object containing data for use by installed plugins. See individual plugins'
+	*	documentation for details.
+	* @param override If true, any previous tweens on the same target will be removed. This is the
+	*	same as calling `Tween.removeTweens(target)`.
 	*/
 	public static function get(target:Dynamic, ?props:Dynamic, ?pluginData:Dynamic, ?_override:Bool):Tween;
 	
 	/**
 	* Returns a string representation of this object.
 	*/
-	public override function toString():String;
+	override public function toString():String;
 	
 	/**
 	* Stop and remove all existing tweens.
