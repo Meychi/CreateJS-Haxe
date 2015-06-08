@@ -79,16 +79,16 @@ extern class MouseEvent extends Event
 	* @param rawY The raw y position relative to the stage.
 	* @param relatedTarget The secondary target for the event.
 	*/
-	public function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, relatedTarget:DisplayObject):Void;
+	public function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:js.html.MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, relatedTarget:DisplayObject):Void;
 	
 	/**
 	* Returns a clone of the MouseEvent instance.
 	*/
-	public function clone():MouseEvent;
+	override public function clone():MouseEvent;
 	
 	/**
 	* Returns a string representation of this object.
 	*/
-	public function toString():String;
+	override public function toString():String;
 	
 }

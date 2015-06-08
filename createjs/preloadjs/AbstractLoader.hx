@@ -250,6 +250,6 @@ extern class AbstractLoader extends EventDispatcher
 	
 	private function buildPath():Dynamic;
 	
-	public function toString():String;
+	override public function toString():String;
 	
 }

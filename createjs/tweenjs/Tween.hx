@@ -112,7 +112,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _curQueueProps:Dynamic;
 	
-	private var _inited:Boolean;
+	private var _inited:Bool;
 	
 	private var _initQueueProps:Dynamic;
 	
@@ -124,7 +124,7 @@ extern class Tween extends EventDispatcher
 	
 	private var _useTicks:Bool;
 	
-	public static var _listeners:Array<Tween>;
+	//public static var _listeners:Array<Tween>;
 	
 	public static var _plugins:Dynamic;
 	

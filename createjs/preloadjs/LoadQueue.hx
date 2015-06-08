@@ -701,7 +701,7 @@ extern class LoadQueue extends AbstractLoader
 	*	is set to `true`.
 	* @param event The error event, containing relevant error information.
 	*/
-	private function _handleError(event:ErrorEvent):Dynamic;
+	private function _handleError(event:Event):Dynamic;
 	
 	/**
 	* The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
