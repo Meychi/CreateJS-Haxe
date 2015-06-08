@@ -1,7 +1,5 @@
 package createjs;
 
-import js.html.svg.Number;
-
 /**
 * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
 *	event to be notified when a set time interval has elapsed.
@@ -56,7 +54,7 @@ extern class Ticker
 	/**
 	* Specifies a maximum value for the delta property in the tick event object. This is useful when building time based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep, alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value (ex. maxDelta=50 when running at 40fps).  This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta when using both delta and other values.  If 0, there is no maximum.
 	*/
-	public static var maxDelta:Number;
+	public static var maxDelta:Float;
 	
 	/**
 	* Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
