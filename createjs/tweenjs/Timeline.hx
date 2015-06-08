@@ -20,7 +20,7 @@ extern class Timeline extends EventDispatcher
 	/**
 	* Indicates whether the timeline is currently registered with Tween.
 	*/
-	private var _registered:Boolean;
+	private var _registered:Bool;
 	
 	/**
 	* The current normalized position of the timeline. This will always be a value between 0 and {{#crossLink "Timeline/duration:property"}}{{/crossLink}}. Changing this property directly will have no effect.
@@ -32,7 +32,7 @@ extern class Timeline extends EventDispatcher
 	*/
 	public var duration:Float;
 	
-	private var _labelList:Array<Object>;
+	private var _labelList:Array<Dynamic>;
 	
 	private var _labels:Dynamic;
 	
@@ -119,7 +119,7 @@ extern class Timeline extends EventDispatcher
 	/**
 	* Returns a sorted list of the labels defined on this timeline.
 	*/
-	public function getLabels():Array<Object>;
+	public function getLabels():Array<Dynamic>;
 	
 	/**
 	* Returns a string representation of this object.

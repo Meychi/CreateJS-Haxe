@@ -76,7 +76,7 @@ extern class Tween extends EventDispatcher
 	/**
 	* Indicates whether the tween is currently registered with Tween.
 	*/
-	private var _registered:Boolean;
+	private var _registered:Bool;
 	
 	/**
 	* Normalized position.

@@ -34,8 +34,6 @@ extern class MotionGuidePlugin
 {
 	public static var priority:Dynamic;
 	
-	public static var temporary variable storage:Dynamic;
-	
 	/**
 	* A TweenJS plugin for working with motion guides.
 	*	
