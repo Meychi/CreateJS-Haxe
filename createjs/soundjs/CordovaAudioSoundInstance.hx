@@ -1,5 +1,4 @@
 package createjs.soundjs;
-import haxe.Constraints.Function;
 
 /**
 * CordovaAudioSoundInstance extends the base api of {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} and is used by
@@ -44,7 +43,7 @@ extern class CordovaAudioSoundInstance extends AbstractSoundInstance
 	* @param mediaSuccess The callback that is passed the current position in seconds.
 	* @param mediaError (Optional) The callback to execute if an error occurs.
 	*/
-	public function getCurrentPosition(mediaSuccess:Function, ?mediaError:Function):Dynamic;
+	public function getCurrentPosition(mediaSuccess:Dynamic, ?mediaError:Dynamic):Dynamic;
 	
 	/**
 	* media object has failed and likely will never work
