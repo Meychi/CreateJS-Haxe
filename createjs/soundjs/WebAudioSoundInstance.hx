@@ -3,6 +3,7 @@ package createjs.soundjs;
 import js.html.audio.AudioContext;
 import js.html.audio.AudioNode;
 import js.html.audio.GainNode;
+import js.html.audio.PannerNode;
 
 /**
 * WebAudioSoundInstance extends the base api of {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} and is used by
@@ -21,7 +22,7 @@ extern class WebAudioSoundInstance extends AbstractSoundInstance
 	/**
 	* NOTE this is only intended for use by advanced users. <br />A panNode allowing left and right audio channel panning only. Connected to WebAudioSoundInstance {{#crossLink "WebAudioSoundInstance/gainNode:property"}}{{/crossLink}}.
 	*/
-	public var panNode:AudioPannerNode;
+	public var panNode:PannerNode;
 	
 	/**
 	* Note this is only intended for use by advanced users. <br />Audio context used to create nodes.  This is and needs to be the same context used by {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
@@ -51,7 +52,7 @@ extern class WebAudioSoundInstance extends AbstractSoundInstance
 	/**
 	* Timeout that is created internally to handle sound playing to completion. Stored so we can remove it when stop, pause, or cleanup are called
 	*/
-	private var _soundCompleteTimeout:TimeoutVariable;
+	private var _soundCompleteTimeout:Dynamic;
 	
 	/**
 	* Value to set panning model to equal power for WebAudioSoundInstance.  Can be "equalpower" or 0 depending on browser implementation.

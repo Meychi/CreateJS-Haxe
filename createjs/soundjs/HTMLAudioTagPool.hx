@@ -19,7 +19,7 @@ extern class HTMLAudioTagPool
 	/**
 	* An object pool for html audio tags
 	*/
-	public static var _tagPool:TagPool;
+	public static var _tagPool:Dynamic;
 	
 	/**
 	* Delete stored tag reference and return them to pool. Note that if the tag reference does not exist, this will fail.

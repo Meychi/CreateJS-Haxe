@@ -1,6 +1,5 @@
 package createjs.soundjs;
-
-import js.html.Event;
+import createjs.preloadjs.AbstractLoader;
 
 /**
 * Loader provides a mechanism to preload Flash content via PreloadJS or internally. Instances are returned to

@@ -26,7 +26,7 @@ extern class CordovaAudioPlugin extends AbstractPlugin
 	/**
 	* Sets a default playAudioWhenScreenIsLocked property for play calls on iOS devices. Individual SoundInstances can alter the default with {{#crossLink "CordovaAudioSoundInstance/playWhenScreenLocked"}}{{/crossLink}}.
 	*/
-	public static var playWhenScreenLocked:Boolean;
+	public static var playWhenScreenLocked:Bool;
 	
 	/**
 	* The build date for this release in UTC format.

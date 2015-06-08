@@ -1,4 +1,5 @@
 package createjs.soundjs;
+import js.html.DivElement;
 
 /**
 * Play sounds using a Flash instance. This plugin is not used by default, and must be registered manually in
@@ -45,7 +46,7 @@ extern class FlashAudioPlugin extends AbstractPlugin
 	/**
 	* A reference to the DIV container that gets created to hold the Flash instance.
 	*/
-	private var _container:HTMLDivElement;
+	private var _container:DivElement;
 	
 	/**
 	* A reference to the Flash instance that gets created.

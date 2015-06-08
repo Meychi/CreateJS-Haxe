@@ -17,12 +17,12 @@ extern class CordovaAudioLoader extends XHRRequest
 	/**
 	* A time counter that triggers timeout if loading takes too long
 	*/
-	private var _loadTime:Number;
+	private var _loadTime:Float;
 	
 	/**
 	* The frequency to fire the loading timer until duration can be retrieved
 	*/
-	private var _TIMER_FREQUENCY:Number;
+	private var _TIMER_FREQUENCY:Float;
 	
 	/**
 	* Fires if audio cannot seek, indicating that src does not exist.

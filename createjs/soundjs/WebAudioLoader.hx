@@ -1,5 +1,5 @@
 package createjs.soundjs;
-
+import createjs.preloadjs.XHRRequest;
 import js.html.audio.AudioContext;
 
 /**

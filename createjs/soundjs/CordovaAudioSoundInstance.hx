@@ -1,4 +1,5 @@
 package createjs.soundjs;
+import haxe.Constraints.Function;
 
 /**
 * CordovaAudioSoundInstance extends the base api of {{#crossLink "AbstractSoundInstance"}}{{/crossLink}} and is used by
@@ -15,12 +16,12 @@ extern class CordovaAudioSoundInstance extends AbstractSoundInstance
 	/**
 	* Boolean value that indicates if we are using an audioSprite
 	*/
-	private var _audioSprite:Boolean;
+	private var _audioSprite:Bool;
 	
 	/**
 	* Sets the playAudioWhenScreenIsLocked property for play calls on iOS devices.
 	*/
-	public var playWhenScreenLocked:Boolean;
+	public var playWhenScreenLocked:Bool;
 	
 	/**
 	* Used to approximate the playback position by storing the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC when playing Note that if js clock is out of sync with Media playback, this will become increasingly inaccurate.
@@ -43,7 +44,7 @@ extern class CordovaAudioSoundInstance extends AbstractSoundInstance
 	* @param mediaSuccess The callback that is passed the current position in seconds.
 	* @param mediaError (Optional) The callback to execute if an error occurs.
 	*/
-	public function getCurrentPosition(mediaSuccess:Method, ?mediaError:Method):Dynamic;
+	public function getCurrentPosition(mediaSuccess:Function, ?mediaError:Function):Dynamic;
 	
 	/**
 	* media object has failed and likely will never work
