@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.Element;
-import js.html.Event;
 import js.html.MouseEvent;
 
 /**

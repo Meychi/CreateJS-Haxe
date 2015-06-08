@@ -1,7 +1,5 @@
 package createjs.easeljs;
 
-import js.html.Point;
-
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
 *	

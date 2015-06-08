@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Text;
 
 /**
 * Display one or more lines of dynamic text (not user editable) in the display list. Line wrapping support (using the

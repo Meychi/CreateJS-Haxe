@@ -1,4 +1,5 @@
 package createjs.easeljs;
+import js.html.ImageElement;
 
 /**
 * The SpriteSheetBuilder allows you to generate sprite sheets at run time from any display object. This can allow
@@ -167,7 +168,7 @@ extern class SpriteSheetBuilder extends EventDispatcher
 	
 	private function _endBuild():Dynamic;
 	
-	private function _fillRow(frames:Array<Dynamic>, y:Float, img:HTMLImageElement, dataFrames:Dynamic, pad:Float):Float;
+	private function _fillRow(frames:Array<Dynamic>, y:Float, img:ImageElement, dataFrames:Dynamic, pad:Float):Float;
 	
 	private function _getSize():Float;
 	

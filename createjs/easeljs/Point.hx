@@ -1,7 +1,5 @@
 package createjs.easeljs;
 
-import js.html.Point;
-
 /**
 * Represents a point on a 2 dimensional x / y coordinate system.
 *	

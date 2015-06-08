@@ -1,7 +1,6 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Point;
 import haxe.extern.Rest;
 
 /**

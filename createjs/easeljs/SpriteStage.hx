@@ -2,7 +2,13 @@ package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
 import js.html.Float32Array;
+import js.html.ImageElement;
 import js.html.Uint16Array;
+import js.html.webgl.Buffer;
+import js.html.webgl.Program;
+import js.html.webgl.RenderingContext;
+import js.html.webgl.Shader;
+import js.html.webgl.Texture;
 
 /**
 * A sprite stage is the root level {{#crossLink "Container"}}{{/crossLink}} for an aggressively optimized display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
@@ -66,12 +72,12 @@ extern class SpriteStage extends Stage
 	/**
 	* The buffer that contains all the indices data.
 	*/
-	private var _indicesBuffer:WebGLBuffer;
+	private var _indicesBuffer:Buffer;
 	
 	/**
 	* The buffer that contains all the vertices data.
 	*/
-	private var _verticesBuffer:WebGLBuffer;
+	private var _verticesBuffer:Buffer;
 	
 	/**
 	* The color to use when the WebGL canvas has been cleared.
@@ -86,12 +92,12 @@ extern class SpriteStage extends Stage
 	/**
 	* The current texture that will be used to draw into the GPU.
 	*/
-	private var _drawTexture:WebGLTexture;
+	private var _drawTexture:Texture;
 	
 	/**
 	* The current WebGL canvas context.
 	*/
-	private var _webGLContext:WebGLRenderingContext;
+	private var _webGLContext:RenderingContext;
 	
 	/**
 	* The height of the canvas element.
@@ -151,7 +157,7 @@ extern class SpriteStage extends Stage
 	/**
 	* The shader program used to draw everything.
 	*/
-	private var _shaderProgram:WebGLProgram;
+	private var _shaderProgram:Program;
 	
 	/**
 	* The vertices data for the current draw call.
@@ -239,7 +245,7 @@ extern class SpriteStage extends Stage
 	* Clears an image's texture to free it up for garbage collection.
 	* @param image 
 	*/
-	public function clearImageTexture(image:HTMLImageElement):Dynamic;
+	public function clearImageTexture(image:ImageElement):Dynamic;
 	
 	/**
 	* Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
@@ -252,13 +258,13 @@ extern class SpriteStage extends Stage
 	* @param type The type of shader to create.
 	* @param str The definition for the shader.
 	*/
-	private function _createShader(ctx:WebGLRenderingContext, type:Float, str:String):WebGLShader;
+	private function _createShader(ctx:RenderingContext, type:Float, str:String):Shader;
 	
 	/**
 	* Creates the shader program that's going to be used to draw everything.
 	* @param ctx 
 	*/
-	private function _createShaderProgram(ctx:WebGLRenderingContext):Dynamic;
+	private function _createShaderProgram(ctx:RenderingContext):Dynamic;
 	
 	/**
 	* Draw all the kids into the WebGL context.
@@ -266,13 +272,13 @@ extern class SpriteStage extends Stage
 	* @param ctx The canvas WebGL context object to draw into.
 	* @param parentMVMatrix The parent's global transformation matrix.
 	*/
-	private function _drawWebGLKids(kids:Array<Dynamic>, ctx:WebGLRenderingContext, parentMVMatrix:Matrix2D):Dynamic;
+	private function _drawWebGLKids(kids:Array<Dynamic>, ctx:RenderingContext, parentMVMatrix:Matrix2D):Dynamic;
 	
 	/**
 	* Draws all the currently defined boxes to the GPU.
 	* @param ctx The canvas WebGL context object to draw into.
 	*/
-	private function _drawToGPU(ctx:WebGLRenderingContext):Dynamic;
+	private function _drawToGPU(ctx:RenderingContext):Dynamic;
 	
 	/**
 	* Draws the stage into the specified context (using WebGL) ignoring its visible, alpha, shadow, and transform.
@@ -309,20 +315,20 @@ extern class SpriteStage extends Stage
 	/**
 	* Sets the WebGL context to use for future draws.
 	*/
-	private function _setWebGLContext():WebGLRenderingContext;
+	private function _setWebGLContext():RenderingContext;
 	
 	/**
 	* Sets up an image's WebGL texture.
 	* @param ctx The canvas WebGL context object to draw into.
 	* @param image 
 	*/
-	private function _setupImageTexture(ctx:WebGLRenderingContext, image:Dynamic):WebGLTexture;
+	private function _setupImageTexture(ctx:RenderingContext, image:Dynamic):Texture;
 	
 	/**
 	* Sets up the necessary vertices and indices buffers.
 	* @param ctx 
 	*/
-	private function _createBuffers(ctx:WebGLRenderingContext):Dynamic;
+	private function _createBuffers(ctx:RenderingContext):Dynamic;
 	
 	/**
 	* Sets up the WebGL context for rendering.
@@ -342,6 +348,6 @@ extern class SpriteStage extends Stage
 	* @param ctx 
 	* @param value The new this._maxBoxesPointsPerDraw value.
 	*/
-	private function _setMaxBoxesPoints(ctx:WebGLRenderingContext, value:Float):Dynamic;
+	private function _setMaxBoxesPoints(ctx:RenderingContext, value:Float):Dynamic;
 	
 }
