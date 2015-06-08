@@ -1,4 +1,5 @@
 package createjs.soundjs;
+import js.html.DivElement;
 
 /**
 * Play sounds using a Flash instance. This plugin is not used by default, and must be registered manually in
@@ -45,17 +46,12 @@ extern class FlashAudioPlugin extends AbstractPlugin
 	/**
 	* A reference to the DIV container that gets created to hold the Flash instance.
 	*/
-	private var _container:HTMLDivElement;
+	private var _container:DivElement;
 	
 	/**
 	* A reference to the Flash instance that gets created.
 	*/
 	private var flash:Dynamic;
-	
-	/**
-	* An array of Sound Preload instances that are waiting to preload. Once Flash is initialized, the queued instances are preloaded.
-	*/
-	private var _queuedInstances:Dynamic;
 	
 	/**
 	* Determines if the Flash object has been created and initialized. This is required to make <code>ExternalInterface</code> calls from JavaScript to Flash.
@@ -71,6 +67,11 @@ extern class FlashAudioPlugin extends AbstractPlugin
 	* Event constant for the "unregisterFlashID" event for cleaner code.
 	*/
 	public static var _UNREG_FLASHID:String;
+	
+	/**
+	* The build date for this release in UTC format.
+	*/
+	public static var buildDate:String;
 	
 	/**
 	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/_generateCapabilities"}}{{/crossLink}} method. Please see the Sound {{#crossLink "Sound/getCapabilities"}}{{/crossLink}} method for a list of available capabilities.
@@ -91,6 +92,11 @@ extern class FlashAudioPlugin extends AbstractPlugin
 	* The path relative to the HTML page that the FlashAudioPlugin.swf resides. Note if this is not correct, this plugin will not work.
 	*/
 	public static var swfPath:String;
+	
+	/**
+	* The version string for this release.
+	*/
+	public static var version:String;
 	
 	/**
 	* Determine if the plugin can be used in the current browser/OS.

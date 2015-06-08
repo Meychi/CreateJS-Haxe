@@ -2,7 +2,6 @@ package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
 import js.html.Element;
-import js.html.Event;
 
 /**
 * <b>This class is still experimental, and more advanced use is likely to be buggy. Please report bugs.</b>

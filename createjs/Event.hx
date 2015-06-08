@@ -1,7 +1,5 @@
 package createjs;
 
-import js.html.Event;
-
 /**
 * Contains properties and methods shared by all events for use with
 *	{{#crossLink "EventDispatcher"}}{{/crossLink}}.

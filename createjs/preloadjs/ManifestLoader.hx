@@ -1,21 +1,37 @@
 package createjs.preloadjs;
 
-import js.html.ErrorEvent;
-import js.html.Event;
-import js.html.ProgressEvent;
-import js.html.svg.Number;
-
 /**
 * A loader for JSON manifests. Items inside the manifest are loaded before the loader completes. To load manifests
 *	using JSONP, specify a {{#crossLink "LoadItem/callback:property"}}{{/crossLink}} as part of the
-*	{{#crossLink "LoadItem"}}{{/crossLink}}. Note that the {{#crossLink "JSONLoader"}}{{/crossLink}} and
-*	{{#crossLink "JSONPLoader"}}{{/crossLink}} are higher priority loaders, so manifests <strong>must</strong>
-*	set the {{#crossLink "LoadItem"}}{{/crossLink}} {{#crossLink "LoadItem/type:property"}}{{/crossLink}} property
-*	to {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}.
+*	{{#crossLink "LoadItem"}}{{/crossLink}}.
+*	
+*	The list of files in the manifest must be defined on the top-level JSON object in a `manifest` property. This
+*	example shows a sample manifest definition, as well as how to to include a sub-manifest.
+*	
+*			{
+*				"path": "assets/",
+*		 	    "manifest": [
+*					"image.png",
+*					{"src": "image2.png", "id":"image2"},
+*					{"src": "sub-manifest.json", "type":"manifest", "callback":"jsonCallback"}
+*		 	    ]
+*		 	}
+*	
+*	When a ManifestLoader has completed loading, the parent loader (usually a {{#crossLink "LoadQueue"}}{{/crossLink}},
+*	but could also be another ManifestLoader) will inherit all the loaded items, so you can access them directly.
+*	
+*	Note that the {{#crossLink "JSONLoader"}}{{/crossLink}} and {{#crossLink "JSONPLoader"}}{{/crossLink}} are
+*	higher priority loaders, so manifests <strong>must</strong> set the {{#crossLink "LoadItem"}}{{/crossLink}}
+*	{{#crossLink "LoadItem/type:property"}}{{/crossLink}} property to {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}.
 */
 @:native("createjs.ManifestLoader")
 extern class ManifestLoader extends AbstractLoader
 {
+	/**
+	* An array of the plugins registered using {{#crossLink "LoadQueue/installPlugin"}}{{/crossLink}}, used to pass plugins to new LoadQueues that may be created.
+	*/
+	private var _plugins:Array<Dynamic>;
+	
 	/**
 	* An internal {{#crossLink "LoadQueue"}}{{/crossLink}} that loads the contents of the manifest.
 	*/
@@ -24,15 +40,31 @@ extern class ManifestLoader extends AbstractLoader
 	/**
 	* The amount of progress that the manifest itself takes up.
 	*/
-	public static var MANIFEST_PROGRESS:Number;
+	public static var MANIFEST_PROGRESS:Float;
 	
 	/**
 	* A loader for JSON manifests. Items inside the manifest are loaded before the loader completes. To load manifests
 	*	using JSONP, specify a {{#crossLink "LoadItem/callback:property"}}{{/crossLink}} as part of the
-	*	{{#crossLink "LoadItem"}}{{/crossLink}}. Note that the {{#crossLink "JSONLoader"}}{{/crossLink}} and
-	*	{{#crossLink "JSONPLoader"}}{{/crossLink}} are higher priority loaders, so manifests <strong>must</strong>
-	*	set the {{#crossLink "LoadItem"}}{{/crossLink}} {{#crossLink "LoadItem/type:property"}}{{/crossLink}} property
-	*	to {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}.
+	*	{{#crossLink "LoadItem"}}{{/crossLink}}.
+	*	
+	*	The list of files in the manifest must be defined on the top-level JSON object in a `manifest` property. This
+	*	example shows a sample manifest definition, as well as how to to include a sub-manifest.
+	*	
+	*			{
+	*				"path": "assets/",
+	*		 	    "manifest": [
+	*					"image.png",
+	*					{"src": "image2.png", "id":"image2"},
+	*					{"src": "sub-manifest.json", "type":"manifest", "callback":"jsonCallback"}
+	*		 	    ]
+	*		 	}
+	*	
+	*	When a ManifestLoader has completed loading, the parent loader (usually a {{#crossLink "LoadQueue"}}{{/crossLink}},
+	*	but could also be another ManifestLoader) will inherit all the loaded items, so you can access them directly.
+	*	
+	*	Note that the {{#crossLink "JSONLoader"}}{{/crossLink}} and {{#crossLink "JSONPLoader"}}{{/crossLink}} are
+	*	higher priority loaders, so manifests <strong>must</strong> set the {{#crossLink "LoadItem"}}{{/crossLink}}
+	*	{{#crossLink "LoadItem/type:property"}}{{/crossLink}} property to {{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}.
 	* @param loadItem 
 	*/
 	public function new(loadItem:Dynamic):Void;
@@ -67,7 +99,7 @@ extern class ManifestLoader extends AbstractLoader
 	* The manifest has reported an error with one of the files.
 	* @param event 
 	*/
-	private function _handleManifestError(event:ErrorEvent):Dynamic;
+	private function _handleManifestError(event:Event):Dynamic;
 	
 	/**
 	* The manifest has reported progress.

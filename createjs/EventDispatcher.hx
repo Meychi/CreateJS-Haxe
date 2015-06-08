@@ -66,7 +66,11 @@ extern class EventDispatcher
 	*	only run once, associate arbitrary data with the listener, and remove the listener.
 	*	
 	*	This method works by creating an anonymous wrapper function and subscribing it with addEventListener.
-	*	The created anonymous function is returned for use with .removeEventListener (or .off).
+	*	The wrapper function is returned for use with `removeEventListener` (or `off`).
+	*	
+	*	<b>IMPORTANT:</b> To remove a listener added with `on`, you must pass in the returned wrapper function as the listener, or use
+	*	{{#crossLink "Event/remove"}}{{/crossLink}}. Likewise, each time you call `on` a NEW wrapper function is subscribed, so multiple calls
+	*	to `on` with the same params will create multiple listeners.
 	*	
 	*	<h4>Example</h4>
 	*	
@@ -93,6 +97,9 @@ extern class EventDispatcher
 	/**
 	* A shortcut to the removeEventListener method, with the same parameters and return value. This is a companion to the
 	*	.on method.
+	*	
+	*	<b>IMPORTANT:</b> To remove a listener added with `on`, you must pass in the returned wrapper function as the listener. See 
+	*	{{#crossLink "EventDispatcher/on"}}{{/crossLink}} for an example.
 	* @param type The string type of the event.
 	* @param listener The listener function or object.
 	* @param useCapture For events that bubble, indicates whether to listen for the event in the capture or bubbling/target phase.

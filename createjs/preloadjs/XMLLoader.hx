@@ -23,6 +23,6 @@ extern class XMLLoader extends AbstractLoader
 	* The result formatter for XML files.
 	* @param loader 
 	*/
-	private function _formatResult(loader:AbstractLoader):XMLDocument;
+	private function _formatResult(loader:AbstractLoader):Dynamic;
 	
 }

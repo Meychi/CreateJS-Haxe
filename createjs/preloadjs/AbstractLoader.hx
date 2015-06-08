@@ -1,8 +1,6 @@
 package createjs.preloadjs;
 
 import js.html.Element;
-import js.html.ErrorEvent;
-import js.html.Event;
 
 /**
 * The base loader, which defines all the generic methods, properties, and events. All loaders extend this class,
@@ -208,7 +206,7 @@ extern class AbstractLoader extends EventDispatcher
 	*	event for details on the event payload.
 	* @param event The event object containing specific error properties.
 	*/
-	private function _sendError(event:ErrorEvent):Dynamic;
+	private function _sendError(event:Event):Dynamic;
 	
 	/**
 	* Get a reference to the content that was loaded by the loader (only available after the {{#crossLink "complete:event"}}{{/crossLink}}
@@ -252,6 +250,6 @@ extern class AbstractLoader extends EventDispatcher
 	
 	private function buildPath():Dynamic;
 	
-	public function toString():String;
+	override public function toString():String;
 	
 }

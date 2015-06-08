@@ -1,9 +1,5 @@
 package createjs.preloadjs;
 
-import js.html.ErrorEvent;
-import js.html.Event;
-import js.html.ProgressEvent;
-
 /**
 * The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
 *	a single file, or queue of files.
@@ -183,6 +179,11 @@ extern class LoadQueue extends AbstractLoader
 	private var _loadQueue:Array<Dynamic>;
 	
 	/**
+	* An array of the plugins registered using {{#crossLink "LoadQueue/installPlugin"}}{{/crossLink}}.
+	*/
+	private var _plugins:Array<Dynamic>;
+	
+	/**
 	* An internal list of all the default Loaders that are included with PreloadJS. Before an item is loaded, the available loader list is iterated, in the order they are included, and as soon as a loader indicates it can handle the content, it will be selected. The default loader, ({{#crossLink "TextLoader"}}{{/crossLink}} is last in the list, so it will be used if no other match is found. Typically, loaders will match based on the {{#crossLink "LoadItem/type"}}{{/crossLink}}, which is automatically determined using the file extension of the {{#crossLink "LoadItem/src:property"}}{{/crossLink}}.  Loaders can be removed from PreloadJS by simply not including them.  Custom loaders installed using {{#crossLink "registerLoader"}}{{/crossLink}} will be prepended to this list so that they are checked first.
 	*/
 	private var _availableLoaders:Array<Dynamic>;
@@ -285,7 +286,7 @@ extern class LoadQueue extends AbstractLoader
 	/**
 	* Whether the queue is currently paused or not.
 	*/
-	private var _paused:Boolean;
+	private var _paused:Bool;
 	
 	public static var BINARY:String;
 	
@@ -441,7 +442,7 @@ extern class LoadQueue extends AbstractLoader
 	* @param item The item that is being loaded.
 	* @param loader 
 	*/
-	private function _sendFileComplete(item:LoadItemObject, loader:AbstractLoader):Dynamic;
+	private function _sendFileComplete(item:LoadItem, loader:AbstractLoader):Dynamic;
 	
 	/**
 	* Dispatch a filestart {{#crossLink "Event"}}{{/crossLink}} immediately before a file starts to load. Please see
@@ -700,7 +701,7 @@ extern class LoadQueue extends AbstractLoader
 	*	is set to `true`.
 	* @param event The error event, containing relevant error information.
 	*/
-	private function _handleError(event:ErrorEvent):Dynamic;
+	private function _handleError(event:Event):Dynamic;
 	
 	/**
 	* The LoadQueue class is the main API for preloading content. LoadQueue is a load manager, which can preload either
@@ -861,4 +862,6 @@ extern class LoadQueue extends AbstractLoader
 	
 	public function setUseXHR(value:Bool):Bool;
 	
+	@:overload(function(id:String, ?raw:Bool):Dynamic {})
+	override public function getResult(?raw:Bool):Dynamic;
 }

@@ -1,7 +1,5 @@
 package createjs;
 
-import js.html.svg.Number;
-
 /**
 * The Ticker provides a centralized tick or heartbeat broadcast at a set interval. Listeners can subscribe to the tick
 *	event to be notified when a set time interval has elapsed.
@@ -29,12 +27,12 @@ extern class Ticker
 	public static var useRAF:Bool;
 	
 	/**
-	* In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely. Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based. You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the tick event object's "delta" properties to make this easier.  Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	* In this mode, Ticker passes through the requestAnimationFrame heartbeat, ignoring the target framerate completely. Because requestAnimationFrame frequency is not deterministic, any content using this mode should be time based. You can leverage {{#crossLink "Ticker/getTime"}}{{/crossLink}} and the {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object's "delta" properties to make this easier.  Falls back on {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not supported.
 	*/
 	public static var RAF:String;
 	
 	/**
-	* In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and dispatches the tick when the time is within a certain threshold.  This mode has a higher variance for time between frames than TIMEOUT, but does not require that content be time based as with RAF while gaining the benefits of that API (screen synch, background throttling).  Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so framerates of 10, 12, 15, 20, and 30 work well.  Falls back on TIMEOUT if the requestAnimationFrame API is not supported.
+	* In this mode, Ticker uses the requestAnimationFrame API, but attempts to synch the ticks to target framerate. It uses a simple heuristic that compares the time of the RAF return to the target time for the current frame and dispatches the tick when the time is within a certain threshold.  This mode has a higher variance for time between frames than {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}}, but does not require that content be time based as with {{#crossLink "Ticker/RAF:property"}}{{/crossLink}} while gaining the benefits of that API (screen synch, background throttling).  Variance is usually lowest for framerates that are a divisor of the RAF frequency. This is usually 60, so framerates of 10, 12, 15, 20, and 30 work well.  Falls back to {{#crossLink "Ticker/TIMEOUT:property"}}{{/crossLink}} if the requestAnimationFrame API is not supported.
 	*/
 	public static var RAF_SYNCHED:String;
 	
@@ -56,7 +54,7 @@ extern class Ticker
 	/**
 	* Specifies a maximum value for the delta property in the tick event object. This is useful when building time based animations and systems to prevent issues caused by large time gaps caused by background tabs, system sleep, alert dialogs, or other blocking routines. Double the expected frame duration is often an effective value (ex. maxDelta=50 when running at 40fps).  This does not impact any other values (ex. time, runTime, etc), so you may experience issues if you enable maxDelta when using both delta and other values.  If 0, there is no maximum.
 	*/
-	public static var maxDelta:Number;
+	public static var maxDelta:Float;
 	
 	/**
 	* Specifies the timing api (setTimeout or requestAnimationFrame) and mode to use. See {{#crossLink "Ticker/TIMEOUT"}}{{/crossLink}}, {{#crossLink "Ticker/RAF"}}{{/crossLink}}, and {{#crossLink "Ticker/RAF_SYNCHED"}}{{/crossLink}} for mode details.
@@ -84,7 +82,7 @@ extern class Ticker
 	public static var _raf:Bool;
 	
 	/**
-	* When the ticker is paused, all listeners will still receive a tick event, but the <code>paused</code> property of the event will be false. Also, while paused the `runTime` will not increase. See {{#crossLink "Ticker/tick:event"}}{{/crossLink}}, {{#crossLink "Ticker/getTime"}}{{/crossLink}}, and {{#crossLink "Ticker/getEventTime"}}{{/crossLink}} for more info.  <h4>Example</h4>       createjs.Ticker.addEventListener("tick", handleTick);      createjs.Ticker.paused = true;      function handleTick(event) {          console.log(event.paused,          	createjs.Ticker.getTime(false),          	createjs.Ticker.getTime(true));      }
+	* When the ticker is paused, all listeners will still receive a tick event, but the <code>paused</code> property of the event will be `true`. Also, while paused the `runTime` will not increase. See {{#crossLink "Ticker/tick:event"}}{{/crossLink}}, {{#crossLink "Ticker/getTime"}}{{/crossLink}}, and {{#crossLink "Ticker/getEventTime"}}{{/crossLink}} for more info.  <h4>Example</h4>       createjs.Ticker.addEventListener("tick", handleTick);      createjs.Ticker.paused = true;      function handleTick(event) {          console.log(event.paused,          	createjs.Ticker.getTime(false),          	createjs.Ticker.getTime(true));      }
 	*/
 	public static var paused:Bool;
 	
@@ -144,7 +142,8 @@ extern class Ticker
 	public static function getTicks(pauseable:Bool):Float;
 	
 	/**
-	* Similar to getTime(), but returns the time on the most recent tick event object.
+	* Similar to the {{#crossLink "Ticker/getTime"}}{{/crossLink}} method, but returns the time on the most recent {{#crossLink "Ticker/tick:event"}}{{/crossLink}}
+	*	event object.
 	* @param runTime [runTime=false] If true, the runTime property will be returned instead of time.
 	*/
 	public static function getEventTime(runTime:Bool):Float;
@@ -168,7 +167,7 @@ extern class Ticker
 	/**
 	* Use the {{#crossLink "Ticker/framerate:property"}}{{/crossLink}} property instead.
 	*/
-	public static function getInterval():Float;
+	public static function getFPS():Float;
 	
 	/**
 	* Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
@@ -179,7 +178,7 @@ extern class Ticker
 	/**
 	* Use the {{#crossLink "Ticker/interval:property"}}{{/crossLink}} property instead.
 	*/
-	public static function getFPS():Float;
+	public static function getInterval():Float;
 	
 	/**
 	* Use the {{#crossLink "Ticker/paused:property"}}{{/crossLink}} property instead.

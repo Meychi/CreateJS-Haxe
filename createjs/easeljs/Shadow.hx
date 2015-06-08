@@ -17,6 +17,17 @@ extern class Shadow
 	public static var identity:Shadow;
 	
 	/**
+	* The color of the shadow. This can be any valid CSS color value.
+	*/
+	public var color:String;
+	
+	public var blur:Float;
+	
+	public var offsetX:Float;
+	
+	public var offsetY:Float;
+	
+	/**
 	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
 	*	See {{#crossLink "Utility Methods/extend"}}{{/crossLink}} and {{#crossLink "Utility Methods/promote"}}{{/crossLink}}
 	*	for details.
@@ -42,7 +53,7 @@ extern class Shadow
 	*	<h4>Example</h4>
 	*	
 	*	     myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
-	* @param color The color of the shadow.
+	* @param color The color of the shadow. This can be any valid CSS color value.
 	* @param offsetX The x offset of the shadow in pixels.
 	* @param offsetY The y offset of the shadow in pixels.
 	* @param blur The size of the blurring effect.

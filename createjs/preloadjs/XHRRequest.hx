@@ -33,7 +33,7 @@ extern class XHRRequest extends AbstractLoader
 	/**
 	* The response of a loaded file. This is set because it is expensive to look up constantly. This property will be null until the file is loaded.
 	*/
-	private var _response:Mixed;
+	private var _response:Dynamic;
 	
 	/**
 	* The response of the loaded file before it is modified. In most cases, content is converted from raw text to an HTML tag or a formatted object which is set to the <code>result</code> property, but the developer may still want to access the raw content as it was loaded.

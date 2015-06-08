@@ -1,6 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
+import haxe.extern.Rest;
 
 /**
 * A Container is a nestable display list that allows you to work with compound display elements. For  example you could
@@ -96,6 +97,7 @@ extern class Container extends DisplayObject
 	*			container.addChild(bitmapInstance, shapeInstance, textInstance);
 	* @param child The display object to add.
 	*/
+	@:overload(function(childs:Rest<DisplayObject>):DisplayObject {})
 	public function addChild(child:DisplayObject):DisplayObject;
 	
 	/**
@@ -150,7 +152,7 @@ extern class Container extends DisplayObject
 	*	
 	*	<h4>Example</h4>
 	*	
-	*	     container.removeAlLChildren();
+	*		container.removeAllChildren();
 	*/
 	public function removeAllChildren():Dynamic;
 	

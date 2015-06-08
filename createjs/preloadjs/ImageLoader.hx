@@ -1,4 +1,5 @@
 package createjs.preloadjs;
+import js.html.ImageElement;
 
 /**
 * A loader for image files.
@@ -7,7 +8,7 @@ package createjs.preloadjs;
 extern class ImageLoader extends AbstractLoader
 {
 	/**
-	* Before the item loads, set its mimetype and responseType.
+	* Before the item loads, set its mimeType and responseType.
 	*/
 	private var _updateXHR:Dynamic;
 	
@@ -29,6 +30,6 @@ extern class ImageLoader extends AbstractLoader
 	* The result formatter for Image files.
 	* @param loader 
 	*/
-	private function _formatResult(loader:AbstractLoader):HTMLImageElement;
+	private function _formatResult(loader:AbstractLoader):ImageElement;
 	
 }
