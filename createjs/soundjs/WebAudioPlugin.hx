@@ -1,5 +1,6 @@
 package createjs.soundjs;
 
+import js.html.audio.AudioBuffer;
 import js.html.audio.AudioContext;
 import js.html.audio.AudioNode;
 import js.html.audio.GainNode;
@@ -11,18 +12,29 @@ import js.html.audio.GainNode;
 *	
 *	<h4>Known Browser and OS issues for Web Audio</h4>
 *	<b>Firefox 25</b>
-*	<ul><li>mp3 audio files do not load properly on all windows machines, reported
-*	<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=929969" target="_blank">here</a>. </br>
-*	For this reason it is recommended to pass another FF supported type (ie ogg) first until this bug is resolved, if possible.</li></ul>
-*	<br />
+*	<li>
+*	    mp3 audio files do not load properly on all windows machines, reported <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=929969" target="_blank">here</a>.
+*	    <br />For this reason it is recommended to pass another FireFox-supported type (i.e. ogg) as the default
+*	    extension, until this bug is resolved
+*	</li>
+*	
 *	<b>Webkit (Chrome and Safari)</b>
-*	<ul><li>AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
-*	are playing a lot of audio files.</li></ul>
-*	<br />
+*	<li>
+*	    AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
+*		   are playing a lot of audio files.
+*	</li>
+*	
 *	<b>iOS 6 limitations</b>
-*		<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
-*		<li>A bug exists that will distort uncached audio when a video element is present in the DOM.  You can avoid this bug
-*		by ensuring the audio and video audio share the same sampleRate.</li>
+*	<ul>
+*	    <li>
+*	        Sound is initially muted and will only unmute through play being called inside a user initiated event
+*	        (touch/click). Please read the mobile playback notes in the the {{#crossLink "Sound"}}{{/crossLink}}
+*	        class for a full overview of the limitations, and how to get around them.
+*	    </li>
+*		   <li>
+*		       A bug exists that will distort un-cached audio when a video element is present in the DOM. You can avoid
+*		       this bug by ensuring the audio and video audio share the same sample rate.
+*		   </li>
 *	</ul>
 */
 @:native("createjs.WebAudioPlugin")
@@ -39,14 +51,19 @@ extern class WebAudioPlugin extends AbstractPlugin
 	public var gainNode:GainNode;
 	
 	/**
+	* Indicated whether audio on iOS has been unlocked, which requires a touchend/mousedown event that plays an empty sound.
+	*/
+	private var _unlocked:Boolean;
+	
+	/**
 	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/_generateCapabilities:method"}}{{/crossLink}} method and is used internally.
 	*/
 	public static var _capabilities:Dynamic;
 	
 	/**
-	* The internal master volume value of the plugin.
+	* The scratch buffer that will be assigned to the buffer property of a source node on close. Works around an iOS Safari bug: https://github.com/CreateJS/SoundJS/issues/102  Advanced users can set this to an existing source node, but <b>must</b> do so before they call {{#crossLink "Sound/registerPlugins"}}{{/crossLink}} or {{#crossLink "Sound/initializeDefaultPlugins"}}{{/crossLink}}.
 	*/
-	private var _volume:Float;
+	public static var _scratchBuffer:AudioBuffer;
 	
 	/**
 	* The web audio context, which WebAudio uses to play audio. All nodes that interact with the WebAudioPlugin need to be created within this context.
@@ -91,18 +108,29 @@ extern class WebAudioPlugin extends AbstractPlugin
 	*	
 	*	<h4>Known Browser and OS issues for Web Audio</h4>
 	*	<b>Firefox 25</b>
-	*	<ul><li>mp3 audio files do not load properly on all windows machines, reported
-	*	<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=929969" target="_blank">here</a>. </br>
-	*	For this reason it is recommended to pass another FF supported type (ie ogg) first until this bug is resolved, if possible.</li></ul>
-	*	<br />
+	*	<li>
+	*	    mp3 audio files do not load properly on all windows machines, reported <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=929969" target="_blank">here</a>.
+	*	    <br />For this reason it is recommended to pass another FireFox-supported type (i.e. ogg) as the default
+	*	    extension, until this bug is resolved
+	*	</li>
+	*	
 	*	<b>Webkit (Chrome and Safari)</b>
-	*	<ul><li>AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
-	*	are playing a lot of audio files.</li></ul>
-	*	<br />
+	*	<li>
+	*	    AudioNode.disconnect does not always seem to work.  This can cause the file size to grow over time if you
+	*		   are playing a lot of audio files.
+	*	</li>
+	*	
 	*	<b>iOS 6 limitations</b>
-	*		<ul><li>Sound is initially muted and will only unmute through play being called inside a user initiated event (touch/click).</li>
-	*		<li>A bug exists that will distort uncached audio when a video element is present in the DOM.  You can avoid this bug
-	*		by ensuring the audio and video audio share the same sampleRate.</li>
+	*	<ul>
+	*	    <li>
+	*	        Sound is initially muted and will only unmute through play being called inside a user initiated event
+	*	        (touch/click). Please read the mobile playback notes in the the {{#crossLink "Sound"}}{{/crossLink}}
+	*	        class for a full overview of the limitations, and how to get around them.
+	*	    </li>
+	*		   <li>
+	*		       A bug exists that will distort un-cached audio when a video element is present in the DOM. You can avoid
+	*		       this bug by ensuring the audio and video audio share the same sample rate.
+	*		   </li>
 	*	</ul>
 	*/
 	public function new():Void;
@@ -138,5 +166,16 @@ extern class WebAudioPlugin extends AbstractPlugin
 	* Set up needed properties on supported classes WebAudioSoundInstance and WebAudioLoader.
 	*/
 	private static function _addPropsToClasses():Dynamic;
+	
+	/**
+	* Try to unlock audio on iOS. This is triggered from either WebAudio plugin setup (which will work if inside of
+	*	a `mousedown` or `touchend` event stack), or the first document touchend/mousedown event. If it fails (touchend
+	*	will fail if the user presses for too long, indicating a scroll event instead of a click event.
+	*	
+	*	Note that earlier versions of iOS supported `touchstart` for this, but iOS9 removed this functionality. Adding
+	*	a `touchstart` event to support older platforms may preclude a `mousedown` even from getting fired on iOS9, so we
+	*	stick with `mousedown` and `touchend`.
+	*/
+	private function _unlock():Dynamic;
 	
 }

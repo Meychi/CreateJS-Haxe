@@ -56,6 +56,11 @@ extern class MouseEvent extends Event
 	public var rawY:Float;
 	
 	/**
+	* The secondary target for the event, if applicable. This is used for mouseout/rollout events to indicate the object that the mouse entered from, mouseover/rollover for the object the mouse exited, and stagemousedown/stagemouseup events for the object that was the under the cursor, if any.  Only valid interaction targets will be returned (ie. objects with mouse listeners or a cursor set).
+	*/
+	public var relatedTarget:DisplayObject;
+	
+	/**
 	* The unique id for the pointer (touch point or cursor). This will be either -1 for the mouse, or the system supplied id value.
 	*/
 	public var pointerID:Float;
@@ -73,8 +78,9 @@ extern class MouseEvent extends Event
 	* @param primary Indicates whether this is the primary pointer in a multitouch environment.
 	* @param rawX The raw x position relative to the stage.
 	* @param rawY The raw y position relative to the stage.
+	* @param relatedTarget The secondary target for the event.
 	*/
-	public function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float):Void;
+	public function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, relatedTarget:DisplayObject):Void;
 	
 	/**
 	* Returns a clone of the MouseEvent instance.

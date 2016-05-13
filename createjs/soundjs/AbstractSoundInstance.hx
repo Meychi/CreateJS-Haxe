@@ -40,7 +40,12 @@ extern class AbstractSoundInstance extends EventDispatcher
 	private var delayTimeoutId:Dynamic;
 	
 	/**
-	* Determines if the audio is currently muted.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setMute"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getMute"}}{{/crossLink}}.
+	* Audio sprite property used to determine the starting offset.
+	*/
+	public var startTime:Float;
+	
+	/**
+	* Mutes or unmutes the current audio instance.
 	*/
 	public var muted:Bool;
 	
@@ -50,22 +55,22 @@ extern class AbstractSoundInstance extends EventDispatcher
 	public var playbackResource:Dynamic;
 	
 	/**
-	* Tells you if the audio is currently paused.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower. Use {{#crossLink "AbstractSoundInstance/pause:method"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/resume:method"}}{{/crossLink}} to set.
+	* Pauses or resumes the current audio instance.
 	*/
 	public var paused:Bool;
 	
 	/**
-	* The length of the audio clip, in milliseconds.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setDuration"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getDuration"}}{{/crossLink}}.
+	* Sets or gets the length of the audio clip, value is in milliseconds.
 	*/
 	public var duration:Float;
 	
 	/**
-	* The number of play loops remaining. Negative values will loop infinitely.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setLoop"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getLoop"}}{{/crossLink}}.
+	* The number of play loops remaining. Negative values will loop infinitely.
 	*/
 	public var loop:Float;
 	
 	/**
-	* The pan of the sound, between -1 (left) and 1 (right). Note that pan is not supported by HTML Audio.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setPan"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getPan"}}{{/crossLink}}. <br />Note in WebAudioPlugin this only gives us the "x" value of what is actually 3D audio.
+	* The pan of the sound, between -1 (left) and 1 (right). Note that pan is not supported by HTML Audio.  <br />Note in WebAudioPlugin this only gives us the "x" value of what is actually 3D audio.
 	*/
 	public var pan:Float;
 	
@@ -75,7 +80,7 @@ extern class AbstractSoundInstance extends EventDispatcher
 	public var playState:String;
 	
 	/**
-	* The position of the playhead in milliseconds. This can be set while a sound is playing, paused, or stopped.  <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower, Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setPosition"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getPosition"}}{{/crossLink}}.
+	* The position of the playhead in milliseconds. This can be set while a sound is playing, paused, or stopped.
 	*/
 	public var position:Float;
 	
@@ -90,7 +95,7 @@ extern class AbstractSoundInstance extends EventDispatcher
 	public var uniqueId:Dynamic;
 	
 	/**
-	* The volume of the sound, between 0 and 1. <br />Note this uses a getter setter, which is not supported by Firefox versions 3.6 or lower and Opera versions 11.50 or lower, and Internet Explorer 8 or lower.  Instead use {{#crossLink "AbstractSoundInstance/setVolume"}}{{/crossLink}} and {{#crossLink "AbstractSoundInstance/getVolume"}}{{/crossLink}}.  The actual output volume of a sound can be calculated using: <code>myInstance.volume * createjs.Sound.getVolume();</code>
+	* The volume of the sound, between 0 and 1.  The actual output volume of a sound can be calculated using: <code>myInstance.volume * createjs.Sound.getVolume();</code>
 	*/
 	public var volume:Float;
 	
@@ -146,12 +151,9 @@ extern class AbstractSoundInstance extends EventDispatcher
 	/**
 	* Called by the Sound class when the audio is ready to play (delay has completed). Starts sound playing if the
 	*	src is loaded, otherwise playback will fail.
-	* @param offset How far into the sound to begin playback, in milliseconds.
-	* @param loop The number of times to loop the audio. Use -1 for infinite loops.
-	* @param volume The volume of the sound, between 0 and 1.
-	* @param pan The pan of the sound between -1 (left) and 1 (right). Note that pan does not work for HTML Audio.
+	* @param playProps A PlayPropsConfig object.
 	*/
-	private function _beginPlaying(offset:Float, loop:Float, volume:Float, pan:Float):Bool;
+	private function _beginPlaying(playProps:PlayPropsConfig):Bool;
 	
 	/**
 	* Clean up the instance. Remove references and clean up any additional properties such as timers.
@@ -159,14 +161,98 @@ extern class AbstractSoundInstance extends EventDispatcher
 	private function _cleanUp():Dynamic;
 	
 	/**
-	* Deprecated, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} instead.
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
+	* @param value The new duration time in milli seconds.
 	*/
-	public function pause():Bool;
+	public function setDuration(value:Float):AbstractSoundInstance;
 	
 	/**
-	* Deprecated, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} instead.
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} directly as a property
 	*/
-	public function resume():Bool;
+	public function getDuration():Float;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getLoop():Float;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} directly as a property,
+	* @param value The number of times to loop after play.
+	*/
+	public function setLoop(value:Float):Dynamic;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
+	* @param value If the sound should be muted.
+	*/
+	public function setMuted(value:Bool):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getMuted():Bool;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
+	* @param value The pan value, between -1 (left) and 1 (right).
+	*/
+	public function setPan(value:Float):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getPan():Float;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property
+	* @param value 
+	*/
+	public function setPaused(value:Bool):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} directly as a property,
+	*/
+	public function getPaused():Bool;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} directly as a property
+	* @param value The new playback resource.
+	*/
+	public function setPlayback(value:Dynamic):Dynamic;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
+	* @param value The position to place the playhead, in milliseconds.
+	*/
+	public function setPosition(value:Float):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getPosition():Float;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
+	* @param value The new startTime time in milli seconds.
+	*/
+	public function setStartTime(value:Float):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/startTime:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getStartTime():Float;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
+	* @param value The volume to set, between 0 and 1.
+	*/
+	public function setVolume(value:Float):AbstractSoundInstance;
+	
+	/**
+	* DEPRECATED, please use {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} directly as a property
+	*/
+	public function getVolume():Float;
 	
 	/**
 	* Handles starting playback when the sound is ready for playing.
@@ -176,17 +262,24 @@ extern class AbstractSoundInstance extends EventDispatcher
 	/**
 	* Internal function called when AbstractSoundInstance has played to end and is looping
 	*/
+	private function _handleLoop():Dynamic;
+	
+	/**
+	* Internal function called when AbstractSoundInstance is being cleaned up
+	*/
 	private function _handleCleanUp():Dynamic;
 	
 	/**
 	* Internal function called when looping is added during playback.
+	* @param value The number of times to loop after play.
 	*/
-	private function _addLooping():Dynamic;
+	private function _addLooping(value:Float):Dynamic;
 	
 	/**
 	* Internal function called when looping is removed during playback.
+	* @param value The number of times to loop after play.
 	*/
-	private function _removeLooping():Dynamic;
+	private function _removeLooping(value:Float):Dynamic;
 	
 	/**
 	* Internal function called when pausing playback
@@ -204,6 +297,11 @@ extern class AbstractSoundInstance extends EventDispatcher
 	private function _handleStop():Dynamic;
 	
 	/**
+	* Internal function that calculates the current position of the playhead and sets this._position to that value
+	*/
+	private function _calculateCurrentPosition():Dynamic;
+	
+	/**
 	* Internal function used to get the duration of the audio from the source we'll be playing.
 	*/
 	private function _updateDuration():Dynamic;
@@ -219,180 +317,15 @@ extern class AbstractSoundInstance extends EventDispatcher
 	private function _updatePosition():Dynamic;
 	
 	/**
+	* Internal function used to update the startTime of the audio.
+	*/
+	private function _updateStartTime():Dynamic;
+	
+	/**
 	* Internal function used to update the volume based on the instance volume, master volume, instance mute value,
 	*	and master mute value.
 	*/
 	private function _updateVolume():Dynamic;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getDuration exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Get the duration of the instance, in milliseconds.
-	*	Note a sound needs to be loaded before it will have duration, unless it was set manually to create an audio sprite.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    var soundDur = myInstance.getDuration();
-	*/
-	public function getDuration():Float;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/duration:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setDuration exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Set the duration of the audio.  Generally this is not called, but it can be used to create an audio sprite out of an existing AbstractSoundInstance.
-	* @param value The new duration time in milli seconds.
-	*/
-	public function setDuration(value:Float):AbstractSoundInstance;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getLoop exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	The number of play loops remaining. Negative values will loop infinitely.
-	*/
-	public function getLoop():Float;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/loop:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setLoop exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Set the number of play loops remaining.
-	* @param value The number of times to loop after play.
-	*/
-	public function setLoop(value:Float):Dynamic;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getMuted remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Get the mute value of the instance.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	     var isMuted = myInstance.getMuted();
-	*/
-	public function getMute():Bool;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/muted:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setMuted exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Mute and unmute the sound. Muted sounds will still play at 0 volume. Note that an unmuted sound may still be
-	*	silent depending on {{#crossLink "Sound"}}{{/crossLink}} volume, instance volume, and Sound muted.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    myInstance.setMuted(true);
-	* @param value If the sound should be muted.
-	*/
-	public function setMute(value:Bool):AbstractSoundInstance;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getPan remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Get the left/right pan of the instance. Note in WebAudioPlugin this only gives us the "x" value of what is
-	*	actually 3D audio.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    var myPan = myInstance.getPan();
-	*/
-	public function getPan():Float;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/pan:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getPan remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Set the left(-1)/right(+1) pan of the instance. Note that {{#crossLink "HTMLAudioPlugin"}}{{/crossLink}} does not
-	*	support panning, and only simple left/right panning has been implemented for {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
-	*	The default pan value is 0 (center).
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    myInstance.setPan(-1);  // to the left!
-	* @param value The pan value, between -1 (left) and 1 (right).
-	*/
-	public function setPan(value:Float):AbstractSoundInstance;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	and getPaused remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Returns true if the instance is currently paused.
-	*/
-	public function getPaused():Bool;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/paused:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setPaused remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Pause or resume the instance.  Note you can also resume playback with {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}}.
-	* @param value 
-	*/
-	public function setPaused(value:Bool):AbstractSoundInstance;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/playbackResource:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getPlaybackResource exists to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	An object containing any resources needed for audio playback, usually set by the plugin.
-	* @param value The new playback resource.
-	*/
-	public function setPlayback(value:Dynamic):Dynamic;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getPosition remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Get the position of the playhead of the instance in milliseconds.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	    var currentOffset = myInstance.getPosition();
-	*/
-	public function getPosition():Float;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/position:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setPosition remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Set the position of the playhead in the instance. This can be set while a sound is playing, paused, or
-	*	stopped.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	     myInstance.setPosition(myInstance.getDuration()/2); // set audio to its halfway point.
-	* @param value The position to place the playhead, in milliseconds.
-	*/
-	public function setPosition(value:Float):AbstractSoundInstance;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	getVolume remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Get the volume of the instance. The actual output volume of a sound can be calculated using:
-	*	<code>myInstance.getVolume() * createjs.Sound.getVolume();</code>
-	*/
-	public function getVolume():Float;
-	
-	/**
-	* NOTE {{#crossLink "AbstractSoundInstance/volume:property"}}{{/crossLink}} can be accessed directly as a property,
-	*	setVolume remains to allow support for IE8 with FlashAudioPlugin.
-	*	
-	*	Set the volume of the instance.
-	*	
-	*	<h4>Example</h4>
-	*	
-	*	     myInstance.setVolume(0.5);
-	*	
-	*	Note that the master volume set using the Sound API method {{#crossLink "Sound/setVolume"}}{{/crossLink}}
-	*	will be applied to the instance volume.
-	* @param value The volume to set, between 0 and 1.
-	*/
-	public function setVolume(value:Float):AbstractSoundInstance;
 	
 	/**
 	* Play an instance. This method is intended to be called on SoundInstances that already exist (created
@@ -401,22 +334,27 @@ extern class AbstractSoundInstance extends EventDispatcher
 	*	<h4>Example</h4>
 	*	
 	*	     var myInstance = createjs.Sound.createInstance(mySrc);
-	*	     myInstance.play({offset:1, loop:2, pan:0.5});	// options as object properties
-	*	     myInstance.play(createjs.Sound.INTERRUPT_ANY);	// options as parameters
+	*	     myInstance.play({interrupt:createjs.Sound.INTERRUPT_ANY, loop:2, pan:0.5});
 	*	
-	*	Note that if this sound is already playing, this call will do nothing.
-	* @param interrupt How to interrupt any currently playing instances of audio with the same source,
-	*	if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
-	*	constants on the Sound class, with the default defined by Sound {{#crossLink "Sound/defaultInterruptBehavior:property"}}{{/crossLink}}.
+	*	Note that if this sound is already playing, this call will still set the passed in parameters.
+	*	
+	*	<b>Parameters Deprecated</b><br />
+	*	The parameters for this method are deprecated in favor of a single parameter that is an Object or {{#crossLink "PlayPropsConfig"}}{{/crossLink}}.
+	* @param interrupt <b>This parameter will be renamed playProps in the next release.</b><br />
+	*	This parameter can be an instance of {{#crossLink "PlayPropsConfig"}}{{/crossLink}} or an Object that contains any or all optional properties by name,
+	*	including: interrupt, delay, offset, loop, volume, pan, startTime, and duration (see the above code sample).
 	*	<br /><strong>OR</strong><br />
-	*	This parameter can be an object that contains any or all optional properties by name, including: interrupt,
-	*	delay, offset, loop, volume, and pan (see the above code sample).
-	* @param delay The delay in milliseconds before the sound starts
-	* @param offset How far into the sound to begin playback, in milliseconds.
-	* @param loop The number of times to loop the audio. Use -1 for infinite loops.
-	* @param volume The volume of the sound, between 0 and 1.
-	* @param pan The pan of the sound between -1 (left) and 1 (right). Note that pan is not supported
-	*	for HTML Audio.
+	*	<b>Deprecated</b> How to interrupt any currently playing instances of audio with the same source,
+	*	if the maximum number of instances of the sound are already playing. Values are defined as <code>INTERRUPT_TYPE</code>
+	*	constants on the Sound class, with the default defined by {{#crossLink "Sound/defaultInterruptBehavior:property"}}{{/crossLink}}.
+	* @param delay <b>Deprecated</b> The amount of time to delay the start of audio playback, in milliseconds.
+	* @param offset <b>Deprecated</b> The offset from the start of the audio to begin playback, in milliseconds.
+	* @param loop <b>Deprecated</b> How many times the audio loops when it reaches the end of playback. The default is 0 (no
+	*	loops), and -1 can be used for infinite playback.
+	* @param volume <b>Deprecated</b> The volume of the sound, between 0 and 1. Note that the master volume is applied
+	*	against the individual volume.
+	* @param pan <b>Deprecated</b> The left-right pan of the sound (if supported), between -1 (left) and 1 (right).
+	*	Note that pan is not supported for HTML Audio.
 	*/
 	public function play(?interrupt:Dynamic, ?delay:Float, ?offset:Float, ?loop:Float, ?volume:Float, ?pan:Float):AbstractSoundInstance;
 	
@@ -433,13 +371,21 @@ extern class AbstractSoundInstance extends EventDispatcher
 	
 	/**
 	* Stop playback of the instance. Stopped sounds will reset their position to 0, and calls to {{#crossLink "AbstractSoundInstance/resume"}}{{/crossLink}}
-	*	will fail.  To start playback again, call {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}}.
+	*	will fail. To start playback again, call {{#crossLink "AbstractSoundInstance/play"}}{{/crossLink}}.
+	*	
+	*	If you don't want to lose your position use yourSoundInstance.paused = true instead. {{#crossLink "AbstractSoundInstance/paused"}}{{/crossLink}}.
 	*	
 	*	<h4>Example</h4>
 	*	
 	*	    myInstance.stop();
 	*/
 	public function stop():AbstractSoundInstance;
+	
+	/**
+	* Takes an PlayPropsConfig or Object with the same properties and sets them on this instance.
+	* @param playProps A PlayPropsConfig or object containing the same properties.
+	*/
+	public function applyPlayProps(playProps:Dynamic):AbstractSoundInstance;
 	
 	/**
 	* The sound has been interrupted.

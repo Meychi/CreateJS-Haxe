@@ -74,10 +74,11 @@ import js.html.ProgressEvent;
 *	    <li>{{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
 *	    {{#crossLink "AbstractLoader/loadManifest"}}{{/crossLink}}</li>
 *	    <li>{{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
-*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definiteions. This
+*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definitions. This
 *	    will also load sub-images, and provide a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance.</li>
 *	    <li>{{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}: SVG files</li>
 *	    <li>{{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
+*	    <li>{{#crossLink "AbstractLoader/VIDEO:property"}}{{/crossLink}}: Video objects</li>
 *	    <li>{{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}: XML data</li>
 *	</ul>
 *	
@@ -100,6 +101,7 @@ import js.html.ProgressEvent;
 *	    <li>SpriteSheet: A {{#crossLink "SpriteSheet"}}{{/crossLink}} instance, containing loaded images.
 *	    <li>SVG: An &lt;object /&gt; tag</li>
 *	    <li>Text: Raw text</li>
+*	    <li>Video: A Video DOM node</li>
 *	    <li>XML: An XML DOM node</li>
 *	</ul>
 *	
@@ -181,6 +183,11 @@ extern class LoadQueue extends AbstractLoader
 	* An array containing the queued items that have not yet started downloading.
 	*/
 	private var _loadQueue:Array<Dynamic>;
+	
+	/**
+	* An array of the plugins registered using {{#crossLink "LoadQueue/installPlugin"}}{{/crossLink}}.
+	*/
+	private var _plugins:Array<Dynamic>;
 	
 	/**
 	* An internal list of all the default Loaders that are included with PreloadJS. Before an item is loaded, the available loader list is iterated, in the order they are included, and as soon as a loader indicates it can handle the content, it will be selected. The default loader, ({{#crossLink "TextLoader"}}{{/crossLink}} is last in the list, so it will be used if no other match is found. Typically, loaders will match based on the {{#crossLink "LoadItem/type"}}{{/crossLink}}, which is automatically determined using the file extension of the {{#crossLink "LoadItem/src:property"}}{{/crossLink}}.  Loaders can be removed from PreloadJS by simply not including them.  Custom loaders installed using {{#crossLink "registerLoader"}}{{/crossLink}} will be prepended to this list so that they are checked first.
@@ -627,7 +634,7 @@ extern class LoadQueue extends AbstractLoader
 	public function installPlugin(plugin:Dynamic):Dynamic;
 	
 	/**
-	* Remove a custom loader added usig {{#crossLink "registerLoader"}}{{/crossLink}}. Only custom loaders can be
+	* Remove a custom loader added using {{#crossLink "registerLoader"}}{{/crossLink}}. Only custom loaders can be
 	*	unregistered, the default loaders will always be available.
 	* @param loader The AbstractLoader class to remove
 	*/
@@ -772,10 +779,11 @@ extern class LoadQueue extends AbstractLoader
 	*	    <li>{{#crossLink "AbstractLoader/MANIFEST:property"}}{{/crossLink}}: A list of files to load in JSON format, see
 	*	    {{#crossLink "AbstractLoader/loadManifest"}}{{/crossLink}}</li>
 	*	    <li>{{#crossLink "AbstractLoader/SOUND:property"}}{{/crossLink}}: Audio file formats</li>
-	*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definiteions. This
+	*	    <li>{{#crossLink "AbstractLoader/SPRITESHEET:property"}}{{/crossLink}}: JSON SpriteSheet definitions. This
 	*	    will also load sub-images, and provide a {{#crossLink "SpriteSheet"}}{{/crossLink}} instance.</li>
 	*	    <li>{{#crossLink "AbstractLoader/SVG:property"}}{{/crossLink}}: SVG files</li>
 	*	    <li>{{#crossLink "AbstractLoader/TEXT:property"}}{{/crossLink}}: Text files - XHR only</li>
+	*	    <li>{{#crossLink "AbstractLoader/VIDEO:property"}}{{/crossLink}}: Video objects</li>
 	*	    <li>{{#crossLink "AbstractLoader/XML:property"}}{{/crossLink}}: XML data</li>
 	*	</ul>
 	*	
@@ -798,6 +806,7 @@ extern class LoadQueue extends AbstractLoader
 	*	    <li>SpriteSheet: A {{#crossLink "SpriteSheet"}}{{/crossLink}} instance, containing loaded images.
 	*	    <li>SVG: An &lt;object /&gt; tag</li>
 	*	    <li>Text: Raw text</li>
+	*	    <li>Video: A Video DOM node</li>
 	*	    <li>XML: An XML DOM node</li>
 	*	</ul>
 	*	

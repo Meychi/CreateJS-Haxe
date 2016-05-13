@@ -15,8 +15,7 @@ extern class DataUtils
 	/**
 	* Parse XML using the DOM. This is required when preloading XML or SVG.
 	* @param text The raw text or XML that is loaded by XHR.
-	* @param type The mime type of the XML. Use "text/xml" for XML, and  "image/svg+xml" for SVG parsing.
 	*/
-	public static function parseXML(text:String, type:String):XML;
+	public static function parseXML(text:String):XML;
 	
 }

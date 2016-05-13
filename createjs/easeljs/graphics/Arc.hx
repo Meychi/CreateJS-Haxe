@@ -21,6 +21,12 @@ extern class Arc
 	public var y:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param x 
 	* @param y 
@@ -30,7 +36,5 @@ extern class Arc
 	* @param anticlockwise 
 	*/
 	public function new(x:Float, y:Float, radius:Float, startAngle:Float, endAngle:Float, anticlockwise:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

@@ -1,5 +1,7 @@
 package createjs.preloadjs;
 
+import js.html.XMLDocument;
+
 /**
 * A loader for CSS files.
 */

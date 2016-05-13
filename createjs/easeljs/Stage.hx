@@ -230,7 +230,7 @@ extern class Stage extends Container
 	*/
 	//public function clone():Dynamic;
 	
-	private function _dispatchMouseEvent(target:DisplayObject, type:String, bubbles:Bool, pointerId:Float, o:Dynamic, ?nativeEvent:MouseEvent):Dynamic;
+	private function _dispatchMouseEvent(target:DisplayObject, type:String, bubbles:Bool, pointerId:Float, o:Dynamic, ?nativeEvent:MouseEvent, ?relatedTarget:DisplayObject):Dynamic;
 	
 	private function _getElementRect(e:Element):Dynamic;
 	

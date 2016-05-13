@@ -289,7 +289,7 @@ extern class DisplayObject extends EventDispatcher
 	*	<h4>Example</h4>
 	*	
 	*	     var myGraphics = new createjs.Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
-	*	     var shape = stage.addChild(new Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
+	*	     var shape = stage.addChild(new createjs.Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
 	* @param props A generic object containing properties to copy to the DisplayObject instance.
 	*/
 	public function set(props:Dynamic):DisplayObject;
@@ -435,17 +435,28 @@ extern class DisplayObject extends EventDispatcher
 	public function setTransform(?x:Float, ?y:Float, ?scaleX:Float, ?scaleY:Float, ?rotation:Float, ?skewX:Float, ?skewY:Float, ?regX:Float, ?regY:Float):DisplayObject;
 	
 	/**
-	* Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
-	*	the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
+	* Tests whether the display object intersects the specified point in <em>local</em> coordinates (ie. draws a pixel
+	*	with alpha > 0 at the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation
+	*	of the display object.
 	*	
 	*	<h4>Example</h4>
 	*	
+	*			var myShape = new createjs.Shape();
+	*			myShape.graphics.beginFill("red").drawRect(100, 100, 20, 50);
+	*	
+	*			console.log(myShape.hitTest(10,10); // false
+	*			console.log(myShape.hitTest(110, 25); // true
+	*	
+	*	Note that to use Stage coordinates (such as {{#crossLink "Stage/mouseX:property"}}{{/crossLink}}), they must
+	*	first be converted to local coordinates:
+	*	
 	*	     stage.addEventListener("stagemousedown", handleMouseDown);
 	*	     function handleMouseDown(event) {
-	*	         var hit = myShape.hitTest(event.stageX, event.stageY);
+	*	     	var p = myShape.globalToLocal(stage.mouseX, stage.mouseY);
+	*	         var hit = myShape.hitTest(p.x, p.y);
 	*	     }
 	*	
-	*	Please note that shape-to-shape collision is not currently supported by EaselJS.
+	*	Shape-to-shape collision is not currently supported by EaselJS.
 	* @param x The x position to check in the display object's local coordinates.
 	* @param y The y position to check in the display object's local coordinates.
 	*/
@@ -462,7 +473,7 @@ extern class DisplayObject extends EventDispatcher
 	*	     displayObject.x = 300;
 	*	     displayObject.y = 200;
 	*	     stage.addChild(displayObject);
-	*	     var point = myDisplayObject.localToGlobal(100, 100);
+	*	     var point = displayObject.localToGlobal(100, 100);
 	*	     // Results in x=400, y=300
 	* @param x The x position in the source display object to transform.
 	* @param y The y position in the source display object to transform.
@@ -496,7 +507,7 @@ extern class DisplayObject extends EventDispatcher
 	*	     displayObject.x = 300;
 	*	     displayObject.y = 200;
 	*	     stage.addChild(displayObject);
-	*	     var point = myDisplayObject.globalToLocal(100, 100);
+	*	     var point = displayObject.globalToLocal(100, 100);
 	*	     // Results in x=-200, y=-100
 	* @param x The x position on the stage to transform.
 	* @param y The y position on the stage to transform.

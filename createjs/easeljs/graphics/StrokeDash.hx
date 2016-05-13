@@ -18,12 +18,16 @@ extern class StrokeDash
 	public var segments:Array<Dynamic>;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param segments 
 	* @param offset 
 	*/
 	public function new(?segments:Array<Dynamic>, ?offset:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

@@ -50,12 +50,16 @@ extern class Fill
 	public function radialGradient(colors:Array<Dynamic>, ratios:Array<Dynamic>, x0:Float, y0:Float, r0:Float, x1:Float, y1:Float, r1:Float):Fill;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param style A valid Context2D fillStyle.
 	* @param matrix 
 	*/
 	public function new(style:Dynamic, matrix:Matrix2D):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

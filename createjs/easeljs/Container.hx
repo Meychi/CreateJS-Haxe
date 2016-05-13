@@ -150,7 +150,7 @@ extern class Container extends DisplayObject
 	*	
 	*	<h4>Example</h4>
 	*	
-	*	     container.removeAlLChildren();
+	*		container.removeAllChildren();
 	*/
 	public function removeAllChildren():Dynamic;
 	

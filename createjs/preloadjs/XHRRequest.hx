@@ -70,7 +70,7 @@ extern class XHRRequest extends AbstractLoader
 	
 	/**
 	* Determine if there is an error in the current load. This checks the status of the request for problem codes. Note
-	*	that this does not check for an actual response. Currently, it only checks for 404 or 0 error code.
+	*	that this does not check for an actual response. Currently, it only checks for error codes between 400 and 599
 	*/
 	private function _checkError():Int;
 	

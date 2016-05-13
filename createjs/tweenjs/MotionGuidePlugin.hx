@@ -22,7 +22,8 @@ package createjs.tweenjs;
 *	     <LI> orient: Optional, string : "fixed"/"auto"/"cw"/"ccw"<UL>
 *					<LI>"fixed" forces the object to face down the path all movement (relative to start rotation),</LI>
 *	     		<LI>"auto" rotates the object along the path relative to the line.</LI>
-*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including flash like behaviour</LI>
+*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including Adobe Flash/Animate-like
+*	     		behaviour</LI>
 *			</UL></LI>
 *	</UL>
 *	Guide objects should not be shared between tweens even if all properties are identical, the library stores
@@ -58,7 +59,8 @@ extern class MotionGuidePlugin
 	*	     <LI> orient: Optional, string : "fixed"/"auto"/"cw"/"ccw"<UL>
 	*					<LI>"fixed" forces the object to face down the path all movement (relative to start rotation),</LI>
 	*	     		<LI>"auto" rotates the object along the path relative to the line.</LI>
-	*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including flash like behaviour</LI>
+	*	     		<LI>"cw"/"ccw" force clockwise or counter clockwise rotations including Adobe Flash/Animate-like
+	*	     		behaviour</LI>
 	*			</UL></LI>
 	*	</UL>
 	*	Guide objects should not be shared between tweens even if all properties are identical, the library stores

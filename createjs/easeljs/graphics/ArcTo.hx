@@ -19,6 +19,12 @@ extern class ArcTo
 	public var y2:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param x1 
 	* @param y1 
@@ -27,7 +33,5 @@ extern class ArcTo
 	* @param radius 
 	*/
 	public function new(x1:Float, y1:Float, x2:Float, y2:Float, radius:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

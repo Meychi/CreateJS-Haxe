@@ -122,7 +122,7 @@ extern class Matrix2D
 	* Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
 	*	For example, you can use this to generate a matrix representing the transformations of a display object:
 	*	
-	*		var mtx = new Matrix2D();
+	*		var mtx = new createjs.Matrix2D();
 	*		mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	* @param x 
 	* @param y 

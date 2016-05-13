@@ -25,6 +25,12 @@ extern class RoundRect
 	public var y:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param x 
 	* @param y 
@@ -36,7 +42,5 @@ extern class RoundRect
 	* @param radiusBL 
 	*/
 	public function new(x:Float, y:Float, w:Float, h:Float, radiusTL:Float, radiusTR:Float, radiusBR:Float, radiusBL:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

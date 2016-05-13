@@ -12,7 +12,7 @@ extern class DisplayProps
 	public var alpha:Float;
 	
 	/**
-	* Property representing the compositeOperation that will be applied to a display object. You can find a list of valid composite operations at: <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
+	* Property representing the compositeOperation that will be applied to a display object. You can find a list of valid composite operations at: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing">https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing</a>
 	*/
 	public var compositeOperation:String;
 	

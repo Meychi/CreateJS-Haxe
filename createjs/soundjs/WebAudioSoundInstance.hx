@@ -1,5 +1,6 @@
 package createjs.soundjs;
 
+import js.html.audio.AudioBufferSourceNode;
 import js.html.audio.AudioContext;
 import js.html.audio.AudioNode;
 import js.html.audio.GainNode;
@@ -37,6 +38,11 @@ extern class WebAudioSoundInstance extends AbstractSoundInstance
 	* NOTE this is only intended for use by advanced users. <br />sourceNode is the audio source. Connected to WebAudioSoundInstance {{#crossLink "WebAudioSoundInstance/panNode:property"}}{{/crossLink}}.
 	*/
 	public var sourceNode:AudioNode;
+	
+	/**
+	* Note this is only intended for use by advanced users. <br />The scratch buffer that will be assigned to the buffer property of a source node on close.   This is and should be the same scratch buffer referenced by {{#crossLink "WebAudioPlugin"}}{{/crossLink}}.
+	*/
+	public static var _scratchBuffer:AudioBufferSourceNode;
 	
 	/**
 	* NOTE this is only intended for use by very advanced users. _sourceNodeNext is the audio source for the next loop, inserted in a look ahead approach to allow for smooth looping. Connected to {{#crossLink "WebAudioSoundInstance/gainNode:property"}}{{/crossLink}}.

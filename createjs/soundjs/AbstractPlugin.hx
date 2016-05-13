@@ -12,9 +12,14 @@ extern class AbstractPlugin
 	private var _audioSources:Dynamic;
 	
 	/**
-	* The capabilities of the plugin. This is generated via the {{#crossLink "WebAudioPlugin/_generateCapabilities:method"}}{{/crossLink}} method and is used internally.
+	* The capabilities of the plugin. This is generated via the _generateCapabilities method and is used internally.
 	*/
 	public static var _capabilities:Dynamic;
+	
+	/**
+	* The internal master volume value of the plugin.
+	*/
+	private var _volume:Float;
 	
 	/**
 	* <strong>REMOVED</strong>. Removed in favor of using `MySuperClass_constructor`.
@@ -90,10 +95,9 @@ extern class AbstractPlugin
 	*	Note all plugins provide a <code>Loader</code> instance, which <a href="http://preloadjs.com" target="_blank">PreloadJS</a>
 	*	can use to assist with preloading.
 	* @param loadItem An Object containing the source of the audio
-	* @param instances The number of concurrently playing instances to allow for the channel at any time.
 	*	Note that not every plugin will manage this value.
 	*/
-	public function register(loadItem:String, instances:Float):Dynamic;
+	public function register(loadItem:String):Dynamic;
 	
 	/**
 	* Remove a sound added using {{#crossLink "WebAudioPlugin/register"}}{{/crossLink}}. Note this does not cancel a preload.

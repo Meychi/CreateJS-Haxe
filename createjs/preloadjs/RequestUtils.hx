@@ -27,25 +27,7 @@ extern class RequestUtils
 	* @param data Object used to append values to this request as a query string. Existing parameters on the
 	*	path will be preserved.
 	*/
-	public static function buildPath(src:String, ?data:Dynamic):String;
-	
-	/**
-	* Check if item is a valid HTMLAudioElement
-	* @param item 
-	*/
-	public static function isAudioTag(item:Dynamic):Bool;
-	
-	/**
-	* Check if item is a valid HTMLImageElement
-	* @param item 
-	*/
-	public static function isImageTag(item:Dynamic):Bool;
-	
-	/**
-	* Check if item is a valid HTMLVideoElement
-	* @param item 
-	*/
-	public static function isVideoTag(item:Dynamic):Bool;
+	public static function buildURI(src:String, ?data:Dynamic):String;
 	
 	/**
 	* Determine if a specific type is a text-based asset, and should be loaded as UTF-8.

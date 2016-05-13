@@ -17,6 +17,12 @@ extern class QuadraticCurveTo
 	public var y:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param cpx 
 	* @param cpy 
@@ -24,7 +30,5 @@ extern class QuadraticCurveTo
 	* @param y 
 	*/
 	public function new(cpx:Float, cpy:Float, x:Float, y:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

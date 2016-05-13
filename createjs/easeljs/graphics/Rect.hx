@@ -17,6 +17,12 @@ extern class Rect
 	public var y:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param x 
 	* @param y 
@@ -24,7 +30,5 @@ extern class Rect
 	* @param h 
 	*/
 	public function new(x:Float, y:Float, w:Float, h:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

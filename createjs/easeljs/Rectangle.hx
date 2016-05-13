@@ -43,16 +43,25 @@ extern class Rectangle
 	* Adds the specified padding to the rectangle's bounds.
 	* @param top 
 	* @param left 
-	* @param right 
 	* @param bottom 
+	* @param right 
 	*/
-	public function extend(?top:Float, ?left:Float, ?right:Float, ?bottom:Float):Rectangle;
+	public function pad(top:Float, left:Float, bottom:Float, right:Float):Rectangle;
 	
 	/**
 	* Copies all properties from the specified rectangle to this rectangle.
 	* @param rectangle The rectangle to copy properties from.
 	*/
 	public function copy(rectangle:Rectangle):Rectangle;
+	
+	/**
+	* Extends the rectangle's bounds to include the described point or rectangle.
+	* @param x X position of the point or rectangle.
+	* @param y Y position of the point or rectangle.
+	* @param width The width of the rectangle.
+	* @param height The height of the rectangle.
+	*/
+	public function extend(x:Float, y:Float, ?width:Float, ?height:Float):Rectangle;
 	
 	/**
 	* Represents a rectangle as defined by the points (x, y) and (x+width, y+height).

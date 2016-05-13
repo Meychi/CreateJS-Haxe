@@ -250,6 +250,13 @@ extern class AbstractLoader extends EventDispatcher
 	*/
 	public function setTag(tag:Dynamic):Dynamic;
 	
+	/**
+	* The "error" callback passed to {{#crossLink "AbstractLoader/resultFormatter"}}{{/crossLink}} asynchronous
+	*	functions.
+	* @param error The error event
+	*/
+	private function _resultFormatSuccess(error:Dynamic):Dynamic;
+	
 	private function buildPath():Dynamic;
 	
 	public function toString():String;

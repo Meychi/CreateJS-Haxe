@@ -8,6 +8,11 @@ package createjs.preloadjs;
 extern class AbstractMediaLoader extends AbstractLoader
 {
 	/**
+	* Before the item loads, set its mimeType and responseType.
+	*/
+	private var _updateXHR:Dynamic;
+	
+	/**
 	* Creates a new tag for loading if it doesn't exist yet.
 	*/
 	//private function _createTag():Dynamic;

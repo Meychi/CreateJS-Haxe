@@ -23,14 +23,19 @@ extern class StrokeStyle
 	public var width:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param width 
 	* @param caps 
 	* @param joints 
 	* @param miterLimit 
+	* @param ignoreScale 
 	*/
-	public function new(width:Float, ?caps:String, ?joints:String, ?miterLimit:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	public function new(width:Float, ?caps:String, ?joints:String, ?miterLimit:Float, ?ignoreScale:Bool):Void;
 	
 }

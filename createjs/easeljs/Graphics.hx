@@ -108,7 +108,7 @@ extern class Graphics
 	public static var beginCmd:BeginPath;
 	
 	/**
-	* Holds a reference to the last command that was created or appended. For example, you could retain a reference to a Fill command in order to dynamically update the color later by using: 		myFill = myGraphics.beginFill("red").command; 		// update color later: 		myFill.style = "yellow";
+	* Holds a reference to the last command that was created or appended. For example, you could retain a reference to a Fill command in order to dynamically update the color later by using:  		var myFill = myGraphics.beginFill("red").command; 		// update color later: 		myFill.style = "yellow";
 	*/
 	public var command:Dynamic;
 	
@@ -191,7 +191,7 @@ extern class Graphics
 	*			myShape.color = "red";
 	*	
 	*			// append a Circle command object:
-	*			myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	*			myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
 	*	
 	*			// append a custom command object with an exec method that sets the fill style
 	*			// based on the shape's data, and then fills the circle.
@@ -410,7 +410,8 @@ extern class Graphics
 	
 	/**
 	* Draws a line from the current drawing point to the specified position, which become the new current drawing
-	*	point. A tiny API method "lt" also exists.
+	*	point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
+	*	A tiny API method "lt" also exists.
 	*	
 	*	For detailed information, read the
 	*	<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
@@ -419,6 +420,17 @@ extern class Graphics
 	* @param y The y coordinate the drawing point should draw to.
 	*/
 	public function lineTo(x:Float, y:Float):Graphics;
+	
+	/**
+	* Draws a quadratic curve from the current drawing point to (x, y) using the control point (cpx, cpy). For detailed
+	*	information, read the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-quadraticcurveto">
+	*	whatwg spec</a>. A tiny API method "qt" also exists.
+	* @param cpx 
+	* @param cpy 
+	* @param x 
+	* @param y 
+	*/
+	public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
 	
 	/**
 	* Draws a rectangle at (x, y) with the specified width and height using the current fill and/or stroke.
@@ -558,7 +570,7 @@ extern class Graphics
 	* @param x 
 	* @param y 
 	*/
-	public function quadraticCurveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
+	public function curveTo(cpx:Float, cpy:Float, x:Float, y:Float):Graphics;
 	
 	/**
 	* Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}

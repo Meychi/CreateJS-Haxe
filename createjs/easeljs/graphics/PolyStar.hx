@@ -21,6 +21,12 @@ extern class PolyStar
 	public var y:Float;
 	
 	/**
+	* Execute the Graphics command in the provided Canvas context.
+	* @param ctx The canvas rendering context
+	*/
+	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
+	
+	/**
 	* Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	* @param x 
 	* @param y 
@@ -30,7 +36,5 @@ extern class PolyStar
 	* @param angle 
 	*/
 	public function new(x:Float, y:Float, radius:Float, sides:Float, pointSize:Float, angle:Float):Void;
-	
-	public function exec(ctx:CanvasRenderingContext2D):Dynamic;
 	
 }

@@ -35,6 +35,11 @@ extern class LoadItem
 	public var values:Dynamic;
 	
 	/**
+	* Default duration in milliseconds to wait before a request times out. This only applies to tag-based and and XHR (level one) loading, as XHR (level 2) provides its own timeout event.
+	*/
+	public static var LOAD_TIMEOUT_DEFAULT:Float;
+	
+	/**
 	* Determines if a manifest will maintain the order of this item, in relation to other items in the manifest that have also set the `maintainOrder` property to `true`. This only applies when the max connections has been set above 1 (using {{#crossLink "LoadQueue/setMaxConnections"}}{{/crossLink}}). Everything with this property set to `false` will finish as it is loaded. Ordered items are combined with script tags loading in order when {{#crossLink "LoadQueue/maintainScriptOrder:property"}}{{/crossLink}} is set to `true`.
 	*/
 	public var maintainOrder:Bool;
@@ -65,12 +70,12 @@ extern class LoadItem
 	public var method:String;
 	
 	/**
-	* The source of the file that is being loaded. This property is <b>required</b>. The source can either be a string (recommended), or an HTML tag.</li>
+	* The source of the file that is being loaded. This property is <b>required</b>. The source can either be a string (recommended), or an HTML tag. This can also be an object, but in that case it has to include a type and be handled by a plugin.
 	*/
 	public var src:String;
 	
 	/**
-	* The source of the file that is being loaded. This property is <strong>required</strong>. The source can either be a string (recommended), or an HTML tag. See the {{#crossLink "AbstractLoader"}}{{/crossLink}} class for the full list of supported types.
+	* The type file that is being loaded. The type of the file is usually inferred by the extension, but can also be set manually. This is helpful in cases where a file does not have an extension.
 	*/
 	public var type:String;
 	
@@ -83,11 +88,11 @@ extern class LoadItem
 	public function new():Void;
 	
 	/**
-	* Create/validate a LoadItem.
+	* Create a LoadItem.
 	*	<ul>
 	*	    <li>String-based items are converted to a LoadItem with a populated {{#crossLink "src:property"}}{{/crossLink}}.</li>
 	*	    <li>LoadItem instances are returned as-is</li>
-	*	    <li>Objectss are returned as-is</li>
+	*	    <li>Objects are returned with any needed properties added</li>
 	*	</ul>
 	* @param value The load item value
 	*/
