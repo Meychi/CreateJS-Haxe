@@ -1,7 +1,7 @@
 package createjs.easeljs;
 
 import js.html.CanvasRenderingContext2D;
-import js.html.Point;
+import js.html.DOMPoint;
 
 /**
 * DisplayObject is an abstract class that should not be constructed directly. Instead construct subclasses such as
@@ -479,7 +479,7 @@ extern class DisplayObject extends EventDispatcher
 	* @param y The y position in the source display object to transform.
 	* @param pt An object to copy the result into. If omitted a new Point object with x/y properties will be returned.
 	*/
-	public function localToGlobal(x:Float, y:Float, ?pt:Dynamic):Point;
+	public function localToGlobal(x:Float, y:Float, ?pt:Dynamic):DOMPoint;
 	
 	/**
 	* Transforms the specified x and y position from the coordinate space of this display object to the coordinate

@@ -1,6 +1,6 @@
 package createjs.easeljs;
 
-import js.html.Point;
+import js.html.DOMPoint;
 
 /**
 * Represents a point on a 2 dimensional x / y coordinate system.
@@ -51,7 +51,7 @@ extern class Point
 	/**
 	* Returns a clone of the Point instance.
 	*/
-	public function clone():Point;
+	public function clone():DOMPoint;
 	
 	/**
 	* Returns a string representation of this object.

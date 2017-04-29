@@ -1,6 +1,6 @@
 package createjs.easeljs;
 
-import js.html.Point;
+import js.html.DOMPoint;
 
 /**
 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
@@ -256,7 +256,7 @@ extern class Matrix2D
 	* @param y The y component of the point to transform.
 	* @param pt An object to copy the result into. If omitted a generic object with x/y properties will be returned.
 	*/
-	public function transformPoint(x:Float, y:Float, ?pt:Dynamic):Point;
+	public function transformPoint(x:Float, y:Float, ?pt:Dynamic):DOMPoint;
 	
 	/**
 	* Translates the matrix on the x and y axes.
