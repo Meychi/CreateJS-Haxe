@@ -57,7 +57,7 @@ extern class LoadItem
 	/**
 	* Sets the crossOrigin attribute for CORS-enabled images loading cross-domain.
 	*/
-	public var crossOrigin:Boolean;
+	public var crossOrigin:Bool;
 	
 	/**
 	* The duration in milliseconds to wait before a request times out. This only applies to tag-based and and XHR (level one) loading, as XHR (level 2) provides its own timeout event.

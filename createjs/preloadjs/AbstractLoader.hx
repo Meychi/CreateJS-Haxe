@@ -258,7 +258,4 @@ extern class AbstractLoader extends EventDispatcher
 	private function _resultFormatSuccess(error:Dynamic):Dynamic;
 	
 	private function buildPath():Dynamic;
-	
-	public function toString():String;
-	
 }
